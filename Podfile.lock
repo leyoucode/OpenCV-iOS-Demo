@@ -1,0 +1,15 @@
+PODS:
+  - OpenCV (3.1.0.1)
+  - SnapKit (3.0.2)
+
+DEPENDENCIES:
+  - OpenCV (~> 3.1.0.1)
+  - SnapKit (~> 3.0.0)
+
+SPEC CHECKSUMS:
+  OpenCV: 41c4250e2b06a394d6fbb634b5fa622cdd846018
+  SnapKit: 2e456761aa92d4d4067a7a5594c18769d451a8ad
+
+PODFILE CHECKSUM: b3b45dbe669235858b205bfa4d2b894fdfbb47d1
+
+COCOAPODS: 1.1.0.beta.2
