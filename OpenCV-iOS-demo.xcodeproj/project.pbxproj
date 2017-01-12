@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		C475CF8670EA98DC5AF1F9A5 /* Pods_OpenCV_iOS_demo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 495A4B7ED13F512899B4D569 /* Pods_OpenCV_iOS_demo.framework */; };
 		FE00839D1E272D7800299936 /* OpenCVWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE00839C1E272D7800299936 /* OpenCVWrapper.mm */; };
+		FE0083A21E2784D900299936 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083A11E2784D900299936 /* ViewController.mm */; };
 		FEF47F8D1E2645B500AF034B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF47F8C1E2645B500AF034B /* AppDelegate.swift */; };
-		FEF47F8F1E2645B500AF034B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF47F8E1E2645B500AF034B /* ViewController.swift */; };
 		FEF47F921E2645B500AF034B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FEF47F901E2645B500AF034B /* Main.storyboard */; };
 		FEF47F941E2645B500AF034B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FEF47F931E2645B500AF034B /* Assets.xcassets */; };
 		FEF47F971E2645B500AF034B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FEF47F951E2645B500AF034B /* LaunchScreen.storyboard */; };
@@ -24,9 +24,10 @@
 		FE00839B1E272D7800299936 /* OpenCVWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenCVWrapper.h; sourceTree = "<group>"; };
 		FE00839C1E272D7800299936 /* OpenCVWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenCVWrapper.mm; sourceTree = "<group>"; };
 		FE00839E1E27724800299936 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
+		FE0083A01E2784D900299936 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		FE0083A11E2784D900299936 /* ViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
 		FEF47F891E2645B500AF034B /* OpenCV-iOS-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "OpenCV-iOS-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEF47F8C1E2645B500AF034B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		FEF47F8E1E2645B500AF034B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		FEF47F911E2645B500AF034B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		FEF47F931E2645B500AF034B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FEF47F961E2645B500AF034B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -85,7 +86,6 @@
 			isa = PBXGroup;
 			children = (
 				FEF47F8C1E2645B500AF034B /* AppDelegate.swift */,
-				FEF47F8E1E2645B500AF034B /* ViewController.swift */,
 				FEF47F901E2645B500AF034B /* Main.storyboard */,
 				FEF47F931E2645B500AF034B /* Assets.xcassets */,
 				FEF47F951E2645B500AF034B /* LaunchScreen.storyboard */,
@@ -93,6 +93,8 @@
 				FE00839B1E272D7800299936 /* OpenCVWrapper.h */,
 				FE00839C1E272D7800299936 /* OpenCVWrapper.mm */,
 				FE00839A1E272D7700299936 /* OpenCV-iOS-demo-Bridging-Header.h */,
+				FE0083A01E2784D900299936 /* ViewController.h */,
+				FE0083A11E2784D900299936 /* ViewController.mm */,
 			);
 			path = "OpenCV-iOS-demo";
 			sourceTree = "<group>";
@@ -222,7 +224,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FEF47F8F1E2645B500AF034B /* ViewController.swift in Sources */,
+				FE0083A21E2784D900299936 /* ViewController.mm in Sources */,
 				FEF47F8D1E2645B500AF034B /* AppDelegate.swift in Sources */,
 				FE00839D1E272D7800299936 /* OpenCVWrapper.mm in Sources */,
 			);
