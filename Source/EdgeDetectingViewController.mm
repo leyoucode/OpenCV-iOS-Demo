@@ -104,7 +104,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 //        [CATransaction begin];
 //        [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
 //        [CATransaction setAnimationDuration:0.4];
-//        // hide all the drawing layers
+////        // hide all the drawing layers
 //        for (CALayer *layer in sublayers) {
 //            NSString *layerName = [layer name];
 //            if ([layerName isEqualToString:@"DrawingLayer"])
@@ -154,42 +154,44 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 //        [featureLayer setFrame:_videoPreviewLayer.frame];
 //        [featureLayer setNeedsDisplay];
         
-//        
-        if (aggregateRectangle)
-        {
-            [rectangleCALayer setFrame:_videoPreviewLayer.frame];
+//
+        //NSLog(@"aggregateRectangle => %@",aggregateRectangle);
+        
+//        if (aggregateRectangle)
+//        {
+            //[rectangleCALayer setFrame:_videoPreviewLayer.frame];
             [rectangleCALayer updateDetect:aggregateRectangle];
-        }
+//        }
         
         
 //        [CATransaction commit];
     }
 }
 
-- (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)context {
-    
-    NSLog(@"aggregateRectangle => %@",aggregateRectangle);
-    
-    if ( aggregateRectangle ){
-        
-        
-        CGContextSetLineWidth(context, 2.0);
-        CGContextSetStrokeColorWithColor(context, [[UIColor greenColor] CGColor]);
-        CGContextSetFillColorWithColor(context, [[UIColor colorWithWhite:1 alpha:0.25] CGColor]);
-        
-        CGContextMoveToPoint(context, aggregateRectangle.topLeftX, aggregateRectangle.topLeftY);
-        
-        CGContextAddLineToPoint(context, aggregateRectangle.topRightX, aggregateRectangle.topRightY);
-        
-        CGContextAddLineToPoint(context, aggregateRectangle.bottomRightX, aggregateRectangle.bottomRightY);
-        
-        CGContextAddLineToPoint(context, aggregateRectangle.bottomLeftX, aggregateRectangle.bottomLeftY);
-        
-        CGContextAddLineToPoint(context, aggregateRectangle.topLeftX, aggregateRectangle.topLeftY);
-        
-        CGContextDrawPath(context, kCGPathFillStroke);
-    }
-}
+//- (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)context {
+//    
+//    NSLog(@"aggregateRectangle => %@",aggregateRectangle);
+//    
+//    if ( aggregateRectangle ){
+//        
+//        
+//        CGContextSetLineWidth(context, 2.0);
+//        CGContextSetStrokeColorWithColor(context, [[UIColor greenColor] CGColor]);
+//        CGContextSetFillColorWithColor(context, [[UIColor colorWithWhite:1 alpha:0.25] CGColor]);
+//        
+//        CGContextMoveToPoint(context, aggregateRectangle.topLeftX, aggregateRectangle.topLeftY);
+//        
+//        CGContextAddLineToPoint(context, aggregateRectangle.topRightX, aggregateRectangle.topRightY);
+//        
+//        CGContextAddLineToPoint(context, aggregateRectangle.bottomRightX, aggregateRectangle.bottomRightY);
+//        
+//        CGContextAddLineToPoint(context, aggregateRectangle.bottomLeftX, aggregateRectangle.bottomLeftY);
+//        
+//        CGContextAddLineToPoint(context, aggregateRectangle.topLeftX, aggregateRectangle.topLeftY);
+//        
+//        CGContextDrawPath(context, kCGPathFillStroke);
+//    }
+//}
 
 
 
