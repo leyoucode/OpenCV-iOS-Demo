@@ -161,7 +161,7 @@ void find_squares(cv::Mat& image, cv::vector<cv::vector<cv::Point>>&squares) {
                         double cosine = fabs(angle(approx[j%4], approx[j-2], approx[j-1]));
                         maxCosine = MAX(maxCosine, cosine);
                     }
-                    
+ 
                     if (maxCosine < 0.3)
                         squares.push_back(approx);
                 }

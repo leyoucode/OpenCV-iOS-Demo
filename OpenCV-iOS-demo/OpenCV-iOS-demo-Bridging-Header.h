@@ -20,4 +20,4 @@
 #endif
 
 #import "OpenCVWrapper.h"
-#import "CannyEdgeDetectingViewController.h"
+//#import "CannyEdgeDetectingViewController.h"
