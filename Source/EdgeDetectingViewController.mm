@@ -159,7 +159,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
         
 //        if (aggregateRectangle)
 //        {
-            //[rectangleCALayer setFrame:_videoPreviewLayer.frame];
+            [rectangleCALayer setFrame:_videoPreviewLayer.frame];
             [rectangleCALayer updateDetect:aggregateRectangle];
 //        }
         

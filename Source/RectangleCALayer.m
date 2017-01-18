@@ -53,6 +53,7 @@
      
         NSLog(@"开始 Detecting...");
         
+        /*
         int w1 = abs(rectangle.topRightX - rectangle.topLeftX);
         int w2 = abs(rectangle.topRightX - rectangle.bottomLeftX);
         int w3 = abs(rectangle.bottomRightX - rectangle.bottomLeftX);
@@ -67,21 +68,11 @@
         int maxWidth = MAX(MAX(w1,w2),MAX(w3,w4));
         int maxHeight = MAX(MAX(h1,h2),MAX(h3,h4));
         
-//        [UIView animateWithDuration:1.4 animations:^{
-//            
-            self.frame = CGRectMake(MIN(rectangle.topLeftX, rectangle.bottomLeftX),
+        self.frame = CGRectMake(MIN(rectangle.topLeftX, rectangle.bottomLeftX),
                                     MIN(rectangle.topLeftY, rectangle.bottomLeftY),
                                     maxWidth,
                                     maxHeight);
-//
-//        } completion:^(BOOL finished) {
-//            
-//            if (finished)
-//            {
-//                isDetecting = NO;
-//                NSLog(@"动画执行完毕");
-//            }
-//        }];
+         */
         [self setNeedsDisplay];
         
         [CATransaction begin];
@@ -109,6 +100,7 @@
     
     if ( _newRectangle ){
         
+        /*
         UIGraphicsPushContext(context);
         
         UIBezierPath* bezierPath = [UIBezierPath bezierPath];
@@ -171,24 +163,24 @@
         [bezierPath stroke];
         [bezierPath fill];
         
+        */
         
         
-//        
-//        CGContextSetLineWidth(context, 2.0);
-//        CGContextSetStrokeColorWithColor(context, [[UIColor greenColor] CGColor]);
-//        CGContextSetFillColorWithColor(context, [[UIColor colorWithWhite:1 alpha:0.25] CGColor]);
-//        
-//        CGContextMoveToPoint(context, _newRectangle.topLeftX, _newRectangle.topLeftY);
-//        
-//        CGContextAddLineToPoint(context, _newRectangle.topRightX, _newRectangle.topRightY);
-//        
-//        CGContextAddLineToPoint(context, _newRectangle.bottomRightX, _newRectangle.bottomRightY);
-//        
-//        CGContextAddLineToPoint(context, _newRectangle.bottomLeftX, _newRectangle.bottomLeftY);
-//        
-//        CGContextAddLineToPoint(context, _newRectangle.topLeftX, _newRectangle.topLeftY);
-//        
-//        CGContextDrawPath(context, kCGPathFillStroke);
+        CGContextSetLineWidth(context, 2.0);
+        CGContextSetStrokeColorWithColor(context, [[UIColor greenColor] CGColor]);
+        CGContextSetFillColorWithColor(context, [[UIColor colorWithWhite:1 alpha:0.05] CGColor]);
+        
+        CGContextMoveToPoint(context, _newRectangle.topLeftX, _newRectangle.topLeftY);
+        
+        CGContextAddLineToPoint(context, _newRectangle.topRightX, _newRectangle.topRightY);
+        
+        CGContextAddLineToPoint(context, _newRectangle.bottomRightX, _newRectangle.bottomRightY);
+        
+        CGContextAddLineToPoint(context, _newRectangle.bottomLeftX, _newRectangle.bottomLeftY);
+        
+        CGContextAddLineToPoint(context, _newRectangle.topLeftX, _newRectangle.topLeftY);
+        
+        CGContextDrawPath(context, kCGPathFillStroke);
     }
     
 }
