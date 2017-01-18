@@ -83,6 +83,7 @@ Rectangle * aggregateRectangle;
     long end = [[NSDate date] timeIntervalSince1970 ] * 1000;
     
     long difference = end - start;
+    
     NSLog(@"%@", [NSString stringWithFormat:@"Millis to calculate: %ld", difference]);
     
     dispatch_sync(dispatch_get_main_queue(), ^{
