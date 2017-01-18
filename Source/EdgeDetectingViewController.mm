@@ -103,7 +103,7 @@ Rectangle * aggregateRectangle;
         
         [CATransaction begin];
         [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
-        [CATransaction setAnimationDuration:2.4];
+        [CATransaction setAnimationDuration:0.4];
         // hide all the drawing layers
         for (CALayer *layer in sublayers) {
             NSString *layerName = [layer name];
@@ -175,6 +175,8 @@ Rectangle * aggregateRectangle;
     NSLog(@"aggregateRectangle => %@",aggregateRectangle);
     
     if ( aggregateRectangle ){
+        
+        
         CGContextSetLineWidth(context, 2.0);
         CGContextSetStrokeColorWithColor(context, [[UIColor greenColor] CGColor]);
         CGContextSetFillColorWithColor(context, [[UIColor colorWithWhite:1 alpha:0.25] CGColor]);
