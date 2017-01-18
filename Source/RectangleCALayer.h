@@ -10,10 +10,8 @@
 
 @class Rectangle;
 
-@interface RectangleCALayer : CALayer{
-    Rectangle * rectangle;
-}
+@interface RectangleCALayer : CALayer
 
-@property (nonatomic, strong) Rectangle * rectangle;
+-(void)updateDetect:(Rectangle *)rectangle;
 
 @end

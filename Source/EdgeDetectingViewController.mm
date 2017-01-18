@@ -25,12 +25,12 @@ NSObject * queueLockObject = [[NSObject alloc] init];
 NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
 
 Rectangle * aggregateRectangle;
-//RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
+RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-//    [_videoPreviewLayer addSublayer:rectangleCALayer];
+    [_videoPreviewLayer addSublayer:rectangleCALayer];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -97,19 +97,19 @@ Rectangle * aggregateRectangle;
     
     @synchronized (self) {
         
-        NSArray *sublayers = [NSArray arrayWithArray:[_videoPreviewLayer sublayers]];
-        int sublayersCount = (int) [sublayers count];
-        int currentSublayer = 0;
-        
-        [CATransaction begin];
-        [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
-        [CATransaction setAnimationDuration:0.4];
-        // hide all the drawing layers
-        for (CALayer *layer in sublayers) {
-            NSString *layerName = [layer name];
-            if ([layerName isEqualToString:@"DrawingLayer"])
-                [layer setHidden:YES];
-        }
+//        NSArray *sublayers = [NSArray arrayWithArray:[_videoPreviewLayer sublayers]];
+//        int sublayersCount = (int) [sublayers count];
+//        int currentSublayer = 0;
+//        
+//        [CATransaction begin];
+//        [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+//        [CATransaction setAnimationDuration:0.4];
+//        // hide all the drawing layers
+//        for (CALayer *layer in sublayers) {
+//            NSString *layerName = [layer name];
+//            if ([layerName isEqualToString:@"DrawingLayer"])
+//                [layer setHidden:YES];
+//        }
         
         CGAffineTransform t = [self affineTransformForVideoFrame:rect orientation:videoOrientation];
         
@@ -132,41 +132,37 @@ Rectangle * aggregateRectangle;
         }
         
         
-        CALayer *featureLayer = nil;
-        
-        // re-use an existing layer if possible
-        while ( !featureLayer && (currentSublayer < sublayersCount) ) {
-            CALayer *currentLayer = [sublayers objectAtIndex:currentSublayer++];
-            if ( [[currentLayer name] isEqualToString:@"DrawingLayer"] ) {
-                featureLayer = currentLayer;
-                [currentLayer setHidden:NO];
-            }
-        }
-        
-        // create a new one if necessary
-        if ( !featureLayer ) {
-            featureLayer = [CALayer new];
-            featureLayer.delegate = self;
-            [featureLayer setName:@"DrawingLayer"];
-            [_videoPreviewLayer addSublayer:featureLayer];
-        }
-        
-        [featureLayer setFrame:_videoPreviewLayer.frame];
-        [featureLayer setNeedsDisplay];
-        
+//        CALayer *featureLayer = nil;
 //        
-//        if (aggregateRectangle)
-//        {
-//            [rectangleCALayer setFrame:CGRectMake(
-//                                                  aggregateRectangle.topLeftX,
-//                                                  aggregateRectangle.topLeftY,
-//                                                  std::abs(aggregateRectangle.topRightX - aggregateRectangle.topLeftX),
-//                                                  std::abs(aggregateRectangle.bottomLeftY - aggregateRectangle.topLeftY))];
+//        // re-use an existing layer if possible
+//        while ( !featureLayer && (currentSublayer < sublayersCount) ) {
+//            CALayer *currentLayer = [sublayers objectAtIndex:currentSublayer++];
+//            if ( [[currentLayer name] isEqualToString:@"DrawingLayer"] ) {
+//                featureLayer = currentLayer;
+//                [currentLayer setHidden:NO];
+//            }
 //        }
 //        
-//        [rectangleCALayer setNeedsDisplay];
+//        // create a new one if necessary
+//        if ( !featureLayer ) {
+//            featureLayer = [CALayer new];
+//            featureLayer.delegate = self;
+//            [featureLayer setName:@"DrawingLayer"];
+//            [_videoPreviewLayer addSublayer:featureLayer];
+//        }
+//        
+//        [featureLayer setFrame:_videoPreviewLayer.frame];
+//        [featureLayer setNeedsDisplay];
         
-        [CATransaction commit];
+//        
+        if (aggregateRectangle)
+        {
+            [rectangleCALayer setFrame:_videoPreviewLayer.frame];
+            [rectangleCALayer updateDetect:aggregateRectangle];
+        }
+        
+        
+//        [CATransaction commit];
     }
 }
 
