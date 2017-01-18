@@ -25,10 +25,12 @@ NSObject * queueLockObject = [[NSObject alloc] init];
 NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
 
 Rectangle * aggregateRectangle;
+//RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+//    [_videoPreviewLayer addSublayer:rectangleCALayer];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -101,7 +103,7 @@ Rectangle * aggregateRectangle;
         
         [CATransaction begin];
         [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
-        [CATransaction setAnimationDuration:0.4];
+        [CATransaction setAnimationDuration:2.4];
         // hide all the drawing layers
         for (CALayer *layer in sublayers) {
             NSString *layerName = [layer name];
@@ -129,6 +131,7 @@ Rectangle * aggregateRectangle;
             aggregateRectangle.bottomRightY = transformedBottomRight.y;
         }
         
+        
         CALayer *featureLayer = nil;
         
         // re-use an existing layer if possible
@@ -151,6 +154,18 @@ Rectangle * aggregateRectangle;
         [featureLayer setFrame:_videoPreviewLayer.frame];
         [featureLayer setNeedsDisplay];
         
+//        
+//        if (aggregateRectangle)
+//        {
+//            [rectangleCALayer setFrame:CGRectMake(
+//                                                  aggregateRectangle.topLeftX,
+//                                                  aggregateRectangle.topLeftY,
+//                                                  std::abs(aggregateRectangle.topRightX - aggregateRectangle.topLeftX),
+//                                                  std::abs(aggregateRectangle.bottomLeftY - aggregateRectangle.topLeftY))];
+//        }
+//        
+//        [rectangleCALayer setNeedsDisplay];
+        
         [CATransaction commit];
     }
 }
@@ -162,7 +177,7 @@ Rectangle * aggregateRectangle;
     if ( aggregateRectangle ){
         CGContextSetLineWidth(context, 2.0);
         CGContextSetStrokeColorWithColor(context, [[UIColor greenColor] CGColor]);
-        CGContextSetFillColorWithColor(context, [[UIColor clearColor] CGColor]);
+        CGContextSetFillColorWithColor(context, [[UIColor colorWithWhite:1 alpha:0.25] CGColor]);
         
         CGContextMoveToPoint(context, aggregateRectangle.topLeftX, aggregateRectangle.topLeftY);
         

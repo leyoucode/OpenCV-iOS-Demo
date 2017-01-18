@@ -13,7 +13,6 @@
 #include <iostream>
 
 #import "Rectangle.h"
-#import "RectangleCALayer.h"
 
 @implementation CannyEdgeDetectingViewController
 
@@ -120,14 +119,14 @@ void find_squares(cv::Mat& image, std::vector<std::vector<cv::Point>>&squares) {
         mixChannels(&blurred, 1, &gray0, 1, ch, 1);
         
         // try several threshold levels
-        const int threshold_level = 2;
+        const int threshold_level = 4;
         for (int l = 0; l < threshold_level; l++)
         {
             // Use Canny instead of zero threshold level!
             // Canny helps to catch squares with gradient shading
             if (l == 0){
-                Canny(gray0, gray, 10, 20, 3); //
-                
+                Canny(gray0, gray, 10, 30, 3); //
+                //Canny(gray0, gray, 1, 3, 5); //
                 // Dilate helps to remove potential holes between edge segments
                 dilate(gray, gray, cv::Mat(), cv::Point(-1,-1));
             }
