@@ -20,4 +20,13 @@
 @synthesize bottomLeftY;
 @synthesize bottomRightY;
 
+-(NSString *)description
+{
+    return [NSString stringWithFormat:@"(%d,%d),(%d,%d),(%d,%d),(%d,%d)",
+            topLeftX, topLeftY,
+            topRightX, topRightY,
+            bottomLeftX, bottomLeftY,
+            bottomRightX, bottomRightY];
+}
+
 @end

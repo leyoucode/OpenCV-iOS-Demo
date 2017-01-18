@@ -84,7 +84,7 @@ Rectangle * aggregateRectangle;
     
     long difference = end - start;
     
-    NSLog(@"%@", [NSString stringWithFormat:@"Millis to calculate: %ld", difference]);
+    //NSLog(@"%@", [NSString stringWithFormat:@"Millis to calculate: %ld", difference]);
     
     dispatch_sync(dispatch_get_main_queue(), ^{
         [self displayDataForVideoRect:rect videoOrientation:orientation];
@@ -95,70 +95,69 @@ Rectangle * aggregateRectangle;
     
     @synchronized (self) {
         
-    
-    NSArray *sublayers = [NSArray arrayWithArray:[_videoPreviewLayer sublayers]];
-    int sublayersCount = (int) [sublayers count];
-    int currentSublayer = 0;
-    
-    [CATransaction begin];
-    [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
-    [CATransaction setAnimationDuration:0.4];
-    // hide all the drawing layers
-    for (CALayer *layer in sublayers) {
-        NSString *layerName = [layer name];
-        if ([layerName isEqualToString:@"DrawingLayer"])
-            [layer setHidden:YES];
-    }
-    
-    CGAffineTransform t = [self affineTransformForVideoFrame:rect orientation:videoOrientation];
-    
-    if ( aggregateRectangle ){
+        NSArray *sublayers = [NSArray arrayWithArray:[_videoPreviewLayer sublayers]];
+        int sublayersCount = (int) [sublayers count];
+        int currentSublayer = 0;
         
-        
-        
-        CGPoint transformedTopLeft = CGPointApplyAffineTransform(CGPointMake(aggregateRectangle.topLeftX, aggregateRectangle.topLeftY), t);
-        CGPoint transformedTopRight = CGPointApplyAffineTransform(CGPointMake(aggregateRectangle.topRightX, aggregateRectangle.topRightY), t);
-        CGPoint transformedBottomLeft = CGPointApplyAffineTransform(CGPointMake(aggregateRectangle.bottomLeftX, aggregateRectangle.bottomLeftY), t);
-        CGPoint transformedBottomRight = CGPointApplyAffineTransform(CGPointMake(aggregateRectangle.bottomRightX, aggregateRectangle.bottomRightY), t);
-        
-        aggregateRectangle.topLeftX = transformedTopLeft.x;
-        aggregateRectangle.topRightX = transformedTopRight.x;
-        aggregateRectangle.bottomLeftX = transformedBottomLeft.x;
-        aggregateRectangle.bottomRightX = transformedBottomRight.x;
-        
-        aggregateRectangle.topLeftY = transformedTopLeft.y;
-        aggregateRectangle.topRightY = transformedTopRight.y;
-        aggregateRectangle.bottomLeftY = transformedBottomLeft.y;
-        aggregateRectangle.bottomRightY = transformedBottomRight.y;
-    }
-    
-    CALayer *featureLayer = nil;
-    
-    // re-use an existing layer if possible
-    while ( !featureLayer && (currentSublayer < sublayersCount) ) {
-        CALayer *currentLayer = [sublayers objectAtIndex:currentSublayer++];
-        if ( [[currentLayer name] isEqualToString:@"DrawingLayer"] ) {
-            featureLayer = currentLayer;
-            [currentLayer setHidden:NO];
+        [CATransaction begin];
+        [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+        [CATransaction setAnimationDuration:0.4];
+        // hide all the drawing layers
+        for (CALayer *layer in sublayers) {
+            NSString *layerName = [layer name];
+            if ([layerName isEqualToString:@"DrawingLayer"])
+                [layer setHidden:YES];
         }
-    }
-    
-    // create a new one if necessary
-    if ( !featureLayer ) {
-        featureLayer = [CALayer new];
-        featureLayer.delegate = self;
-        [featureLayer setName:@"DrawingLayer"];
-        [_videoPreviewLayer addSublayer:featureLayer];
-    }
-    
-    [featureLayer setFrame:_videoPreviewLayer.frame];
-    [featureLayer setNeedsDisplay];
-    
-    [CATransaction commit];
+        
+        CGAffineTransform t = [self affineTransformForVideoFrame:rect orientation:videoOrientation];
+        
+        if ( aggregateRectangle ){
+            
+            CGPoint transformedTopLeft = CGPointApplyAffineTransform(CGPointMake(aggregateRectangle.topLeftX, aggregateRectangle.topLeftY), t);
+            CGPoint transformedTopRight = CGPointApplyAffineTransform(CGPointMake(aggregateRectangle.topRightX, aggregateRectangle.topRightY), t);
+            CGPoint transformedBottomLeft = CGPointApplyAffineTransform(CGPointMake(aggregateRectangle.bottomLeftX, aggregateRectangle.bottomLeftY), t);
+            CGPoint transformedBottomRight = CGPointApplyAffineTransform(CGPointMake(aggregateRectangle.bottomRightX, aggregateRectangle.bottomRightY), t);
+            
+            aggregateRectangle.topLeftX = transformedTopLeft.x;
+            aggregateRectangle.topRightX = transformedTopRight.x;
+            aggregateRectangle.bottomLeftX = transformedBottomLeft.x;
+            aggregateRectangle.bottomRightX = transformedBottomRight.x;
+            
+            aggregateRectangle.topLeftY = transformedTopLeft.y;
+            aggregateRectangle.topRightY = transformedTopRight.y;
+            aggregateRectangle.bottomLeftY = transformedBottomLeft.y;
+            aggregateRectangle.bottomRightY = transformedBottomRight.y;
+        }
+        
+        CALayer *featureLayer = nil;
+        
+        // re-use an existing layer if possible
+        while ( !featureLayer && (currentSublayer < sublayersCount) ) {
+            CALayer *currentLayer = [sublayers objectAtIndex:currentSublayer++];
+            if ( [[currentLayer name] isEqualToString:@"DrawingLayer"] ) {
+                featureLayer = currentLayer;
+                [currentLayer setHidden:NO];
+            }
+        }
+        
+        // create a new one if necessary
+        if ( !featureLayer ) {
+            featureLayer = [CALayer new];
+            featureLayer.delegate = self;
+            [featureLayer setName:@"DrawingLayer"];
+            [_videoPreviewLayer addSublayer:featureLayer];
+        }
+        
+        [featureLayer setFrame:_videoPreviewLayer.frame];
+        [featureLayer setNeedsDisplay];
+        
+        [CATransaction commit];
     }
 }
 
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)context {
+    
+    NSLog(@"aggregateRectangle => %@",aggregateRectangle);
     
     if ( aggregateRectangle ){
         CGContextSetLineWidth(context, 2.0);

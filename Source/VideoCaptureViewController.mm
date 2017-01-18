@@ -488,7 +488,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         _captureDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     }
     else if (camera >= 0 && camera < [devices count]) {
-        _camera = camera;
+        _camera = (int)camera;
         _captureDevice = [devices objectAtIndex:camera];
     }
     else {
