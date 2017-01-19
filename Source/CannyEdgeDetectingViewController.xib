@@ -29,6 +29,9 @@
                                 <constraint firstAttribute="width" constant="80" id="7ZM-37-L1b"/>
                             </constraints>
                             <state key="normal" image="record_flash_off"/>
+                            <connections>
+                                <action selector="onToggleTorchClick:" destination="-1" eventType="touchUpInside" id="KC6-kJ-nzL"/>
+                            </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QLm-ct-tzD">
                             <rect key="frame" x="295" y="0.0" width="80" height="50"/>
@@ -36,6 +39,9 @@
                                 <constraint firstAttribute="width" constant="80" id="sPl-hX-4gi"/>
                             </constraints>
                             <state key="normal" image="record_camera"/>
+                            <connections>
+                                <action selector="onToggleCameraClick:" destination="-1" eventType="touchUpInside" id="sGv-iA-Xpd"/>
+                            </connections>
                         </button>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00:00" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zNl-yK-B7q">
                             <rect key="frame" x="145" y="15" width="85" height="21"/>

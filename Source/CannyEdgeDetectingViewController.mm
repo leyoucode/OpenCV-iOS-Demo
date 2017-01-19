@@ -16,9 +16,24 @@
 
 @implementation CannyEdgeDetectingViewController
 
+
+- (IBAction)onToggleTorchClick:(UIButton *)sender {
+    [self setTorchOn:![self torchOn]];
+}
+
+- (IBAction)onToggleCameraClick:(UIButton *)sender {
+    if ( self.camera == 0)
+    {
+        [self setCamera:1];
+    }else{
+        [self setCamera:0];
+    }
+}
+
 -(void) viewDidLoad
 {
     [super viewDidLoad];
+    [UIApplication sharedApplication].statusBarHidden = YES;
     //[self setShowDebugInfo:YES];
 }
 
