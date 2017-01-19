@@ -175,7 +175,7 @@
         
         CGContextSetLineWidth(context, 2.0);
         CGContextSetStrokeColorWithColor(context, [[UIColor greenColor] CGColor]);
-        CGContextSetFillColorWithColor(context, [[UIColor colorWithWhite:1 alpha:0.05] CGColor]);
+        CGContextSetFillColorWithColor(context, [[UIColor clearColor] CGColor]);
         
         CGContextMoveToPoint(context, _rectangle.topLeftX, _rectangle.topLeftY);
         

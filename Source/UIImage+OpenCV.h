@@ -25,4 +25,6 @@
 @property(nonatomic, readonly) cv::Mat CVMat;
 @property(nonatomic, readonly) cv::Mat CVGrayscaleMat;
 
+- (UIImage *)fixOrientation:(UIImage *)aImage;
+
 @end

@@ -14,8 +14,10 @@
 #import <ImageIO/ImageIO.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 
+
 #import "Rectangle.h"
 #import "RectangleCALayer.h"
+#import "UIImage+OpenCV.h"
 
 @implementation EdgeDetectingViewController
 
@@ -27,6 +29,8 @@ NSObject * queueLockObject = [[NSObject alloc] init];
 NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
 
 Rectangle * aggregateRectangle;
+cv::Mat currentMat;
+
 RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 
 - (void)viewDidLoad {
@@ -48,6 +52,8 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 }
 
 - (void)processFrame:(cv::Mat&)mat videoRect:(CGRect)rect videoOrientation:(AVCaptureVideoOrientation)orientation{
+    
+    currentMat = mat;
     
     @synchronized(frameNumberLockObject){
         frameNumber++;
@@ -336,6 +342,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 
 - (void)captureImageWithCompletionHander:(void(^)(NSString *imageFilePath))completionHandler
 {
+    
     dispatch_suspend(_captureQueue);
     
     AVCaptureConnection *videoConnection = nil;
@@ -367,76 +374,39 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
          @autoreleasepool
          {
              NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
-             CIImage *enhancedImage = [[CIImage alloc] initWithData:imageData options:@{kCIImageColorSpace:[NSNull null]}];
-             imageData = nil;
+             UIImage* myImage = [[UIImage alloc] initWithData:imageData];
              
-             //             if (weakSelf.cameraViewType == IPDFCameraViewTypeBlackAndWhite)
-             //             {
-             //                 enhancedImage = [self filteredImageUsingEnhanceFilterOnImage:enhancedImage];
-             //             }
-             //             else
-             //             {
-//             enhancedImage = [self filteredImageUsingContrastFilterOnImage:enhancedImage];
-//             //             }
-//             
-//             if (weakSelf.isBorderDetectionEnabled && rectangleDetectionConfidenceHighEnough(_imageDedectionConfidence))
-//             {
-//                 CIRectangleFeature *rectangleFeature = [self biggestRectangleInRectangles:[[self highAccuracyRectangleDetector] featuresInImage:enhancedImage]];
-//                 
-//                 if (rectangleFeature)
-//                 {
-//                     enhancedImage = [self correctPerspectiveForImage:enhancedImage withFeatures:rectangleFeature];
-//                 }
-//             }
+             myImage = [myImage fixOrientation:myImage];
              
-             Rectangle *rectangle = [rectangleCALayer getCurrentRectangle];
+             Rectangle* rectangle = [rectangleCALayer getCurrentRectangle];
              
-             if (rectangle)
-             {
-                 enhancedImage = [self correctPerspectiveForImage:enhancedImage withFeatures:rectangle];
-             }
+             //enhancedImage = [self correctPerspectiveForImage:enhancedImage withFeatures:rectangle];
              
              
-             CIFilter *transform = [CIFilter filterWithName:@"CIAffineTransform"];
-             [transform setValue:enhancedImage forKey:kCIInputImageKey];
-             NSValue *rotation = [NSValue valueWithCGAffineTransform:CGAffineTransformMakeRotation(-90 * (M_PI/180))];
-             [transform setValue:rotation forKey:@"inputTransform"];
-             enhancedImage = [transform outputImage];
+             int w1 = abs(rectangle.topRightX - rectangle.topLeftX);
+             int w2 = abs(rectangle.topRightX - rectangle.bottomLeftX);
+             int w3 = abs(rectangle.bottomRightX - rectangle.bottomLeftX);
+             int w4 = abs(rectangle.bottomRightX - rectangle.topLeftX);
              
-             if (!enhancedImage || CGRectIsEmpty(enhancedImage.extent)) return;
              
-             static CIContext *ctx = nil;
-             if (!ctx)
-             {
-                 ctx = [CIContext contextWithOptions:@{kCIContextWorkingColorSpace:[NSNull null]}];
-             }
+             int h1 = abs(rectangle.bottomLeftY - rectangle.topLeftY);
+             int h2 = abs(rectangle.bottomLeftY - rectangle.topRightY);
+             int h3 = abs(rectangle.bottomRightY - rectangle.topRightY);
+             int h4 = abs(rectangle.bottomRightY - rectangle.topLeftY);
              
-             CGSize bounds = enhancedImage.extent.size;
-             bounds = CGSizeMake(floorf(bounds.width / 4) * 4,floorf(bounds.height / 4) * 4);
-             CGRect extent = CGRectMake(enhancedImage.extent.origin.x, enhancedImage.extent.origin.y, bounds.width, bounds.height);
+             int maxWidth = MAX(MAX(w1,w2),MAX(w3,w4));
+             int maxHeight = MAX(MAX(h1,h2),MAX(h3,h4));
              
-             static int bytesPerPixel = 8;
-             uint rowBytes = bytesPerPixel * bounds.width;
-             uint totalBytes = rowBytes * bounds.height;
-             uint8_t *byteBuffer = (uint8_t *)malloc(totalBytes);
-             
-             CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-             
-             [ctx render:enhancedImage toBitmap:byteBuffer rowBytes:rowBytes bounds:extent format:kCIFormatRGBA8 colorSpace:colorSpace];
-             
-             CGContextRef bitmapContext = CGBitmapContextCreate(byteBuffer,bounds.width,bounds.height,bytesPerPixel,rowBytes,colorSpace,kCGImageAlphaNoneSkipLast);
-             CGImageRef imgRef = CGBitmapContextCreateImage(bitmapContext);
-             CGColorSpaceRelease(colorSpace);
-             CGContextRelease(bitmapContext);
-             free(byteBuffer);
-             
-             if (imgRef == NULL)
-             {
-                 CFRelease(imgRef);
-                 return;
-             }
-             saveCGImageAsJPEGToFilePath(imgRef, filePath);
-             CFRelease(imgRef);
+             CGRect rect = CGRectMake(MIN(rectangle.topLeftX, rectangle.bottomLeftX),
+                                     MIN(rectangle.topLeftY, rectangle.bottomLeftY),
+                                     maxWidth,
+                                     maxHeight) ;
+             // Create bitmap image from original image data,
+             // using rectangle to specify desired crop area
+             CGImageRef imageRef = CGImageCreateWithImageInRect(myImage.CGImage, rect);
+             UIImage *img = [UIImage imageWithCGImage:imageRef];
+             saveCGImageAsJPEGToFilePath(imageRef, filePath);
+             CGImageRelease(imageRef);
              
              dispatch_async(dispatch_get_main_queue(), ^
                             {
@@ -444,15 +414,67 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
                                 dispatch_resume(_captureQueue);
                             });
              
-             //_imageDedectionConfidence = 0.0f;
+             
+//             if (!enhancedImage || CGRectIsEmpty(enhancedImage.extent)) return;
+//             
+//             static CIContext *ctx = nil;
+//             if (!ctx)
+//             {
+//                 ctx = [CIContext contextWithOptions:@{kCIContextWorkingColorSpace:[NSNull null]}];
+//             }
+//             
+//             CGSize bounds = enhancedImage.extent.size;
+//             bounds = CGSizeMake(floorf(bounds.width / 4) * 4,floorf(bounds.height / 4) * 4);
+//             CGRect extent = CGRectMake(enhancedImage.extent.origin.x, enhancedImage.extent.origin.y, bounds.width, bounds.height);
+//             
+//             static int bytesPerPixel = 8;
+//             uint rowBytes = bytesPerPixel * bounds.width;
+//             uint totalBytes = rowBytes * bounds.height;
+//             uint8_t *byteBuffer = (uint8_t *)malloc(totalBytes);
+//             
+//             CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+//             
+//             [ctx render:enhancedImage toBitmap:byteBuffer rowBytes:rowBytes bounds:extent format:kCIFormatRGBA8 colorSpace:colorSpace];
+//             
+//             CGContextRef bitmapContext = CGBitmapContextCreate(byteBuffer,bounds.width,bounds.height,bytesPerPixel,rowBytes,colorSpace,kCGImageAlphaNoneSkipLast);
+//             CGImageRef imgRef = CGBitmapContextCreateImage(bitmapContext);
+//             CGColorSpaceRelease(colorSpace);
+//             CGContextRelease(bitmapContext);
+//             free(byteBuffer);
+//             
+//             if (imgRef == NULL)
+//             {
+//                 CFRelease(imgRef);
+//                 return;
+//             }
+//             saveCGImageAsJPEGToFilePath(imgRef, filePath);
+//             CFRelease(imgRef);
+//             
+//             dispatch_async(dispatch_get_main_queue(), ^
+//                            {
+//                                completionHandler(filePath);
+//                                dispatch_resume(_captureQueue);
+//                            });
          }
      }];
 }
 
+//CFDataRef save_cgimage_to_jpeg (CGImageRef image)
+//{
+//    CFMutableDataRef cfdata = CFDataCreateMutable(nil,0);
+//    CGImageDestinationRef dest = CGImageDestinationCreateWithData(data, CFSTR("public.jpeg"), 1, NULL);
+//    CGImageDestinationAddImage(dest, image, NULL);
+//    if(!CGImageDestinationFinalize(dest))
+//        ; // error
+//    CFRelease(dest);
+//    return cfdata
+//}
+
 - (CIImage *)correctPerspectiveForImage:(CIImage *)image withFeatures:(Rectangle *)rectangle
 {
+    
     NSMutableDictionary *rectangleCoordinates = [NSMutableDictionary new];
-    rectangleCoordinates[@"inputTopLeft"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.topLeftX, rectangle.topLeftY)];
+    rectangleCoordinates[@"inputTopLeft"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.topLeftX, rectangle.topLeftY )];
     rectangleCoordinates[@"inputTopRight"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.topRightX, rectangle.topRightY)];
     rectangleCoordinates[@"inputBottomLeft"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.bottomLeftX, rectangle.bottomLeftY)];
     rectangleCoordinates[@"inputBottomRight"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.bottomRightX, rectangle.bottomRightY)];
@@ -461,6 +483,10 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 
 void saveCGImageAsJPEGToFilePath(CGImageRef imageRef, NSString *filePath)
 {
+//    UIImage *uiImage = [UIImage imageWithCGImage:imageRef];
+//    NSData *jpgData = UIImageJPEGRepresentation(uiImage, 1.0f);
+//    [jpgData writeToFile:filePath atomically:NO];
+    
     @autoreleasepool
     {
         CFURLRef url = (__bridge CFURLRef)[NSURL fileURLWithPath:filePath];

@@ -16,7 +16,8 @@
 		FE0083D31E2884C500299936 /* RectangleCALayer.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CA1E2884C500299936 /* RectangleCALayer.m */; };
 		FE0083D41E2884C500299936 /* UIImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CC1E2884C500299936 /* UIImage+OpenCV.mm */; };
 		FE0083D51E2884C500299936 /* VideoCaptureViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CE1E2884C500299936 /* VideoCaptureViewController.mm */; };
-		FE342FAE1E3090C300F0D071 /* CannyEdgeDetectingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FE342FAD1E3090C300F0D071 /* CannyEdgeDetectingViewController.xib */; };
+		FE342FB21E30B88500F0D071 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE342FB11E30B88500F0D071 /* MobileCoreServices.framework */; };
+		FE342FB41E30B89000F0D071 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE342FB31E30B89000F0D071 /* ImageIO.framework */; };
 		FEC619581E2F3ED100A45533 /* CannyEdgeDetectingViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FEC619571E2F3ED100A45533 /* CannyEdgeDetectingViewController.mm */; };
 		FEF47F8D1E2645B500AF034B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF47F8C1E2645B500AF034B /* AppDelegate.swift */; };
 		FEF47F921E2645B500AF034B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FEF47F901E2645B500AF034B /* Main.storyboard */; };
@@ -46,7 +47,8 @@
 		FE0083CC1E2884C500299936 /* UIImage+OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+OpenCV.mm"; sourceTree = "<group>"; };
 		FE0083CD1E2884C500299936 /* VideoCaptureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoCaptureViewController.h; sourceTree = "<group>"; };
 		FE0083CE1E2884C500299936 /* VideoCaptureViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VideoCaptureViewController.mm; sourceTree = "<group>"; };
-		FE342FAD1E3090C300F0D071 /* CannyEdgeDetectingViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CannyEdgeDetectingViewController.xib; sourceTree = "<group>"; };
+		FE342FB11E30B88500F0D071 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		FE342FB31E30B89000F0D071 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		FEC619561E2F3ED100A45533 /* CannyEdgeDetectingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CannyEdgeDetectingViewController.h; sourceTree = "<group>"; };
 		FEC619571E2F3ED100A45533 /* CannyEdgeDetectingViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CannyEdgeDetectingViewController.mm; sourceTree = "<group>"; };
 		FEF47F891E2645B500AF034B /* OpenCV-iOS-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "OpenCV-iOS-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -62,6 +64,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FE342FB41E30B89000F0D071 /* ImageIO.framework in Frameworks */,
+				FE342FB21E30B88500F0D071 /* MobileCoreServices.framework in Frameworks */,
 				C475CF8670EA98DC5AF1F9A5 /* Pods_OpenCV_iOS_demo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -72,6 +76,8 @@
 		7BA92E160A3C650DB08329DF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FE342FB31E30B89000F0D071 /* ImageIO.framework */,
+				FE342FB11E30B88500F0D071 /* MobileCoreServices.framework */,
 				FE00839E1E27724800299936 /* AssetsLibrary.framework */,
 				495A4B7ED13F512899B4D569 /* Pods_OpenCV_iOS_demo.framework */,
 			);
@@ -96,7 +102,6 @@
 				FE0083C41E2884C500299936 /* EdgeDetectingViewController.mm */,
 				FEC619561E2F3ED100A45533 /* CannyEdgeDetectingViewController.h */,
 				FEC619571E2F3ED100A45533 /* CannyEdgeDetectingViewController.mm */,
-				FE342FAD1E3090C300F0D071 /* CannyEdgeDetectingViewController.xib */,
 				FE0083C51E2884C500299936 /* HoughLineEdgeDetectingViewController.h */,
 				FE0083C61E2884C500299936 /* HoughLineEdgeDetectingViewController.mm */,
 				FE0083C71E2884C500299936 /* Rectangle.h */,
@@ -210,7 +215,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FEF47F971E2645B500AF034B /* LaunchScreen.storyboard in Resources */,
-				FE342FAE1E3090C300F0D071 /* CannyEdgeDetectingViewController.xib in Resources */,
 				FEF47F941E2645B500AF034B /* Assets.xcassets in Resources */,
 				FEF47F921E2645B500AF034B /* Main.storyboard in Resources */,
 			);
