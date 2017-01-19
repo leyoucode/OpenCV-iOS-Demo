@@ -16,6 +16,7 @@
 		FE0083D31E2884C500299936 /* RectangleCALayer.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CA1E2884C500299936 /* RectangleCALayer.m */; };
 		FE0083D41E2884C500299936 /* UIImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CC1E2884C500299936 /* UIImage+OpenCV.mm */; };
 		FE0083D51E2884C500299936 /* VideoCaptureViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CE1E2884C500299936 /* VideoCaptureViewController.mm */; };
+		FE342FAE1E3090C300F0D071 /* CannyEdgeDetectingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FE342FAD1E3090C300F0D071 /* CannyEdgeDetectingViewController.xib */; };
 		FEC619581E2F3ED100A45533 /* CannyEdgeDetectingViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FEC619571E2F3ED100A45533 /* CannyEdgeDetectingViewController.mm */; };
 		FEF47F8D1E2645B500AF034B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF47F8C1E2645B500AF034B /* AppDelegate.swift */; };
 		FEF47F921E2645B500AF034B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FEF47F901E2645B500AF034B /* Main.storyboard */; };
@@ -45,6 +46,7 @@
 		FE0083CC1E2884C500299936 /* UIImage+OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+OpenCV.mm"; sourceTree = "<group>"; };
 		FE0083CD1E2884C500299936 /* VideoCaptureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoCaptureViewController.h; sourceTree = "<group>"; };
 		FE0083CE1E2884C500299936 /* VideoCaptureViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VideoCaptureViewController.mm; sourceTree = "<group>"; };
+		FE342FAD1E3090C300F0D071 /* CannyEdgeDetectingViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CannyEdgeDetectingViewController.xib; sourceTree = "<group>"; };
 		FEC619561E2F3ED100A45533 /* CannyEdgeDetectingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CannyEdgeDetectingViewController.h; sourceTree = "<group>"; };
 		FEC619571E2F3ED100A45533 /* CannyEdgeDetectingViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CannyEdgeDetectingViewController.mm; sourceTree = "<group>"; };
 		FEF47F891E2645B500AF034B /* OpenCV-iOS-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "OpenCV-iOS-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -102,6 +104,7 @@
 				FE0083CA1E2884C500299936 /* RectangleCALayer.m */,
 				FE0083CB1E2884C500299936 /* UIImage+OpenCV.h */,
 				FE0083CC1E2884C500299936 /* UIImage+OpenCV.mm */,
+				FE342FAD1E3090C300F0D071 /* CannyEdgeDetectingViewController.xib */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -207,6 +210,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FEF47F971E2645B500AF034B /* LaunchScreen.storyboard in Resources */,
+				FE342FAE1E3090C300F0D071 /* CannyEdgeDetectingViewController.xib in Resources */,
 				FEF47F941E2645B500AF034B /* Assets.xcassets in Resources */,
 				FEF47F921E2645B500AF034B /* Main.storyboard in Resources */,
 			);

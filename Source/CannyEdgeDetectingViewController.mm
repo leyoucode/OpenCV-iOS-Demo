@@ -16,6 +16,21 @@
 
 @implementation CannyEdgeDetectingViewController
 
+-(void) viewDidLoad
+{
+    [super viewDidLoad];
+    //[self setShowDebugInfo:YES];
+}
+
+-(void) viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    
+}
+
+
+
 - (Rectangle *) getLargestRectangleInFrame:(cv::Mat)mat{
     
     std::vector<std::vector<cv::Point>>squares;
@@ -141,7 +156,7 @@ void find_squares(cv::Mat& image, std::vector<std::vector<cv::Point>>&squares) {
                  第五个参数表示Sobel 算子大小，默认为3即表示一个3*3的矩阵。
                  
                  */
-                Canny(gray0, gray, 10, 30, 3); //
+                Canny(gray0, gray, 100, 100, 3); //
                 //Canny(gray0, gray, 1, 3, 5); //
                 // Dilate helps to remove potential holes between edge segments
                 dilate(gray, gray, cv::Mat(), cv::Point(-1,-1));
@@ -153,6 +168,30 @@ void find_squares(cv::Mat& image, std::vector<std::vector<cv::Point>>&squares) {
             }
             
             // Find contours and store them in a list
+            //findContours(gray, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+            
+            /*
+             第一个参数：image，单通道图像矩阵，可以是灰度图，但更常用的是二值图像，一般是经过Canny、拉普拉斯等边
+             缘检测算子处理过的二值图像；
+             第二个参数：contours，定义为“vector<vector<Point>> contours”，是一个向量，并且是一个双重向量，向量
+             内每个元素保存了一组由连续的Point点构成的点的集合的向量，每一组Point点集就是一个轮廓。
+             有多少轮廓，向量contours就有多少元素。
+             第三个参数：int型的mode，定义轮廓的检索模式：
+                         取值一：CV_RETR_EXTERNAL只检测最外围轮廓，包含在外围轮廓内的内围轮廓被忽略
+                         取值二：CV_RETR_LIST   检测所有的轮廓，包括内围、外围轮廓，但是检测到的轮廓不建立等级关
+                         系，彼此之间独立，没有等级关系，这就意味着这个检索模式下不存在父轮廓或内嵌轮廓，
+                         所以hierarchy向量内所有元素的第3、第4个分量都会被置为-1，具体下文会讲到
+                         取值三：CV_RETR_CCOMP  检测所有的轮廓，但所有轮廓只建立两个等级关系，外围为顶层，若外围
+                         内的内围轮廓还包含了其他的轮廓信息，则内围内的所有轮廓均归属于顶层
+                         取值四：CV_RETR_TREE， 检测所有轮廓，所有轮廓建立一个等级树结构。外层轮廓包含内层轮廓，内
+                         层轮廓还可以继续包含内嵌轮廓。
+             第五个参数：int型的method，定义轮廓的近似方法：
+                         取值一：CV_CHAIN_APPROX_NONE 保存物体边界上所有连续的轮廓点到contours向量内
+                         取值二：CV_CHAIN_APPROX_SIMPLE 仅保存轮廓的拐点信息，把所有轮廓拐点处的点保存入contours
+                         向量内，拐点与拐点之间直线段上的信息点不予保留
+                         取值三和四：CV_CHAIN_APPROX_TC89_L1，CV_CHAIN_APPROX_TC89_KCOS使用teh-Chinl chain 近
+                         似算法
+             */
             findContours(gray, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
             
             // Test contours
