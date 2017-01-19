@@ -20,6 +20,7 @@
     AVCaptureDevice *_captureDevice;
     AVCaptureVideoDataOutput *_videoOutput;
     AVCaptureVideoPreviewLayer *_videoPreviewLayer;
+    AVCaptureStillImageOutput *_stillImageOutput;
     
     int _camera;
     NSString * qualityPreset;
@@ -36,6 +37,9 @@
     
     // Debug UI
     UILabel *_fpsLabel;
+    
+    BOOL _isCapturing;
+    dispatch_queue_t _captureQueue;
 }
 
 // Current frames per second
@@ -49,7 +53,7 @@
 @property (nonatomic, readonly) AVCaptureDevice *captureDevice;
 @property (nonatomic, readonly) AVCaptureVideoDataOutput *videoOutput;
 @property (nonatomic, readonly) AVCaptureVideoPreviewLayer *videoPreviewLayer;
-
+@property (nonatomic, strong) AVCaptureStillImageOutput* stillImageOutput;
 
 // -1: default, 0: back camera, 1: front camera
 @property (nonatomic, assign) int camera;

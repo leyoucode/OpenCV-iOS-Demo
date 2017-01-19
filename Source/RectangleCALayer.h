@@ -14,4 +14,6 @@
 
 -(void)updateDetect:(Rectangle *)rectangle;
 
+-(Rectangle *)getCurrentRectangle;
+
 @end

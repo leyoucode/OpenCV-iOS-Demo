@@ -77,6 +77,9 @@
                                 <constraint firstAttribute="width" secondItem="kdm-Vf-7Tf" secondAttribute="height" multiplier="1:1" id="T3c-L3-GgA"/>
                             </constraints>
                             <state key="normal" image="record_idle"/>
+                            <connections>
+                                <action selector="onTakeButtonClick:" destination="-1" eventType="touchUpInside" id="jEh-0a-43m"/>
+                            </connections>
                         </button>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="视频" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ieo-oC-Wi8">
                             <rect key="frame" x="129" y="4.5" width="35" height="20"/>

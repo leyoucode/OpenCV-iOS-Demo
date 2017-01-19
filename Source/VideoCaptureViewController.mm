@@ -158,6 +158,7 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
 @synthesize captureDevice = _captureDevice;
 @synthesize videoOutput = _videoOutput;
 @synthesize videoPreviewLayer = _videoPreviewLayer;
+@synthesize stillImageOutput = _stillImageOutput;
 
 @dynamic showDebugInfo;
 @dynamic torchOn;
@@ -176,6 +177,7 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
     return self;
 }
 
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -187,6 +189,7 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    _captureQueue = dispatch_queue_create("com.linkim.AVCameraCaptureQueue", DISPATCH_QUEUE_SERIAL);
     [self createCaptureSessionForCamera:_camera qualityPreset:_qualityPreset grayscale:_captureGrayscale];
     [_captureSession startRunning];
 }
@@ -508,8 +511,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     // Create and configure device output
     _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
     
-    dispatch_queue_t queue = dispatch_queue_create("cameraQueue", NULL); 
-    [_videoOutput setSampleBufferDelegate:self queue:queue];
+    //dispatch_queue_t queue = dispatch_queue_create("cameraQueue", NULL);
+    [_videoOutput setSampleBufferDelegate:self queue:_captureQueue];
     
     _videoOutput.alwaysDiscardsLateVideoFrames = YES; 
     _videoOutput.minFrameDuration = CMTimeMake(1, 30);
@@ -528,6 +531,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     _videoOutput.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedInt:format]
                                                              forKey:(id)kCVPixelBufferPixelFormatTypeKey];
     
+    _stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
+    
+    
     // Connect up inputs and outputs
     if ([_captureSession canAddInput:input]) {
         [_captureSession addInput:input];
@@ -536,6 +542,11 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     if ([_captureSession canAddOutput:_videoOutput]) {
         [_captureSession addOutput:_videoOutput];
     }
+    
+    if ([_captureSession canAddOutput:_stillImageOutput]) {
+        [_captureSession addOutput:_stillImageOutput];
+    }
+    
     
     // Create the preview layer
     _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];

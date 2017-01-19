@@ -35,6 +35,11 @@
     return self;
 }
 
+-(Rectangle *)getCurrentRectangle
+{
+    return _rectangle;
+}
+
 -(void)updateDetect:(Rectangle *)rectangle
 {
     if (_isAnimating)
