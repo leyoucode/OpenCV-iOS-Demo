@@ -12,12 +12,12 @@
 
 @interface RectangleCALayer() <CALayerDelegate>
 {
-    Rectangle * _oldRectangle;
-    Rectangle * _newRectangle;
-    BOOL isDetecting;
+    // 当前找到的矩形区域
+    Rectangle * _rectangle;
+    
+    // 是否在执行动画中
+    BOOL _isAnimating;
 }
-
-//@property (nonatomic, strong) Rectangle * rectangle;
 
 @end
 
@@ -30,32 +30,47 @@
 //        self.borderWidth = 2;
 //        self.borderColor = [UIColor redColor].CGColor;
         self.delegate = self;
-        isDetecting = NO;
+        _isAnimating = NO;
     }
     return self;
 }
 
-int unfindCount = 0;
-
 -(void)updateDetect:(Rectangle *)rectangle
 {
-//    if (!rectangle)
-//    {
-//        // 未找到
-//        return;
-//    }
-    
-    if (isDetecting)
+    if (_isAnimating)
     {
-        NSLog(@"执行动画中 放弃...");
+        NSLog(@"执行动画中 放弃当前找到的矩形区域...");
         return;
     }
     
-    isDetecting = YES;
-    _newRectangle = rectangle;
+    NSLog(@"开始绘制...%@",rectangle);
+    _rectangle = rectangle;
+    [self setNeedsDisplay];
+    
+    if (rectangle)
+    {
+        NSLog(@"执行动画...");
+        _isAnimating = YES;
+        [CATransaction begin];
+        // 创建Animation
+        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
+        animation.fromValue = @(0.0);
+        animation.toValue = @(1.0);
+        animation.duration = 0.4;
+        animation.repeatCount = 1;
+        animation.removedOnCompletion = YES;
+        
+        [CATransaction setCompletionBlock:^{
+            _isAnimating = NO;
+            NSLog(@"动画执行完毕");
+        }];
+        // 设置layer的animation
+        [self addAnimation:animation forKey:nil];
+        //animation.delegate = self;
+        [CATransaction commit];
+    }
     
     
-    NSLog(@"开始 Detecting...");
     
     /*
      int w1 = abs(rectangle.topRightX - rectangle.topLeftX);
@@ -77,30 +92,15 @@ int unfindCount = 0;
      maxWidth,
      maxHeight);
      */
-    [self setNeedsDisplay];
     
-    [CATransaction begin];
-    // 创建Animation
-    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
-    animation.fromValue = @(0.0);
-    animation.toValue = @(1.0);
-    animation.duration = 0.4;
-    animation.repeatCount = 1;
-    animation.removedOnCompletion = YES;
     
-    [CATransaction setCompletionBlock:^{
-        isDetecting = NO;
-        NSLog(@"动画执行完毕");
-    }];
-    // 设置layer的animation
-    [self addAnimation:animation forKey:nil];
-    //animation.delegate = self;
-    [CATransaction commit];
+    
+    
 }
 
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)context {
     
-    if ( _newRectangle ){
+    if ( _rectangle ){
         
         /*
         UIGraphicsPushContext(context);
@@ -114,35 +114,35 @@ int unfindCount = 0;
         // 定义左上角，右上角，左下角，右下角
         CGPoint tlp, trp, blp, brp;
         
-        if (_newRectangle.topLeftY - _newRectangle.topRightY > 0)
+        if (_rectangle.topLeftY - _rectangle.topRightY > 0)
         {
             //(36,61),(245,56),(27,350),(330,317)
-            if (_newRectangle.topLeftX - _newRectangle.bottomLeftX > 0)
+            if (_rectangle.topLeftX - _rectangle.bottomLeftX > 0)
             {
-                tlp = CGPointMake(_newRectangle.topLeftX - _newRectangle.bottomLeftX, _newRectangle.topLeftY - _newRectangle.topRightY);
-                trp = CGPointMake(_newRectangle.topRightX - _newRectangle.bottomLeftX, 0);
-                blp = CGPointMake(0, _newRectangle.bottomLeftY - _newRectangle.topRightY);
-                brp = CGPointMake(_newRectangle.bottomRightX - _newRectangle.bottomLeftX, _newRectangle.bottomRightY - _newRectangle.topRightY);
+                tlp = CGPointMake(_rectangle.topLeftX - _rectangle.bottomLeftX, _rectangle.topLeftY - _rectangle.topRightY);
+                trp = CGPointMake(_rectangle.topRightX - _rectangle.bottomLeftX, 0);
+                blp = CGPointMake(0, _rectangle.bottomLeftY - _rectangle.topRightY);
+                brp = CGPointMake(_rectangle.bottomRightX - _rectangle.bottomLeftX, _rectangle.bottomRightY - _rectangle.topRightY);
             }
             else{
-                tlp = CGPointMake(0, _newRectangle.topLeftY - _newRectangle.topRightY);
-                trp = CGPointMake(_newRectangle.topRightX - _newRectangle.topLeftX, 0);
-                blp = CGPointMake(_newRectangle.bottomLeftX - _newRectangle.topLeftX, _newRectangle.bottomLeftY - _newRectangle.topRightY);
-                brp = CGPointMake(_newRectangle.bottomRightX - _newRectangle.topLeftX, _newRectangle.bottomLeftY - _newRectangle.topRightY);
+                tlp = CGPointMake(0, _rectangle.topLeftY - _rectangle.topRightY);
+                trp = CGPointMake(_rectangle.topRightX - _rectangle.topLeftX, 0);
+                blp = CGPointMake(_rectangle.bottomLeftX - _rectangle.topLeftX, _rectangle.bottomLeftY - _rectangle.topRightY);
+                brp = CGPointMake(_rectangle.bottomRightX - _rectangle.topLeftX, _rectangle.bottomLeftY - _rectangle.topRightY);
             }
         }
         else {
-            if (_newRectangle.topLeftX - _newRectangle.bottomLeftX > 0)
+            if (_rectangle.topLeftX - _rectangle.bottomLeftX > 0)
             {
-                tlp = CGPointMake(_newRectangle.topLeftX - _newRectangle.bottomLeftX, 0);
-                trp = CGPointMake(_newRectangle.topRightX - _newRectangle.bottomLeftX, _newRectangle.topRightY - _newRectangle.topLeftY);
-                blp = CGPointMake(0, _newRectangle.bottomRightY - _newRectangle.topLeftY);
-                brp = CGPointMake(_newRectangle.bottomRightX - _newRectangle.bottomLeftX, _newRectangle.bottomRightY - _newRectangle.topLeftY);
+                tlp = CGPointMake(_rectangle.topLeftX - _rectangle.bottomLeftX, 0);
+                trp = CGPointMake(_rectangle.topRightX - _rectangle.bottomLeftX, _rectangle.topRightY - _rectangle.topLeftY);
+                blp = CGPointMake(0, _rectangle.bottomRightY - _rectangle.topLeftY);
+                brp = CGPointMake(_rectangle.bottomRightX - _rectangle.bottomLeftX, _rectangle.bottomRightY - _rectangle.topLeftY);
             }else{
                 tlp = CGPointMake(0, 0);
-                trp = CGPointMake(_newRectangle.topRightX - _newRectangle.topLeftX, _newRectangle.topRightY - _newRectangle.topLeftY);
-                blp = CGPointMake(_newRectangle.bottomLeftX - _newRectangle.topLeftX, _newRectangle.bottomLeftY - _newRectangle.topLeftY);
-                brp = CGPointMake(_newRectangle.bottomRightX - _newRectangle.topLeftX, _newRectangle.bottomRightY - _newRectangle.topLeftY);
+                trp = CGPointMake(_rectangle.topRightX - _rectangle.topLeftX, _rectangle.topRightY - _rectangle.topLeftY);
+                blp = CGPointMake(_rectangle.bottomLeftX - _rectangle.topLeftX, _rectangle.bottomLeftY - _rectangle.topLeftY);
+                brp = CGPointMake(_rectangle.bottomRightX - _rectangle.topLeftX, _rectangle.bottomRightY - _rectangle.topLeftY);
             }
         }
         
@@ -172,15 +172,15 @@ int unfindCount = 0;
         CGContextSetStrokeColorWithColor(context, [[UIColor greenColor] CGColor]);
         CGContextSetFillColorWithColor(context, [[UIColor colorWithWhite:1 alpha:0.05] CGColor]);
         
-        CGContextMoveToPoint(context, _newRectangle.topLeftX, _newRectangle.topLeftY);
+        CGContextMoveToPoint(context, _rectangle.topLeftX, _rectangle.topLeftY);
         
-        CGContextAddLineToPoint(context, _newRectangle.topRightX, _newRectangle.topRightY);
+        CGContextAddLineToPoint(context, _rectangle.topRightX, _rectangle.topRightY);
         
-        CGContextAddLineToPoint(context, _newRectangle.bottomRightX, _newRectangle.bottomRightY);
+        CGContextAddLineToPoint(context, _rectangle.bottomRightX, _rectangle.bottomRightY);
         
-        CGContextAddLineToPoint(context, _newRectangle.bottomLeftX, _newRectangle.bottomLeftY);
+        CGContextAddLineToPoint(context, _rectangle.bottomLeftX, _rectangle.bottomLeftY);
         
-        CGContextAddLineToPoint(context, _newRectangle.topLeftX, _newRectangle.topLeftY);
+        CGContextAddLineToPoint(context, _rectangle.topLeftX, _rectangle.topLeftY);
         
         CGContextDrawPath(context, kCGPathFillStroke);
     }

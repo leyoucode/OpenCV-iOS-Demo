@@ -107,6 +107,13 @@ void find_squares(cv::Mat& image, std::vector<std::vector<cv::Point>>&squares) {
     
     // blur will enhance edge detection
     cv::Mat blurred(image);
+    
+    /*
+        medianBlur函数使用中值滤波器来平滑（模糊）处理一张图片，从src输入，而结果从dst输出。且对于多通道图片，每一个通道都单独进行处理，并且支持就地操作（In-placeoperation）。
+        第一个参数，InputArray类型的src，函数的输入参数，填1、3或者4通道的Mat类型的图像；当ksize为3或者5的时候，图像深度需为CV_8U，CV_16U，或CV_32F其中之一，而对于较大孔径尺寸的图片，它只能是CV_8U。
+        第二个参数，OutputArray类型的dst，即目标图像，函数的输出参数，需要和源图片有一样的尺寸和类型。我们可以用Mat::Clone，以源图片为模板，来初始化得到如假包换的目标图。
+        第三个参数，int类型的ksize，孔径的线性尺寸（aperture linear size），注意这个参数必须是大于1的奇数，比如：3，5，7，9 ...
+     */
     medianBlur(image, blurred, 7);
     
     cv::Mat gray0(blurred.size(), CV_8U), gray;
@@ -125,6 +132,15 @@ void find_squares(cv::Mat& image, std::vector<std::vector<cv::Point>>&squares) {
             // Use Canny instead of zero threshold level!
             // Canny helps to catch squares with gradient shading
             if (l == 0){
+                
+                /*
+                 采用Canny方法对图像进行边缘检测
+                 第一个参数表示输入图像，必须为单通道灰度图。
+                 第二个参数表示输出的边缘图像，为单通道黑白图。
+                 第三个参数和第四个参数表示阈值，这二个阈值中当中的小阈值用来控制边缘连接，大的阈值用来控制强边缘的初始分割即如果一个像素的梯度大与上限值，则被认为是边缘像素，如果小于下限阈值，则被抛弃。如果该点的梯度在两者之间则当这个点与高于上限值的像素点连接时我们才保留，否则删除。
+                 第五个参数表示Sobel 算子大小，默认为3即表示一个3*3的矩阵。
+                 
+                 */
                 Canny(gray0, gray, 10, 30, 3); //
                 //Canny(gray0, gray, 1, 3, 5); //
                 // Dilate helps to remove potential holes between edge segments
