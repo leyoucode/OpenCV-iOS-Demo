@@ -397,10 +397,10 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
              int maxWidth = MAX(MAX(w1,w2),MAX(w3,w4));
              int maxHeight = MAX(MAX(h1,h2),MAX(h3,h4));
              
-             CGRect rect = CGRectMake(MIN(rectangle.topLeftX, rectangle.bottomLeftX),
-                                     MIN(rectangle.topLeftY, rectangle.bottomLeftY),
+             CGRect rect = CGRectMake(MIN(rectangle.topLeftX , rectangle.bottomLeftX),
+                                     MIN(rectangle.topLeftY, rectangle.topRightY) - 64,
                                      maxWidth,
-                                     maxHeight) ;
+                                     maxHeight);
              // Create bitmap image from original image data,
              // using rectangle to specify desired crop area
              CGImageRef imageRef = CGImageCreateWithImageInRect(myImage.CGImage, rect);
