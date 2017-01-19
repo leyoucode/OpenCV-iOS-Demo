@@ -332,4 +332,9 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
     return nil;
 }
 
+- (void)captureImageWithCompletionHander:(void(^)(NSString *imageFilePath))completionHandler
+{
+    
+}
+
 @end

@@ -10,4 +10,6 @@
 
 @interface EdgeDetectingViewController : VideoCaptureViewController<CALayerDelegate>
 
+- (void)captureImageWithCompletionHander:(void(^)(NSString *imageFilePath))completionHandler;
+
 @end
