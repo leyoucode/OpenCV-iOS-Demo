@@ -119,6 +119,8 @@ Rectangle* findHoughLines (cv::Mat image){
         rectangle.bottomRightY = corners[2].y;
         rectangle.bottomLeftX = corners[3].x;
         rectangle.bottomLeftY = corners[3].y;
+        
+        return rectangle;
     }
     return nil;
 }

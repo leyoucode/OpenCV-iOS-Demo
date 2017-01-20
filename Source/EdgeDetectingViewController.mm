@@ -18,6 +18,8 @@
 #import "Rectangle.h"
 #import "RectangleCALayer.h"
 #import "UIImage+OpenCV.h"
+#import <opencv2/imgcodecs/ios.h>
+#import "UIImage+UIImage_Rotate.h"
 
 @implementation EdgeDetectingViewController
 
@@ -376,37 +378,65 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
              NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
              UIImage* myImage = [[UIImage alloc] initWithData:imageData];
              
+             
+             
              myImage = [myImage fixOrientation:myImage];
+             
+//             myImage = [UIImage imageWithCGImage:myImage.CGImage
+//                                                         scale:myImage.scale
+//                                                   orientation:UIImageOrientationUpMirrored];
+             
+             myImage = [myImage imageRotatedByDegrees:180];
              
              Rectangle* rectangle = [rectangleCALayer getCurrentRectangle];
              
-             //enhancedImage = [self correctPerspectiveForImage:enhancedImage withFeatures:rectangle];
              
+             //UIImage* mm = [self confirmedImage:myImage withFeatures:rectangle];
              
-             int w1 = abs(rectangle.topRightX - rectangle.topLeftX);
-             int w2 = abs(rectangle.topRightX - rectangle.bottomLeftX);
-             int w3 = abs(rectangle.bottomRightX - rectangle.bottomLeftX);
-             int w4 = abs(rectangle.bottomRightX - rectangle.topLeftX);
+//             NSData *jpgData = UIImageJPEGRepresentation(myImage, 1.0f);
+//             
+//             CIImage *enhancedImage = [[CIImage alloc] initWithData:jpgData options:@{kCIImageColorSpace:[NSNull null]}];
              
+             //myImage = [self confirmedImage:myImage withFeatures:rectangle];
              
-             int h1 = abs(rectangle.bottomLeftY - rectangle.topLeftY);
-             int h2 = abs(rectangle.bottomLeftY - rectangle.topRightY);
-             int h3 = abs(rectangle.bottomRightY - rectangle.topRightY);
-             int h4 = abs(rectangle.bottomRightY - rectangle.topLeftY);
+             myImage = [self correctPerspectiveForImage:myImage withFeatures:rectangle];
              
-             int maxWidth = MAX(MAX(w1,w2),MAX(w3,w4));
-             int maxHeight = MAX(MAX(h1,h2),MAX(h3,h4));
+             myImage = [myImage flipHorizontal];
+             myImage = [myImage imageRotatedByDegrees:180];
              
-             CGRect rect = CGRectMake(MIN(rectangle.topLeftX , rectangle.bottomLeftX),
-                                     MIN(rectangle.topLeftY, rectangle.topRightY) - 64,
-                                     maxWidth,
-                                     maxHeight);
-             // Create bitmap image from original image data,
-             // using rectangle to specify desired crop area
-             CGImageRef imageRef = CGImageCreateWithImageInRect(myImage.CGImage, rect);
-             UIImage *img = [UIImage imageWithCGImage:imageRef];
-             saveCGImageAsJPEGToFilePath(imageRef, filePath);
-             CGImageRelease(imageRef);
+             NSData *jpgData = UIImageJPEGRepresentation(myImage, 1.0f);
+             [jpgData writeToFile:filePath atomically:NO];
+             
+             NSLog(@"===");
+//             int w1 = abs(rectangle.topRightX - rectangle.topLeftX);
+//             int w2 = abs(rectangle.topRightX - rectangle.bottomLeftX);
+//             int w3 = abs(rectangle.bottomRightX - rectangle.bottomLeftX);
+//             int w4 = abs(rectangle.bottomRightX - rectangle.topLeftX);
+//             
+//             
+//             int h1 = abs(rectangle.bottomLeftY - rectangle.topLeftY);
+//             int h2 = abs(rectangle.bottomLeftY - rectangle.topRightY);
+//             int h3 = abs(rectangle.bottomRightY - rectangle.topRightY);
+//             int h4 = abs(rectangle.bottomRightY - rectangle.topLeftY);
+//             
+//             int maxWidth = MAX(MAX(w1,w2),MAX(w3,w4));
+//             int maxHeight = MAX(MAX(h1,h2),MAX(h3,h4));
+//
+//             CGSize imageSize = myImage.size;
+//             CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+//             float a = imageSize.width / screenSize.width;
+//             float b = imageSize.height / screenSize.height;
+//
+//             CGRect rect = CGRectMake(MIN(rectangle.topLeftX, rectangle.bottomLeftX) * a,
+//                                     MIN(rectangle.topLeftY, rectangle.topRightY) * b,
+//                                     maxWidth * a,
+//                                     maxHeight * b);
+//             // Create bitmap image from original image data,
+//             // using rectangle to specify desired crop area
+//             CGImageRef imageRef = CGImageCreateWithImageInRect(myImage.CGImage, rect);
+//             UIImage *img = [UIImage imageWithCGImage:imageRef];
+//             saveCGImageAsJPEGToFilePath(imageRef, filePath);
+//             CGImageRelease(imageRef);
              
              dispatch_async(dispatch_get_main_queue(), ^
                             {
@@ -459,6 +489,89 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
      }];
 }
 
+
+
+- (UIImage *)confirmedImage:(UIImage*)sourceImage withFeatures:(Rectangle *)rectangle
+{
+    cv::Mat originalRot = [sourceImage CVMat];//[self cvMatFromUIImage:_sourceImage];
+    cv::Mat original;
+    cv::transpose(originalRot, original);
+    
+    originalRot.release();
+    
+    cv::flip(original, original, 1);
+    
+    
+//    CGFloat scaleFactor =  1;//[_sourceImageView contentScale];
+//    
+//    CGPoint ptBottomLeft = //[_adjustRect coordinatesForPoint:1 withScaleFactor:scaleFactor];
+//    CGPoint ptBottomRight = [_adjustRect coordinatesForPoint:2 withScaleFactor:scaleFactor];
+//    CGPoint ptTopRight = [_adjustRect coordinatesForPoint:3 withScaleFactor:scaleFactor];
+//    CGPoint ptTopLeft = [_adjustRect coordinatesForPoint:4 withScaleFactor:scaleFactor];
+//    
+//    CGFloat w1 = sqrt( pow(ptBottomRight.x - ptBottomLeft.x , 2) + pow(ptBottomRight.x - ptBottomLeft.x, 2));
+//    CGFloat w2 = sqrt( pow(ptTopRight.x - ptTopLeft.x , 2) + pow(ptTopRight.x - ptTopLeft.x, 2));
+//    
+//    CGFloat h1 = sqrt( pow(ptTopRight.y - ptBottomRight.y , 2) + pow(ptTopRight.y - ptBottomRight.y, 2));
+//    CGFloat h2 = sqrt( pow(ptTopLeft.y - ptBottomLeft.y , 2) + pow(ptTopLeft.y - ptBottomLeft.y, 2));
+//    
+//    CGFloat maxWidth = (w1 < w2) ? w1 : w2;
+//    CGFloat maxHeight = (h1 < h2) ? h1 : h2;
+    
+    CGSize imageSize = sourceImage.size;
+    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+    float a = imageSize.width / screenSize.width;
+    float b = imageSize.height / screenSize.height;
+    float c = MAX(a, b);
+    
+    cv::Point2f src[4], dst[4];
+    src[0].x = rectangle.topLeftX * c;//ptTopLeft.x;
+    src[0].y = rectangle.topLeftY * c;//ptTopLeft.y;
+    src[1].x = rectangle.topRightX * c;//ptTopRight.x;
+    src[1].y = rectangle.topRightY * c;//ptTopRight.y;
+    src[2].x = rectangle.bottomRightX * c;//ptBottomRight.x;
+    src[2].y = rectangle.bottomRightY * c;//ptBottomRight.y;
+    src[3].x = rectangle.bottomLeftX * c;//ptBottomLeft.x;
+    src[3].y = rectangle.bottomLeftY * c;//ptBottomLeft.y;
+    
+    
+    int w1 = abs(rectangle.topRightX - rectangle.topLeftX);
+    int w2 = abs(rectangle.topRightX - rectangle.bottomLeftX);
+    int w3 = abs(rectangle.bottomRightX - rectangle.bottomLeftX);
+    int w4 = abs(rectangle.bottomRightX - rectangle.topLeftX);
+    
+    
+    int h1 = abs(rectangle.bottomLeftY - rectangle.topLeftY);
+    int h2 = abs(rectangle.bottomLeftY - rectangle.topRightY);
+    int h3 = abs(rectangle.bottomRightY - rectangle.topRightY);
+    int h4 = abs(rectangle.bottomRightY - rectangle.topLeftY);
+    
+    int maxWidth = MAX(MAX(w1,w2),MAX(w3,w4));
+    int maxHeight = MAX(MAX(h1,h2),MAX(h3,h4));
+
+    
+
+    
+    dst[0].x = 0;
+    dst[0].y = 0;
+    dst[1].x = (maxWidth - 1) * c;
+    dst[1].y = 0;
+    dst[2].x = (maxWidth - 1) * c;
+    dst[2].y = (maxWidth - 1) * c;
+    dst[3].x = 0;
+    dst[3].y = (maxHeight - 1) * c;
+    
+    cv::Mat undistorted = cv::Mat( cvSize(maxWidth * c,maxHeight * c), CV_8UC1);
+    cv::warpPerspective(original, undistorted, cv::getPerspectiveTransform(src, dst), cvSize(maxWidth, maxHeight));
+    
+    UIImage *newImage = [UIImage imageWithCVMat:undistorted];//[self UIImageFromCVMat:undistorted];
+    
+    undistorted.release();
+    original.release();
+   
+    return newImage;
+}
+
 //CFDataRef save_cgimage_to_jpeg (CGImageRef image)
 //{
 //    CFMutableDataRef cfdata = CFDataCreateMutable(nil,0);
@@ -470,16 +583,109 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 //    return cfdata
 //}
 
-- (CIImage *)correctPerspectiveForImage:(CIImage *)image withFeatures:(Rectangle *)rectangle
+
+- (UIImage *)correctPerspectiveForImage:(UIImage *)image withFeatures:(Rectangle *)rectangle
+{
+    // 定义左上角，右上角，左下角，右下角
+    CGPoint tlp, trp, blp, brp;
+    
+//    if (rectangle.topLeftY - rectangle.topRightY > 0)
+//    {
+//        //(36,61),(245,56),(27,350),(330,317)
+//        if (rectangle.topLeftX - rectangle.bottomLeftX > 0)
+//        {
+//            tlp = CGPointMake(rectangle.topLeftX - rectangle.bottomLeftX, rectangle.topLeftY - rectangle.topRightY);
+//            trp = CGPointMake(rectangle.topRightX - rectangle.bottomLeftX, 1);
+//            blp = CGPointMake(1, rectangle.bottomLeftY - rectangle.topRightY);
+//            brp = CGPointMake(rectangle.bottomRightX - rectangle.bottomLeftX, rectangle.bottomRightY - rectangle.topRightY);
+//        }
+//        else{
+//            tlp = CGPointMake(1, rectangle.topLeftY - rectangle.topRightY);
+//            trp = CGPointMake(rectangle.topRightX - rectangle.topLeftX, 1);
+//            blp = CGPointMake(rectangle.bottomLeftX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topRightY);
+//            brp = CGPointMake(rectangle.bottomRightX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topRightY);
+//        }
+//    }
+//    else {
+//        if (rectangle.topLeftX - rectangle.bottomLeftX > 0)
+//        {
+//            tlp = CGPointMake(rectangle.topLeftX - rectangle.bottomLeftX, 1);
+//            trp = CGPointMake(rectangle.topRightX - rectangle.bottomLeftX, rectangle.topRightY - rectangle.topLeftY);
+//            blp = CGPointMake(1, rectangle.bottomRightY - rectangle.topLeftY);
+//            brp = CGPointMake(rectangle.bottomRightX - rectangle.bottomLeftX, rectangle.bottomRightY - rectangle.topLeftY);
+//        }else{
+//            tlp = CGPointMake(1, 1);
+//            trp = CGPointMake(rectangle.topRightX - rectangle.topLeftX, rectangle.topRightY - rectangle.topLeftY);
+//            blp = CGPointMake(rectangle.bottomLeftX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topLeftY);
+//            brp = CGPointMake(rectangle.bottomRightX - rectangle.topLeftX, rectangle.bottomRightY - rectangle.topLeftY);
+//        }
+//    }
+    
+    tlp = CGPointMake(rectangle.topLeftX, rectangle.topLeftY);
+    trp = CGPointMake(rectangle.topRightX, rectangle.topRightY);
+    blp = CGPointMake(rectangle.bottomLeftX, rectangle.bottomLeftY);
+    brp = CGPointMake(rectangle.bottomRightX, rectangle.bottomRightY);
+    
+    NSLog(@"LT:%@ RT:%@ LB:%@ RB:%@", NSStringFromCGPoint(tlp),NSStringFromCGPoint(trp),NSStringFromCGPoint(blp),NSStringFromCGPoint(brp));
+    
+    CGSize imageSize = image.size;
+    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+    float a = imageSize.width / screenSize.width;
+    float b = imageSize.height / screenSize.height;
+    float c = MAX(a, b);
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef context = CGBitmapContextCreate(NULL, image.size.width, image.size.height, 8, 4 * image.size.width, colorSpace, kCGImageAlphaPremultipliedLast);
+    
+    CGRect rect = CGRectMake(0, 0, image.size.width, image.size.height);
+    
+    [[UIColor blackColor] setFill];
+    CGContextFillRect(context, rect);
+    
+    CGColorRef fillColor = [[UIColor whiteColor] CGColor];
+    CGContextSetFillColor(context, CGColorGetComponents(fillColor));
+    
+    CGContextMoveToPoint(context, tlp.x * c, tlp.y * c);
+    CGContextAddLineToPoint(context, trp.x * c, trp.y * c);
+    CGContextAddLineToPoint(context, brp.x * c, brp.y * c);
+    CGContextAddLineToPoint(context, blp.x * c, blp.y * c);
+    
+    CGContextClosePath(context);
+    CGContextClip(context);
+    //CGContextRotateCTM (context, -90/180*M_PI);
+    image = [image flipHorizontal];
+    CGContextDrawImage(context, rect, image.CGImage);
+    CGImageRef imageMasked = CGBitmapContextCreateImage(context);
+    CGContextRelease(context);
+    UIImage *newImage = [UIImage imageWithCGImage:imageMasked];
+    CGImageRelease(imageMasked);
+    return newImage;
+}
+ 
+
+/*
+- (CIImage *)correctPerspectiveForImage:(CIImage *)image withFeatures:(Rectangle *)rectangle size:(CGSize) imageSize
 {
     
+//    CGSize imageSize = myImage.size;
+     CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+     float a = imageSize.width / screenSize.width;
+     float b = imageSize.height / screenSize.height;
+     float c = MAX(a, b);
+
+//     CGRect rect = CGRectMake(MIN(rectangle.topLeftX, rectangle.bottomLeftX) * a,
+//                             MIN(rectangle.topLeftY, rectangle.topRightY) * b,
+//                             maxWidth * a,
+//                             maxHeight * b);
+    
     NSMutableDictionary *rectangleCoordinates = [NSMutableDictionary new];
-    rectangleCoordinates[@"inputTopLeft"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.topLeftX, rectangle.topLeftY )];
-    rectangleCoordinates[@"inputTopRight"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.topRightX, rectangle.topRightY)];
-    rectangleCoordinates[@"inputBottomLeft"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.bottomLeftX, rectangle.bottomLeftY)];
-    rectangleCoordinates[@"inputBottomRight"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.bottomRightX, rectangle.bottomRightY)];
+    rectangleCoordinates[@"inputTopLeft"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.topLeftX * c, rectangle.topLeftY * c )];
+    rectangleCoordinates[@"inputTopRight"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.topRightX * c, rectangle.topRightY * c)];
+    rectangleCoordinates[@"inputBottomLeft"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.bottomLeftX * c, rectangle.bottomLeftY * c)];
+    rectangleCoordinates[@"inputBottomRight"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.bottomRightX * c, rectangle.bottomRightY * c)];
     return [image imageByApplyingFilter:@"CIPerspectiveCorrection" withInputParameters:rectangleCoordinates];
 }
+ */
 
 void saveCGImageAsJPEGToFilePath(CGImageRef imageRef, NSString *filePath)
 {

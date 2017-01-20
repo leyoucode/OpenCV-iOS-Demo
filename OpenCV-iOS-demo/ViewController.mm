@@ -19,8 +19,6 @@
     IBOutlet UIButton* button;
 }
 
-- (IBAction)actionStart:(id)sender;
-
 @end
 
 @implementation ViewController
@@ -33,11 +31,16 @@
 }
 
 #pragma mark - UI Actions
-- (IBAction)actionStart:(id)sender
+- (IBAction)OnCannyEdgeDetectButtonClick:(id)sender
 {
     CannyEdgeDetectingViewController* controller = [[CannyEdgeDetectingViewController alloc] init];
     [self presentViewController:controller animated:YES completion:nil];
 }
 
+- (IBAction)OnHoughLineEdgeDetectButtonClick:(id)sender
+{
+    HoughLineEdgeDetectingViewController* controller = [[HoughLineEdgeDetectingViewController alloc] init];
+    [self presentViewController:controller animated:YES completion:nil];
+}
 
 @end
