@@ -404,6 +404,8 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
              myImage = [myImage flipHorizontal];
              myImage = [myImage imageRotatedByDegrees:180];
              
+             myImage = [self confirmedImage:myImage withFeatures:rectangle];
+             
              NSData *jpgData = UIImageJPEGRepresentation(myImage, 1.0f);
              [jpgData writeToFile:filePath atomically:NO];
              
@@ -493,13 +495,75 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 
 - (UIImage *)confirmedImage:(UIImage*)sourceImage withFeatures:(Rectangle *)rectangle
 {
-    cv::Mat originalRot = [sourceImage CVMat];//[self cvMatFromUIImage:_sourceImage];
-    cv::Mat original;
-    cv::transpose(originalRot, original);
     
-    originalRot.release();
+    float a1x = rectangle.topLeftX;
+    float a1y = rectangle.topLeftY;
+    float b1x = rectangle.topRightX;
+    float b1y = rectangle.topRightY;
+    float c1x = rectangle.bottomLeftX;
+    float c1y = rectangle.bottomLeftY;
+    float d1x = rectangle.bottomRightX;
+    float d1y = rectangle.bottomRightY;
     
-    cv::flip(original, original, 1);
+    CGSize imageSize = sourceImage.size;
+    float w1 = imageSize.width;
+    float h1 = imageSize.height;
+    
+    cv::Mat img = [sourceImage CVMat];
+    
+    int w2 = img.cols; // W2
+    int h2 = img.rows; // H2
+    
+    std::vector<cv::Point2f> corners(4);
+    corners[0] = cv::Point2f((a1x * w2) / w1, (a1y * h2) / h1 );
+    corners[1] = cv::Point2f((b1x * w2) / w1, (b1y * h2) / h1 );
+    corners[2] = cv::Point2f((c1x * w2) / w1, (c1y * h2) / h1 );
+    corners[3] = cv::Point2f((d1x * w2) / w1, (d1y * h2) / h1 );
+    
+    //CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+    std::vector<cv::Point2f> corners_trans(4);
+    corners_trans[0] = cv::Point2f(0,0);
+    corners_trans[1] = cv::Point2f(imageSize.width,0);
+    corners_trans[2] = cv::Point2f(0,imageSize.height);
+    corners_trans[3] = cv::Point2f(imageSize.width,imageSize.height);
+    
+    cv::Mat transform = getPerspectiveTransform(corners,corners_trans);
+    //cout<<transform<<endl;
+    std::vector<cv::Point2f> ponits, points_trans;
+    for(int i=0;i<h2;i++){
+        for(int j=0;j<w2;j++){
+            ponits.push_back(cv::Point2f(j,i));
+        }
+    }
+    // TODO 继续研究 透视变换
+    perspectiveTransform( ponits, points_trans, transform);
+    cv::Mat img_trans = cv::Mat::zeros(h2,w2,CV_8UC3);
+    int count = 0;
+    for(int i=0;i<h2;i++){
+        uchar* p = img.ptr<uchar>(i);
+        for(int j=0;j<w2;j++){
+            int y = points_trans[count].y;
+            int x = points_trans[count].x;
+            uchar* t = img_trans.ptr<uchar>(y);
+            t[x*3]  = p[j*3];
+            t[x*3+1]  = p[j*3+1];
+            t[x*3+2]  = p[j*3+2];
+            count++;
+        }
+    }
+    //imwrite("boy_trans.png",img_trans);
+    
+    UIImage *newImage = [UIImage imageWithCVMat:img_trans];
+    img_trans.release();
+    
+    return newImage;
+    
+//    cv::Mat original;
+//    cv::transpose(originalRot, original);
+//    
+//    originalRot.release();
+//    
+//    cv::flip(original, original, 1);
     
     
 //    CGFloat scaleFactor =  1;//[_sourceImageView contentScale];
@@ -518,58 +582,58 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 //    CGFloat maxWidth = (w1 < w2) ? w1 : w2;
 //    CGFloat maxHeight = (h1 < h2) ? h1 : h2;
     
-    CGSize imageSize = sourceImage.size;
-    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-    float a = imageSize.width / screenSize.width;
-    float b = imageSize.height / screenSize.height;
-    float c = MAX(a, b);
-    
-    cv::Point2f src[4], dst[4];
-    src[0].x = rectangle.topLeftX * c;//ptTopLeft.x;
-    src[0].y = rectangle.topLeftY * c;//ptTopLeft.y;
-    src[1].x = rectangle.topRightX * c;//ptTopRight.x;
-    src[1].y = rectangle.topRightY * c;//ptTopRight.y;
-    src[2].x = rectangle.bottomRightX * c;//ptBottomRight.x;
-    src[2].y = rectangle.bottomRightY * c;//ptBottomRight.y;
-    src[3].x = rectangle.bottomLeftX * c;//ptBottomLeft.x;
-    src[3].y = rectangle.bottomLeftY * c;//ptBottomLeft.y;
-    
-    
-    int w1 = abs(rectangle.topRightX - rectangle.topLeftX);
-    int w2 = abs(rectangle.topRightX - rectangle.bottomLeftX);
-    int w3 = abs(rectangle.bottomRightX - rectangle.bottomLeftX);
-    int w4 = abs(rectangle.bottomRightX - rectangle.topLeftX);
-    
-    
-    int h1 = abs(rectangle.bottomLeftY - rectangle.topLeftY);
-    int h2 = abs(rectangle.bottomLeftY - rectangle.topRightY);
-    int h3 = abs(rectangle.bottomRightY - rectangle.topRightY);
-    int h4 = abs(rectangle.bottomRightY - rectangle.topLeftY);
-    
-    int maxWidth = MAX(MAX(w1,w2),MAX(w3,w4));
-    int maxHeight = MAX(MAX(h1,h2),MAX(h3,h4));
-
-    
-
-    
-    dst[0].x = 0;
-    dst[0].y = 0;
-    dst[1].x = (maxWidth - 1) * c;
-    dst[1].y = 0;
-    dst[2].x = (maxWidth - 1) * c;
-    dst[2].y = (maxWidth - 1) * c;
-    dst[3].x = 0;
-    dst[3].y = (maxHeight - 1) * c;
-    
-    cv::Mat undistorted = cv::Mat( cvSize(maxWidth * c,maxHeight * c), CV_8UC1);
-    cv::warpPerspective(original, undistorted, cv::getPerspectiveTransform(src, dst), cvSize(maxWidth, maxHeight));
-    
-    UIImage *newImage = [UIImage imageWithCVMat:undistorted];//[self UIImageFromCVMat:undistorted];
-    
-    undistorted.release();
-    original.release();
-   
-    return newImage;
+//    CGSize imageSize = sourceImage.size;
+//    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+//    float a = imageSize.width / screenSize.width;
+//    float b = imageSize.height / screenSize.height;
+//    float c = MAX(a, b);
+//    
+//    cv::Point2f src[4], dst[4];
+//    src[0].x = rectangle.topLeftX * c;//ptTopLeft.x;
+//    src[0].y = rectangle.topLeftY * c;//ptTopLeft.y;
+//    src[1].x = rectangle.topRightX * c;//ptTopRight.x;
+//    src[1].y = rectangle.topRightY * c;//ptTopRight.y;
+//    src[2].x = rectangle.bottomRightX * c;//ptBottomRight.x;
+//    src[2].y = rectangle.bottomRightY * c;//ptBottomRight.y;
+//    src[3].x = rectangle.bottomLeftX * c;//ptBottomLeft.x;
+//    src[3].y = rectangle.bottomLeftY * c;//ptBottomLeft.y;
+//
+//    
+//    int w1 = abs(rectangle.topRightX - rectangle.topLeftX);
+//    int w2 = abs(rectangle.topRightX - rectangle.bottomLeftX);
+//    int w3 = abs(rectangle.bottomRightX - rectangle.bottomLeftX);
+//    int w4 = abs(rectangle.bottomRightX - rectangle.topLeftX);
+//    
+//    
+//    int h1 = abs(rectangle.bottomLeftY - rectangle.topLeftY);
+//    int h2 = abs(rectangle.bottomLeftY - rectangle.topRightY);
+//    int h3 = abs(rectangle.bottomRightY - rectangle.topRightY);
+//    int h4 = abs(rectangle.bottomRightY - rectangle.topLeftY);
+//    
+//    int maxWidth = MAX(MAX(w1,w2),MAX(w3,w4));
+//    int maxHeight = MAX(MAX(h1,h2),MAX(h3,h4));
+//
+//    
+//
+//    
+//    dst[0].x = 0;
+//    dst[0].y = 0;
+//    dst[1].x = (maxWidth - 1) * c;
+//    dst[1].y = 0;
+//    dst[2].x = (maxWidth - 1) * c;
+//    dst[2].y = (maxWidth - 1) * c;
+//    dst[3].x = 0;
+//    dst[3].y = (maxHeight - 1) * c;
+//    
+//    cv::Mat undistorted = cv::Mat( cvSize(maxWidth * c,maxHeight * c), CV_8UC1);
+//    cv::warpPerspective(original, undistorted, cv::getPerspectiveTransform(src, dst), cvSize(maxWidth, maxHeight));
+//    
+//    UIImage *newImage = [UIImage imageWithCVMat:undistorted];//[self UIImageFromCVMat:undistorted];
+//    
+//    undistorted.release();
+//    original.release();
+//   
+//    return newImage;
 }
 
 //CFDataRef save_cgimage_to_jpeg (CGImageRef image)
