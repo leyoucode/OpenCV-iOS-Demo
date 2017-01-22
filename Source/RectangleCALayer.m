@@ -172,20 +172,19 @@
         
         */
         
+//        CGContextSetRGBFillColor(context, 1.0,1.0,1.0,0.65);
+//        CGContextFillRect(context,self.bounds);
         
         CGContextSetLineWidth(context, 2.0);
-        CGContextSetStrokeColorWithColor(context, [[UIColor greenColor] CGColor]);
-        CGContextSetFillColorWithColor(context, [[UIColor clearColor] CGColor]);
         
         CGContextMoveToPoint(context, _rectangle.topLeftX, _rectangle.topLeftY);
-        
         CGContextAddLineToPoint(context, _rectangle.topRightX, _rectangle.topRightY);
-        
         CGContextAddLineToPoint(context, _rectangle.bottomRightX, _rectangle.bottomRightY);
-        
         CGContextAddLineToPoint(context, _rectangle.bottomLeftX, _rectangle.bottomLeftY);
+        CGContextClosePath(context);
         
-        CGContextAddLineToPoint(context, _rectangle.topLeftX, _rectangle.topLeftY);
+        CGContextSetRGBFillColor(context, 1.0,1.1,1.0,0.1);
+        CGContextSetRGBStrokeColor(context, 1.0, 1.0, 1.0, 1.0);
         
         CGContextDrawPath(context, kCGPathFillStroke);
     }

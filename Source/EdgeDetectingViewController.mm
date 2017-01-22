@@ -404,7 +404,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
              myImage = [myImage flipHorizontal];
              myImage = [myImage imageRotatedByDegrees:180];
              
-             myImage = [self confirmedImage:myImage withFeatures:rectangle];
+             //myImage = [self confirmedImage:myImage withFeatures:rectangle];
              
              NSData *jpgData = UIImageJPEGRepresentation(myImage, 1.0f);
              [jpgData writeToFile:filePath atomically:NO];
@@ -496,14 +496,14 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 - (UIImage *)confirmedImage:(UIImage*)sourceImage withFeatures:(Rectangle *)rectangle
 {
     
-    float a1x = rectangle.topLeftX;
-    float a1y = rectangle.topLeftY;
-    float b1x = rectangle.topRightX;
-    float b1y = rectangle.topRightY;
-    float c1x = rectangle.bottomLeftX;
-    float c1y = rectangle.bottomLeftY;
-    float d1x = rectangle.bottomRightX;
-    float d1y = rectangle.bottomRightY;
+    float a1x = rectangle.topLeftX * 0.25;
+    float a1y = rectangle.topLeftY * 0.25;
+    float b1x = rectangle.topRightX * 0.25;
+    float b1y = rectangle.topRightY * 0.25;
+    float c1x = rectangle.bottomLeftX * 0.25;
+    float c1y = rectangle.bottomLeftY * 0.25;
+    float d1x = rectangle.bottomRightX * 0.25;
+    float d1y = rectangle.bottomRightY * 0.25;
     
     CGSize imageSize = sourceImage.size;
     float w1 = imageSize.width;
@@ -515,10 +515,15 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
     int h2 = img.rows; // H2
     
     std::vector<cv::Point2f> corners(4);
-    corners[0] = cv::Point2f((a1x * w2) / w1, (a1y * h2) / h1 );
-    corners[1] = cv::Point2f((b1x * w2) / w1, (b1y * h2) / h1 );
-    corners[2] = cv::Point2f((c1x * w2) / w1, (c1y * h2) / h1 );
-    corners[3] = cv::Point2f((d1x * w2) / w1, (d1y * h2) / h1 );
+//    corners[0] = cv::Point2f((a1x * w2) / w1, (a1y * h2) / h1 );
+//    corners[1] = cv::Point2f((b1x * w2) / w1, (b1y * h2) / h1 );
+//    corners[2] = cv::Point2f((c1x * w2) / w1, (c1y * h2) / h1 );
+//    corners[3] = cv::Point2f((d1x * w2) / w1, (d1y * h2) / h1 );
+//    
+    corners.push_back(cv::Point2f(122,0));
+    corners.push_back(cv::Point2f(814,0));
+    corners.push_back(cv::Point2f(22,540));
+    corners.push_back(cv::Point2f(910,540));
     
     //CGSize screenSize = [[UIScreen mainScreen] bounds].size;
     std::vector<cv::Point2f> corners_trans(4);
@@ -535,7 +540,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
             ponits.push_back(cv::Point2f(j,i));
         }
     }
-    // TODO 继续研究 透视变换
+    
     perspectiveTransform( ponits, points_trans, transform);
     cv::Mat img_trans = cv::Mat::zeros(h2,w2,CV_8UC3);
     int count = 0;
