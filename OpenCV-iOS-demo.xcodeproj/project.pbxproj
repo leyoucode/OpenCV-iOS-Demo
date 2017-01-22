@@ -21,6 +21,7 @@
 		FE342FB71E3211BB00F0D071 /* UIImage+UIImage_Rotate.m in Sources */ = {isa = PBXBuildFile; fileRef = FE342FB61E3211BB00F0D071 /* UIImage+UIImage_Rotate.m */; };
 		FE342FC11E34807100F0D071 /* CannyEdgeDetectingControlView.xib in Resources */ = {isa = PBXBuildFile; fileRef = FE342FC01E34807100F0D071 /* CannyEdgeDetectingControlView.xib */; };
 		FE342FC41E34811C00F0D071 /* CannyEdgeDetectingControlView.m in Sources */ = {isa = PBXBuildFile; fileRef = FE342FC31E34811C00F0D071 /* CannyEdgeDetectingControlView.m */; };
+		FE89BC761E34B23600179706 /* MyZoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE89BC751E34B23600179706 /* MyZoomViewController.m */; };
 		FEC619581E2F3ED100A45533 /* CannyEdgeDetectingViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FEC619571E2F3ED100A45533 /* CannyEdgeDetectingViewController.mm */; };
 		FEF47F8D1E2645B500AF034B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF47F8C1E2645B500AF034B /* AppDelegate.swift */; };
 		FEF47F921E2645B500AF034B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FEF47F901E2645B500AF034B /* Main.storyboard */; };
@@ -57,6 +58,8 @@
 		FE342FC01E34807100F0D071 /* CannyEdgeDetectingControlView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CannyEdgeDetectingControlView.xib; sourceTree = "<group>"; };
 		FE342FC21E34811C00F0D071 /* CannyEdgeDetectingControlView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CannyEdgeDetectingControlView.h; sourceTree = "<group>"; };
 		FE342FC31E34811C00F0D071 /* CannyEdgeDetectingControlView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CannyEdgeDetectingControlView.m; sourceTree = "<group>"; };
+		FE89BC741E34B23600179706 /* MyZoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyZoomViewController.h; sourceTree = "<group>"; };
+		FE89BC751E34B23600179706 /* MyZoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyZoomViewController.m; sourceTree = "<group>"; };
 		FEC619561E2F3ED100A45533 /* CannyEdgeDetectingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CannyEdgeDetectingViewController.h; sourceTree = "<group>"; };
 		FEC619571E2F3ED100A45533 /* CannyEdgeDetectingViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CannyEdgeDetectingViewController.mm; sourceTree = "<group>"; };
 		FEF47F891E2645B500AF034B /* OpenCV-iOS-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "OpenCV-iOS-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -159,6 +162,8 @@
 				FE00839A1E272D7700299936 /* OpenCV-iOS-demo-Bridging-Header.h */,
 				FE0083A01E2784D900299936 /* ViewController.h */,
 				FE0083A11E2784D900299936 /* ViewController.mm */,
+				FE89BC741E34B23600179706 /* MyZoomViewController.h */,
+				FE89BC751E34B23600179706 /* MyZoomViewController.m */,
 			);
 			path = "OpenCV-iOS-demo";
 			sourceTree = "<group>";
@@ -296,6 +301,7 @@
 				FE0083D41E2884C500299936 /* UIImage+OpenCV.mm in Sources */,
 				FE342FB71E3211BB00F0D071 /* UIImage+UIImage_Rotate.m in Sources */,
 				FEF47F8D1E2645B500AF034B /* AppDelegate.swift in Sources */,
+				FE89BC761E34B23600179706 /* MyZoomViewController.m in Sources */,
 				FEC619581E2F3ED100A45533 /* CannyEdgeDetectingViewController.mm in Sources */,
 				FE00839D1E272D7800299936 /* OpenCVWrapper.mm in Sources */,
 				FE0083D31E2884C500299936 /* RectangleCALayer.m in Sources */,

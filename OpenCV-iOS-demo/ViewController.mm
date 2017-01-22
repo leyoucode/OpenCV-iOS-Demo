@@ -27,14 +27,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     openCVVersionLabel.text = [OpenCVWrapper openCVVersionString];
-
+    [self.navigationController setNavigationBarHidden:YES];
 }
 
 #pragma mark - UI Actions
 - (IBAction)OnCannyEdgeDetectButtonClick:(id)sender
 {
     CannyEdgeDetectingViewController* controller = [[CannyEdgeDetectingViewController alloc] init];
-    [self presentViewController:controller animated:YES completion:nil];
+    [self.navigationController pushViewController:controller animated:YES];
+    //[self presentViewController:controller animated:YES completion:nil];
 }
 
 - (IBAction)OnHoughLineEdgeDetectButtonClick:(id)sender

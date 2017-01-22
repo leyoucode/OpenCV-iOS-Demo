@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="ufc-4y-ddK">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -30,7 +30,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="15U-Cn-bkG">
-                                <rect key="frame" x="16" y="20" width="343" height="343"/>
+                                <rect key="frame" x="16" y="64" width="343" height="343"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="15U-Cn-bkG" secondAttribute="height" multiplier="1:1" id="gRB-IX-umT"/>
                                 </constraints>
@@ -71,6 +71,7 @@
                             <constraint firstAttribute="trailingMargin" secondItem="15U-Cn-bkG" secondAttribute="trailing" id="sxy-eG-OAq"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="hrR-6U-WLc"/>
                     <connections>
                         <outlet property="button" destination="mhd-kL-Zyi" id="4rR-u4-7TP"/>
                         <outlet property="imageView" destination="15U-Cn-bkG" id="SSb-2M-7j7"/>
@@ -79,7 +80,25 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="926" y="160"/>
+            <point key="canvasLocation" x="1864.8" y="159.67016491754123"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="Swr-0w-uZL">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="ufc-4y-ddK" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="h1X-QB-shQ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="cTs-NM-TFC"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="v9O-pJ-0Bb" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="925.60000000000002" y="159.67016491754123"/>
         </scene>
     </scenes>
 </document>

@@ -15,6 +15,7 @@
 #import "Rectangle.h"
 
 #import "CannyEdgeDetectingControlView.h"
+#import "MyZoomViewController.h"
 
 @implementation CannyEdgeDetectingViewController
 
@@ -89,21 +90,27 @@
     
     [self captureImageWithCompletionHander:^(NSString *imageFilePath) {
         
-        UIImageView *captureImageView = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:imageFilePath]];
-        captureImageView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.7];
-        captureImageView.frame = CGRectOffset(weakSelf.view.bounds, 0, -weakSelf.view.bounds.size.height);
-        captureImageView.alpha = 1.0;
-        captureImageView.contentMode = UIViewContentModeScaleAspectFit;
-        captureImageView.userInteractionEnabled = YES;
-        [weakSelf.view addSubview:captureImageView];
+        MyZoomViewController *vc = [[MyZoomViewController alloc] init];
+        vc.imagePath = imageFilePath;
+        [weakSelf presentViewController:vc animated:NO completion:nil];
         
-        UITapGestureRecognizer *dismissTap = [[UITapGestureRecognizer alloc] initWithTarget:weakSelf action:@selector(dismissPreview:)];
-        [captureImageView addGestureRecognizer:dismissTap];
+        //[weakSelf.navigationController pushViewController:vc animated:YES];
         
-        [UIView animateWithDuration:0.7 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.7 options:UIViewAnimationOptionAllowUserInteraction animations:^
-         {
-             captureImageView.frame = CGRectMake(50, 0, weakSelf.view.bounds.size.width - 100, weakSelf.view.bounds.size.height);
-         } completion:nil];
+//        UIImageView *captureImageView = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:imageFilePath]];
+//        captureImageView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.7];
+//        captureImageView.frame = CGRectOffset(weakSelf.view.bounds, 0, -weakSelf.view.bounds.size.height);
+//        captureImageView.alpha = 1.0;
+//        captureImageView.contentMode = UIViewContentModeScaleAspectFit;
+//        captureImageView.userInteractionEnabled = YES;
+//        [weakSelf.view addSubview:captureImageView];
+//        
+//        UITapGestureRecognizer *dismissTap = [[UITapGestureRecognizer alloc] initWithTarget:weakSelf action:@selector(dismissPreview:)];
+//        [captureImageView addGestureRecognizer:dismissTap];
+//        
+//        [UIView animateWithDuration:0.7 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.7 options:UIViewAnimationOptionAllowUserInteraction animations:^
+//         {
+//             captureImageView.frame = CGRectMake(50, 0, weakSelf.view.bounds.size.width - 100, weakSelf.view.bounds.size.height);
+//         } completion:nil];
         
     }];
 }
