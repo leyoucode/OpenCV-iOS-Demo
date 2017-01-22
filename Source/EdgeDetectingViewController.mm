@@ -180,37 +180,6 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
     }
 }
 
-//- (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)context {
-//    
-//    NSLog(@"aggregateRectangle => %@",aggregateRectangle);
-//    
-//    if ( aggregateRectangle ){
-//        
-//        
-//        CGContextSetLineWidth(context, 2.0);
-//        CGContextSetStrokeColorWithColor(context, [[UIColor greenColor] CGColor]);
-//        CGContextSetFillColorWithColor(context, [[UIColor colorWithWhite:1 alpha:0.25] CGColor]);
-//        
-//        CGContextMoveToPoint(context, aggregateRectangle.topLeftX, aggregateRectangle.topLeftY);
-//        
-//        CGContextAddLineToPoint(context, aggregateRectangle.topRightX, aggregateRectangle.topRightY);
-//        
-//        CGContextAddLineToPoint(context, aggregateRectangle.bottomRightX, aggregateRectangle.bottomRightY);
-//        
-//        CGContextAddLineToPoint(context, aggregateRectangle.bottomLeftX, aggregateRectangle.bottomLeftY);
-//        
-//        CGContextAddLineToPoint(context, aggregateRectangle.topLeftX, aggregateRectangle.topLeftY);
-//        
-//        CGContextDrawPath(context, kCGPathFillStroke);
-//    }
-//}
-
-
-
-
-
-
-
 - (void) processRectangleFromFrame:(Rectangle *)rectangle inFrame:(long)frame{
     if ( !rectangle ){
         // the rectangle is null, so remove the oldest frame from the queue
@@ -447,157 +416,98 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
                                 completionHandler(filePath);
                                 dispatch_resume(_captureQueue);
                             });
-             
-             
-//             if (!enhancedImage || CGRectIsEmpty(enhancedImage.extent)) return;
-//             
-//             static CIContext *ctx = nil;
-//             if (!ctx)
-//             {
-//                 ctx = [CIContext contextWithOptions:@{kCIContextWorkingColorSpace:[NSNull null]}];
-//             }
-//             
-//             CGSize bounds = enhancedImage.extent.size;
-//             bounds = CGSizeMake(floorf(bounds.width / 4) * 4,floorf(bounds.height / 4) * 4);
-//             CGRect extent = CGRectMake(enhancedImage.extent.origin.x, enhancedImage.extent.origin.y, bounds.width, bounds.height);
-//             
-//             static int bytesPerPixel = 8;
-//             uint rowBytes = bytesPerPixel * bounds.width;
-//             uint totalBytes = rowBytes * bounds.height;
-//             uint8_t *byteBuffer = (uint8_t *)malloc(totalBytes);
-//             
-//             CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-//             
-//             [ctx render:enhancedImage toBitmap:byteBuffer rowBytes:rowBytes bounds:extent format:kCIFormatRGBA8 colorSpace:colorSpace];
-//             
-//             CGContextRef bitmapContext = CGBitmapContextCreate(byteBuffer,bounds.width,bounds.height,bytesPerPixel,rowBytes,colorSpace,kCGImageAlphaNoneSkipLast);
-//             CGImageRef imgRef = CGBitmapContextCreateImage(bitmapContext);
-//             CGColorSpaceRelease(colorSpace);
-//             CGContextRelease(bitmapContext);
-//             free(byteBuffer);
-//             
-//             if (imgRef == NULL)
-//             {
-//                 CFRelease(imgRef);
-//                 return;
-//             }
-//             saveCGImageAsJPEGToFilePath(imgRef, filePath);
-//             CFRelease(imgRef);
-//             
-//             dispatch_async(dispatch_get_main_queue(), ^
-//                            {
-//                                completionHandler(filePath);
-//                                dispatch_resume(_captureQueue);
-//                            });
          }
      }];
 }
 
-cv::Mat OpenWarpPerspective(const cv::Mat& _image
-                            , const cv::Point2f& _lu
-                            , const cv::Point2f& _ru
-                            , const cv::Point2f& _rd
-                            , const cv::Point2f& _ld
-                            , const cv::Point2f& _lu_result
-                            , const cv::Point2f& _ru_result
-                            , const cv::Point2f& _rd_result
-                            , const cv::Point2f& _ld_result
-                            , cv::Mat& _transform_matrix)
-{
-    // todo do some checks on input.
-    
-    cv::Point2f source_points[4];
-    cv::Point2f dest_points[4];
-    
-    
-    source_points[0] = _lu;
-    source_points[1] = _ru;
-    source_points[2] = _rd;
-    source_points[3] = _ld;
-    
-    dest_points[0] = _lu_result;
-    dest_points[1] = _ru_result;
-    dest_points[2] = _rd_result;
-    dest_points[3] = _ld_result;
-    
-    dst: cv::Mat dst = _image.clone();
-    _transform_matrix = cv::getPerspectiveTransform(source_points, dest_points);
-    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-    // cols rows
-    cv::warpPerspective(_image, dst, _transform_matrix, cv::Size(screenSize.width, screenSize.height));
-    
-    
-    return dst;  
-}
+//cv::Mat OpenWarpPerspective(const cv::Mat& _image
+//                            , const cv::Point2f& _lu
+//                            , const cv::Point2f& _ru
+//                            , const cv::Point2f& _rd
+//                            , const cv::Point2f& _ld
+//                            , const cv::Point2f& _lu_result
+//                            , const cv::Point2f& _ru_result
+//                            , const cv::Point2f& _rd_result
+//                            , const cv::Point2f& _ld_result
+//                            , cv::Mat& _transform_matrix)
+//{
+//    // todo do some checks on input.
+//    
+//    cv::Point2f source_points[4];
+//    cv::Point2f dest_points[4];
+//    
+//    
+//    source_points[0] = _lu;
+//    source_points[1] = _ru;
+//    source_points[2] = _rd;
+//    source_points[3] = _ld;
+//    
+//    dest_points[0] = _lu_result;
+//    dest_points[1] = _ru_result;
+//    dest_points[2] = _rd_result;
+//    dest_points[3] = _ld_result;
+//    
+//    dst: cv::Mat dst = _image.clone();
+//    _transform_matrix = cv::getPerspectiveTransform(source_points, dest_points);
+//    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+//    // cols rows
+//    cv::warpPerspective(_image, dst, _transform_matrix, cv::Size(screenSize.width, screenSize.height));
+//    
+//    
+//    return dst;  
+//}
+
+
+
+
 
 - (UIImage *)confirmedImage:(UIImage*)sourceImage withFeatures:(Rectangle *)rectangle
 {
     
-//    float a1x = rectangle.topLeftX;
-//    float a1y = rectangle.topLeftY;
-//    float b1x = rectangle.topRightX;
-//    float b1y = rectangle.topRightY;
-//    float c1x = rectangle.bottomLeftX;
-//    float c1y = rectangle.bottomLeftY;
-//    float d1x = rectangle.bottomRightX;
-//    float d1y = rectangle.bottomRightY;
-    
-    int w1 = abs(rectangle.topRightX - rectangle.topLeftX);
-    int w2 = abs(rectangle.topRightX - rectangle.bottomLeftX);
-    int w3 = abs(rectangle.bottomRightX - rectangle.bottomLeftX);
-    int w4 = abs(rectangle.bottomRightX - rectangle.topLeftX);
-    
-    
-    int h1 = abs(rectangle.bottomLeftY - rectangle.topLeftY);
-    int h2 = abs(rectangle.bottomLeftY - rectangle.topRightY);
-    int h3 = abs(rectangle.bottomRightY - rectangle.topRightY);
-    int h4 = abs(rectangle.bottomRightY - rectangle.topLeftY);
-    
-    int maxWidth = MAX(MAX(w1,w2),MAX(w3,w4));
-    int maxHeight = MAX(MAX(h1,h2),MAX(h3,h4));
-    if (maxWidth > maxHeight)
-    {
-        
-    }
-    
     CGSize imageSize = sourceImage.size;
-//    float w1 = imageSize.width;
-//    float h1 = imageSize.height;
-    
-    
     CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+    
     float a = imageSize.width / screenSize.width;
     float b = imageSize.height / screenSize.height;
     float c = MAX(a, b);
     
-    
     cv::Mat img = [sourceImage CVMat];
     
-//    int w2 = img.cols; // W2
-//    int h2 = img.rows; // H2
-    
     std::vector<cv::Point2f> corners(4);
-
     corners[0] = cv::Point2f(rectangle.topLeftX * c, rectangle.topLeftY * c );
     corners[1] = cv::Point2f(rectangle.topRightX * c, rectangle.topRightY * c );
-    corners[2] = cv::Point2f(rectangle.bottomRightX * c, rectangle.bottomRightY * c );
-    corners[3] = cv::Point2f(rectangle.bottomLeftX * c, rectangle.bottomLeftY * c );
+    corners[2] = cv::Point2f(rectangle.bottomLeftX * c, rectangle.bottomLeftY * c );
+    corners[3] = cv::Point2f(rectangle.bottomRightX * c, rectangle.bottomRightY * c );
     
     std::vector<cv::Point2f> corners_trans(4);
-    corners_trans[0] = cv::Point2f(0,0);
-    corners_trans[1] = cv::Point2f(imageSize.width,0);
-    corners_trans[2] = cv::Point2f(imageSize.width,imageSize.height);
-    corners_trans[3] = cv::Point2f(0,imageSize.height);
+//    corners_trans[0] = cv::Point2f(0,0);
+//    corners_trans[1] = cv::Point2f(img.cols,0);
+//    corners_trans[2] = cv::Point2f(img.cols,img.rows);
+//    corners_trans[3] = cv::Point2f(0,img.rows);
+    
+    // Assemble a rotated rectangle out of that info
+    cv::RotatedRect box = minAreaRect(cv::Mat(corners));
+    std::cout << "Rotated box set to (" << box.boundingRect().x << "," << box.boundingRect().y << ") " << box.size.width << "x" << box.size.height << std::endl;
+    
+//    cv::Point2f pts[4];
+//    box.points(pts);
+
+    corners_trans[0] = cv::Point(0, 0);
+    corners_trans[1] = cv::Point(box.boundingRect().width - 1, 0);
+    corners_trans[2] = cv::Point(0, box.boundingRect().height - 1);
+    corners_trans[3] = cv::Point(box.boundingRect().width - 1, box.boundingRect().height - 1);
     
     cv::Mat warpMatrix = getPerspectiveTransform(corners, corners_trans);
-    cv::Mat rotated;
-    warpPerspective(img, rotated, warpMatrix, rotated.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT);
+    //cv::Mat rotated;
     
-//    cv::Mat dest = img.clone();
-//    
-//    OpenWarpPerspective(img, corners[0], corners[1], corners[2], corners[3], corners_trans[0], corners_trans[1], corners_trans[2], corners_trans[3], dest);
+    cv::Mat outt;
+    cv::Size size(box.boundingRect().width, box.boundingRect().height);
+    warpPerspective(img, outt, warpMatrix,size, 1, 0, 0);
     
-    return [UIImage imageWithCVMat:rotated];
+    //cv::warpPerspective(img, quad, warpMatrix, quad.size());
+    //warpPerspective(img, rotated, warpMatrix, rotated.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT);
+
+    return [UIImage imageWithCVMat:outt];
     
     /*
      
@@ -613,180 +523,46 @@ cv::Mat OpenWarpPerspective(const cv::Mat& _image
     return [UIImage imageWithCVMat:draw];
     */
     
-    
-    
-    
-    
-    
-    
-    
-    
-    /*
-    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-    std::vector<cv::Point2f> corners_trans(4);
-    corners_trans[0] = cv::Point2f(0,0);
-    corners_trans[1] = cv::Point2f(screenSize.width,0);
-    corners_trans[2] = cv::Point2f(0,screenSize.height);
-    corners_trans[3] = cv::Point2f(screenSize.width,screenSize.height);
-    
-    cv::Mat transform = getPerspectiveTransform(corners,corners_trans);
-    //cout<<transform<<endl;
-    std::vector<cv::Point2f> ponits, points_trans;
-    for(int i=0;i<h2;i++){
-        for(int j=0;j<w2;j++){
-            ponits.push_back(cv::Point2f(j,i));
-        }
-    }
-    
-    perspectiveTransform( ponits, points_trans, transform);
-    cv::Mat img_trans = cv::Mat::zeros(h2,w2,CV_8UC3);
-    int count = 0;
-    for(int i=0;i<h2;i++){
-        uchar* p = img.ptr<uchar>(i);
-        for(int j=0;j<w2;j++){
-            int y = points_trans[count].y;
-            int x = points_trans[count].x;
-            uchar* t = img_trans.ptr<uchar>(y);
-            t[x*3]  = p[j*3];
-            t[x*3+1]  = p[j*3+1];
-            t[x*3+2]  = p[j*3+2];
-            count++;
-        }
-    }
-    //imwrite("boy_trans.png",img_trans);
-    
-    UIImage *newImage = [UIImage imageWithCVMat:img_trans];
-    img_trans.release();
-    
-    return newImage;
-    
-     */
-//    cv::Mat original;
-//    cv::transpose(originalRot, original);
-//    
-//    originalRot.release();
-//    
-//    cv::flip(original, original, 1);
-    
-    
-//    CGFloat scaleFactor =  1;//[_sourceImageView contentScale];
-//    
-//    CGPoint ptBottomLeft = //[_adjustRect coordinatesForPoint:1 withScaleFactor:scaleFactor];
-//    CGPoint ptBottomRight = [_adjustRect coordinatesForPoint:2 withScaleFactor:scaleFactor];
-//    CGPoint ptTopRight = [_adjustRect coordinatesForPoint:3 withScaleFactor:scaleFactor];
-//    CGPoint ptTopLeft = [_adjustRect coordinatesForPoint:4 withScaleFactor:scaleFactor];
-//    
-//    CGFloat w1 = sqrt( pow(ptBottomRight.x - ptBottomLeft.x , 2) + pow(ptBottomRight.x - ptBottomLeft.x, 2));
-//    CGFloat w2 = sqrt( pow(ptTopRight.x - ptTopLeft.x , 2) + pow(ptTopRight.x - ptTopLeft.x, 2));
-//    
-//    CGFloat h1 = sqrt( pow(ptTopRight.y - ptBottomRight.y , 2) + pow(ptTopRight.y - ptBottomRight.y, 2));
-//    CGFloat h2 = sqrt( pow(ptTopLeft.y - ptBottomLeft.y , 2) + pow(ptTopLeft.y - ptBottomLeft.y, 2));
-//    
-//    CGFloat maxWidth = (w1 < w2) ? w1 : w2;
-//    CGFloat maxHeight = (h1 < h2) ? h1 : h2;
-    
-//    CGSize imageSize = sourceImage.size;
-//    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-//    float a = imageSize.width / screenSize.width;
-//    float b = imageSize.height / screenSize.height;
-//    float c = MAX(a, b);
-//
-//    cv::Point2f src[4], dst[4];
-//    src[0].x = rectangle.topLeftX * c;//ptTopLeft.x;
-//    src[0].y = rectangle.topLeftY * c;//ptTopLeft.y;
-//    src[1].x = rectangle.topRightX * c;//ptTopRight.x;
-//    src[1].y = rectangle.topRightY * c;//ptTopRight.y;
-//    src[2].x = rectangle.bottomRightX * c;//ptBottomRight.x;
-//    src[2].y = rectangle.bottomRightY * c;//ptBottomRight.y;
-//    src[3].x = rectangle.bottomLeftX * c;//ptBottomLeft.x;
-//    src[3].y = rectangle.bottomLeftY * c;//ptBottomLeft.y;
-//
-//    
-//    int w1 = abs(rectangle.topRightX - rectangle.topLeftX);
-//    int w2 = abs(rectangle.topRightX - rectangle.bottomLeftX);
-//    int w3 = abs(rectangle.bottomRightX - rectangle.bottomLeftX);
-//    int w4 = abs(rectangle.bottomRightX - rectangle.topLeftX);
-//    
-//    
-//    int h1 = abs(rectangle.bottomLeftY - rectangle.topLeftY);
-//    int h2 = abs(rectangle.bottomLeftY - rectangle.topRightY);
-//    int h3 = abs(rectangle.bottomRightY - rectangle.topRightY);
-//    int h4 = abs(rectangle.bottomRightY - rectangle.topLeftY);
-//    
-//    int maxWidth = MAX(MAX(w1,w2),MAX(w3,w4));
-//    int maxHeight = MAX(MAX(h1,h2),MAX(h3,h4));
-//
-//    
-//
-//    
-//    dst[0].x = 0;
-//    dst[0].y = 0;
-//    dst[1].x = (maxWidth - 1) * c;
-//    dst[1].y = 0;
-//    dst[2].x = (maxWidth - 1) * c;
-//    dst[2].y = (maxWidth - 1) * c;
-//    dst[3].x = 0;
-//    dst[3].y = (maxHeight - 1) * c;
-//    
-//    cv::Mat undistorted = cv::Mat( cvSize(maxWidth * c,maxHeight * c), CV_8UC1);
-//    cv::warpPerspective(original, undistorted, cv::getPerspectiveTransform(src, dst), cvSize(maxWidth, maxHeight));
-//    
-//    UIImage *newImage = [UIImage imageWithCVMat:undistorted];//[self UIImageFromCVMat:undistorted];
-//    
-//    undistorted.release();
-//    original.release();
-//   
-//    return newImage;
 }
-
-//CFDataRef save_cgimage_to_jpeg (CGImageRef image)
-//{
-//    CFMutableDataRef cfdata = CFDataCreateMutable(nil,0);
-//    CGImageDestinationRef dest = CGImageDestinationCreateWithData(data, CFSTR("public.jpeg"), 1, NULL);
-//    CGImageDestinationAddImage(dest, image, NULL);
-//    if(!CGImageDestinationFinalize(dest))
-//        ; // error
-//    CFRelease(dest);
-//    return cfdata
-//}
 
 
 - (UIImage *)correctPerspectiveForImage:(UIImage *)image withFeatures:(Rectangle *)rectangle
 {
     // 定义左上角，右上角，左下角，右下角
     CGPoint tlp, trp, blp, brp;
-    
-//    if (rectangle.topLeftY - rectangle.topRightY > 0)
-//    {
-//        //(36,61),(245,56),(27,350),(330,317)
-//        if (rectangle.topLeftX - rectangle.bottomLeftX > 0)
-//        {
-//            tlp = CGPointMake(rectangle.topLeftX - rectangle.bottomLeftX, rectangle.topLeftY - rectangle.topRightY);
-//            trp = CGPointMake(rectangle.topRightX - rectangle.bottomLeftX, 1);
-//            blp = CGPointMake(1, rectangle.bottomLeftY - rectangle.topRightY);
-//            brp = CGPointMake(rectangle.bottomRightX - rectangle.bottomLeftX, rectangle.bottomRightY - rectangle.topRightY);
-//        }
-//        else{
-//            tlp = CGPointMake(1, rectangle.topLeftY - rectangle.topRightY);
-//            trp = CGPointMake(rectangle.topRightX - rectangle.topLeftX, 1);
-//            blp = CGPointMake(rectangle.bottomLeftX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topRightY);
-//            brp = CGPointMake(rectangle.bottomRightX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topRightY);
-//        }
-//    }
-//    else {
-//        if (rectangle.topLeftX - rectangle.bottomLeftX > 0)
-//        {
-//            tlp = CGPointMake(rectangle.topLeftX - rectangle.bottomLeftX, 1);
-//            trp = CGPointMake(rectangle.topRightX - rectangle.bottomLeftX, rectangle.topRightY - rectangle.topLeftY);
-//            blp = CGPointMake(1, rectangle.bottomRightY - rectangle.topLeftY);
-//            brp = CGPointMake(rectangle.bottomRightX - rectangle.bottomLeftX, rectangle.bottomRightY - rectangle.topLeftY);
-//        }else{
-//            tlp = CGPointMake(1, 1);
-//            trp = CGPointMake(rectangle.topRightX - rectangle.topLeftX, rectangle.topRightY - rectangle.topLeftY);
-//            blp = CGPointMake(rectangle.bottomLeftX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topLeftY);
-//            brp = CGPointMake(rectangle.bottomRightX - rectangle.topLeftX, rectangle.bottomRightY - rectangle.topLeftY);
-//        }
-//    }
+    /*
+    if (rectangle.topLeftY - rectangle.topRightY > 0)
+    {
+        //(36,61),(245,56),(27,350),(330,317)
+        if (rectangle.topLeftX - rectangle.bottomLeftX > 0)
+        {
+            tlp = CGPointMake(rectangle.topLeftX - rectangle.bottomLeftX, rectangle.topLeftY - rectangle.topRightY);
+            trp = CGPointMake(rectangle.topRightX - rectangle.bottomLeftX, 1);
+            blp = CGPointMake(1, rectangle.bottomLeftY - rectangle.topRightY);
+            brp = CGPointMake(rectangle.bottomRightX - rectangle.bottomLeftX, rectangle.bottomRightY - rectangle.topRightY);
+        }
+        else{
+            tlp = CGPointMake(1, rectangle.topLeftY - rectangle.topRightY);
+            trp = CGPointMake(rectangle.topRightX - rectangle.topLeftX, 1);
+            blp = CGPointMake(rectangle.bottomLeftX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topRightY);
+            brp = CGPointMake(rectangle.bottomRightX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topRightY);
+        }
+    }
+    else {
+        if (rectangle.topLeftX - rectangle.bottomLeftX > 0)
+        {
+            tlp = CGPointMake(rectangle.topLeftX - rectangle.bottomLeftX, 1);
+            trp = CGPointMake(rectangle.topRightX - rectangle.bottomLeftX, rectangle.topRightY - rectangle.topLeftY);
+            blp = CGPointMake(1, rectangle.bottomRightY - rectangle.topLeftY);
+            brp = CGPointMake(rectangle.bottomRightX - rectangle.bottomLeftX, rectangle.bottomRightY - rectangle.topLeftY);
+        }else{
+            tlp = CGPointMake(1, 1);
+            trp = CGPointMake(rectangle.topRightX - rectangle.topLeftX, rectangle.topRightY - rectangle.topLeftY);
+            blp = CGPointMake(rectangle.bottomLeftX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topLeftY);
+            brp = CGPointMake(rectangle.bottomRightX - rectangle.topLeftX, rectangle.bottomRightY - rectangle.topLeftY);
+        }
+    }
+    */
     
     tlp = CGPointMake(rectangle.topLeftX, rectangle.topLeftY);
     trp = CGPointMake(rectangle.topRightX, rectangle.topRightY);
@@ -828,31 +604,6 @@ cv::Mat OpenWarpPerspective(const cv::Mat& _image
     CGImageRelease(imageMasked);
     return newImage;
 }
- 
-
-/*
-- (CIImage *)correctPerspectiveForImage:(CIImage *)image withFeatures:(Rectangle *)rectangle size:(CGSize) imageSize
-{
-    
-//    CGSize imageSize = myImage.size;
-     CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-     float a = imageSize.width / screenSize.width;
-     float b = imageSize.height / screenSize.height;
-     float c = MAX(a, b);
-
-//     CGRect rect = CGRectMake(MIN(rectangle.topLeftX, rectangle.bottomLeftX) * a,
-//                             MIN(rectangle.topLeftY, rectangle.topRightY) * b,
-//                             maxWidth * a,
-//                             maxHeight * b);
-    
-    NSMutableDictionary *rectangleCoordinates = [NSMutableDictionary new];
-    rectangleCoordinates[@"inputTopLeft"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.topLeftX * c, rectangle.topLeftY * c )];
-    rectangleCoordinates[@"inputTopRight"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.topRightX * c, rectangle.topRightY * c)];
-    rectangleCoordinates[@"inputBottomLeft"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.bottomLeftX * c, rectangle.bottomLeftY * c)];
-    rectangleCoordinates[@"inputBottomRight"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.bottomRightX * c, rectangle.bottomRightY * c)];
-    return [image imageByApplyingFilter:@"CIPerspectiveCorrection" withInputParameters:rectangleCoordinates];
-}
- */
 
 void saveCGImageAsJPEGToFilePath(CGImageRef imageRef, NSString *filePath)
 {
