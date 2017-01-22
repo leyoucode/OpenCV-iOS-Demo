@@ -21,6 +21,7 @@
 #import <opencv2/imgcodecs/ios.h>
 #import "UIImage+UIImage_Rotate.h"
 
+
 @implementation EdgeDetectingViewController
 
 long frameNumber = 0;
@@ -404,7 +405,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
              myImage = [myImage flipHorizontal];
              myImage = [myImage imageRotatedByDegrees:180];
              
-             //myImage = [self confirmedImage:myImage withFeatures:rectangle];
+             myImage = [self confirmedImage:myImage withFeatures:rectangle];
              
              NSData *jpgData = UIImageJPEGRepresentation(myImage, 1.0f);
              [jpgData writeToFile:filePath atomically:NO];
@@ -491,46 +492,141 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
      }];
 }
 
-
+cv::Mat OpenWarpPerspective(const cv::Mat& _image
+                            , const cv::Point2f& _lu
+                            , const cv::Point2f& _ru
+                            , const cv::Point2f& _rd
+                            , const cv::Point2f& _ld
+                            , const cv::Point2f& _lu_result
+                            , const cv::Point2f& _ru_result
+                            , const cv::Point2f& _rd_result
+                            , const cv::Point2f& _ld_result
+                            , cv::Mat& _transform_matrix)
+{
+    // todo do some checks on input.
+    
+    cv::Point2f source_points[4];
+    cv::Point2f dest_points[4];
+    
+    
+    source_points[0] = _lu;
+    source_points[1] = _ru;
+    source_points[2] = _rd;
+    source_points[3] = _ld;
+    
+    dest_points[0] = _lu_result;
+    dest_points[1] = _ru_result;
+    dest_points[2] = _rd_result;
+    dest_points[3] = _ld_result;
+    
+    dst: cv::Mat dst = _image.clone();
+    _transform_matrix = cv::getPerspectiveTransform(source_points, dest_points);
+    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+    // cols rows
+    cv::warpPerspective(_image, dst, _transform_matrix, cv::Size(screenSize.width, screenSize.height));
+    
+    
+    return dst;  
+}
 
 - (UIImage *)confirmedImage:(UIImage*)sourceImage withFeatures:(Rectangle *)rectangle
 {
     
-    float a1x = rectangle.topLeftX * 0.25;
-    float a1y = rectangle.topLeftY * 0.25;
-    float b1x = rectangle.topRightX * 0.25;
-    float b1y = rectangle.topRightY * 0.25;
-    float c1x = rectangle.bottomLeftX * 0.25;
-    float c1y = rectangle.bottomLeftY * 0.25;
-    float d1x = rectangle.bottomRightX * 0.25;
-    float d1y = rectangle.bottomRightY * 0.25;
+//    float a1x = rectangle.topLeftX;
+//    float a1y = rectangle.topLeftY;
+//    float b1x = rectangle.topRightX;
+//    float b1y = rectangle.topRightY;
+//    float c1x = rectangle.bottomLeftX;
+//    float c1y = rectangle.bottomLeftY;
+//    float d1x = rectangle.bottomRightX;
+//    float d1y = rectangle.bottomRightY;
+    
+    int w1 = abs(rectangle.topRightX - rectangle.topLeftX);
+    int w2 = abs(rectangle.topRightX - rectangle.bottomLeftX);
+    int w3 = abs(rectangle.bottomRightX - rectangle.bottomLeftX);
+    int w4 = abs(rectangle.bottomRightX - rectangle.topLeftX);
+    
+    
+    int h1 = abs(rectangle.bottomLeftY - rectangle.topLeftY);
+    int h2 = abs(rectangle.bottomLeftY - rectangle.topRightY);
+    int h3 = abs(rectangle.bottomRightY - rectangle.topRightY);
+    int h4 = abs(rectangle.bottomRightY - rectangle.topLeftY);
+    
+    int maxWidth = MAX(MAX(w1,w2),MAX(w3,w4));
+    int maxHeight = MAX(MAX(h1,h2),MAX(h3,h4));
+    if (maxWidth > maxHeight)
+    {
+        
+    }
     
     CGSize imageSize = sourceImage.size;
-    float w1 = imageSize.width;
-    float h1 = imageSize.height;
+//    float w1 = imageSize.width;
+//    float h1 = imageSize.height;
+    
+    
+    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+    float a = imageSize.width / screenSize.width;
+    float b = imageSize.height / screenSize.height;
+    float c = MAX(a, b);
+    
     
     cv::Mat img = [sourceImage CVMat];
     
-    int w2 = img.cols; // W2
-    int h2 = img.rows; // H2
+//    int w2 = img.cols; // W2
+//    int h2 = img.rows; // H2
     
     std::vector<cv::Point2f> corners(4);
-//    corners[0] = cv::Point2f((a1x * w2) / w1, (a1y * h2) / h1 );
-//    corners[1] = cv::Point2f((b1x * w2) / w1, (b1y * h2) / h1 );
-//    corners[2] = cv::Point2f((c1x * w2) / w1, (c1y * h2) / h1 );
-//    corners[3] = cv::Point2f((d1x * w2) / w1, (d1y * h2) / h1 );
-//    
-    corners.push_back(cv::Point2f(122,0));
-    corners.push_back(cv::Point2f(814,0));
-    corners.push_back(cv::Point2f(22,540));
-    corners.push_back(cv::Point2f(910,540));
+
+    corners[0] = cv::Point2f(rectangle.topLeftX * c, rectangle.topLeftY * c );
+    corners[1] = cv::Point2f(rectangle.topRightX * c, rectangle.topRightY * c );
+    corners[2] = cv::Point2f(rectangle.bottomRightX * c, rectangle.bottomRightY * c );
+    corners[3] = cv::Point2f(rectangle.bottomLeftX * c, rectangle.bottomLeftY * c );
     
-    //CGSize screenSize = [[UIScreen mainScreen] bounds].size;
     std::vector<cv::Point2f> corners_trans(4);
     corners_trans[0] = cv::Point2f(0,0);
     corners_trans[1] = cv::Point2f(imageSize.width,0);
-    corners_trans[2] = cv::Point2f(0,imageSize.height);
-    corners_trans[3] = cv::Point2f(imageSize.width,imageSize.height);
+    corners_trans[2] = cv::Point2f(imageSize.width,imageSize.height);
+    corners_trans[3] = cv::Point2f(0,imageSize.height);
+    
+    cv::Mat warpMatrix = getPerspectiveTransform(corners, corners_trans);
+    cv::Mat rotated;
+    warpPerspective(img, rotated, warpMatrix, rotated.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT);
+    
+//    cv::Mat dest = img.clone();
+//    
+//    OpenWarpPerspective(img, corners[0], corners[1], corners[2], corners[3], corners_trans[0], corners_trans[1], corners_trans[2], corners_trans[3], dest);
+    
+    return [UIImage imageWithCVMat:rotated];
+    
+    /*
+     
+    // 这里顺利打印出了四个点
+    cv::Mat draw = img.clone();
+    
+    // draw the polygon
+    cv::circle(draw,corners[0],5,cv::Scalar(0,0,255),2.5);
+    cv::circle(draw,corners[1],5,cv::Scalar(0,0,255),2.5);
+    cv::circle(draw,corners[2],5,cv::Scalar(0,0,255),2.5);
+    cv::circle(draw,corners[3],5,cv::Scalar(0,0,255),2.5);
+    
+    return [UIImage imageWithCVMat:draw];
+    */
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /*
+    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+    std::vector<cv::Point2f> corners_trans(4);
+    corners_trans[0] = cv::Point2f(0,0);
+    corners_trans[1] = cv::Point2f(screenSize.width,0);
+    corners_trans[2] = cv::Point2f(0,screenSize.height);
+    corners_trans[3] = cv::Point2f(screenSize.width,screenSize.height);
     
     cv::Mat transform = getPerspectiveTransform(corners,corners_trans);
     //cout<<transform<<endl;
@@ -563,6 +659,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
     
     return newImage;
     
+     */
 //    cv::Mat original;
 //    cv::transpose(originalRot, original);
 //    
@@ -592,7 +689,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 //    float a = imageSize.width / screenSize.width;
 //    float b = imageSize.height / screenSize.height;
 //    float c = MAX(a, b);
-//    
+//
 //    cv::Point2f src[4], dst[4];
 //    src[0].x = rectangle.topLeftX * c;//ptTopLeft.x;
 //    src[0].y = rectangle.topLeftY * c;//ptTopLeft.y;
