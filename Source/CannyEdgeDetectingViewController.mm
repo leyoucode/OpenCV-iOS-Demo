@@ -76,17 +76,6 @@
     [UIApplication sharedApplication].statusBarHidden = YES;
     //[self setShowDebugInfo:YES];
     
-    
-//    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-//    
-//    UIView* bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, screenSize.height - 110, screenSize.width, 110)];
-//    bottomView.backgroundColor = [UIColor blackColor];
-//    [self.view addSubview:bottomView];
-//    
-//    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapTest:)];
-//    tap.numberOfTapsRequired = 1;
-//    [bottomView setUserInteractionEnabled:YES];
-//    [bottomView addGestureRecognizer:tap];
     CannyEdgeDetectingControlView *controlView = (CannyEdgeDetectingControlView*)[[[NSBundle mainBundle] loadNibNamed:@"CannyEdgeDetectingControlView" owner:nil options:nil] firstObject];
     controlView.frame = self.view.bounds;
     [self.view addSubview:controlView];
@@ -113,7 +102,7 @@
         
         [UIView animateWithDuration:0.7 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.7 options:UIViewAnimationOptionAllowUserInteraction animations:^
          {
-             captureImageView.frame = CGRectMake(0, 0, weakSelf.view.bounds.size.width - 100, weakSelf.view.bounds.size.height);
+             captureImageView.frame = CGRectMake(50, 0, weakSelf.view.bounds.size.width - 100, weakSelf.view.bounds.size.height);
          } completion:nil];
         
     }];
