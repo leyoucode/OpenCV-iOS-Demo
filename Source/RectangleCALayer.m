@@ -175,6 +175,7 @@
 //        CGContextSetRGBFillColor(context, 1.0,1.0,1.0,0.65);
 //        CGContextFillRect(context,self.bounds);
         
+        // TODO 其实这里可以优化 把边缘部分填充成半透明白色 中间部分为透明色
         CGContextSetLineWidth(context, 2.0);
         
         CGContextMoveToPoint(context, _rectangle.topLeftX, _rectangle.topLeftY);
