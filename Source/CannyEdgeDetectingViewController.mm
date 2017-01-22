@@ -14,46 +14,48 @@
 
 #import "Rectangle.h"
 
+#import "CannyEdgeDetectingControlView.h"
+
 @implementation CannyEdgeDetectingViewController
 
 
-- (IBAction)onToggleTorchClick:(UIButton *)sender {
-    [self setTorchOn:![self torchOn]];
-}
+//- (IBAction)onToggleTorchClick:(UIButton *)sender {
+//    [self setTorchOn:![self torchOn]];
+//}
+//
+//- (IBAction)onToggleCameraClick:(UIButton *)sender {
+//    if ( self.camera == 0)
+//    {
+//        [self setCamera:1];
+//    }else{
+//        [self setCamera:0];
+//    }
+//}
 
-- (IBAction)onToggleCameraClick:(UIButton *)sender {
-    if ( self.camera == 0)
-    {
-        [self setCamera:1];
-    }else{
-        [self setCamera:0];
-    }
-}
-
-- (IBAction)onTakeButtonClick:(UIButton *)sender {
-    
-    __weak typeof(self) weakSelf = self;
-    
-    [self captureImageWithCompletionHander:^(NSString *imageFilePath) {
-       
-        UIImageView *captureImageView = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:imageFilePath]];
-        captureImageView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.7];
-        captureImageView.frame = CGRectOffset(weakSelf.view.bounds, 0, -weakSelf.view.bounds.size.height);
-        captureImageView.alpha = 1.0;
-        captureImageView.contentMode = UIViewContentModeScaleAspectFit;
-        captureImageView.userInteractionEnabled = YES;
-        [weakSelf.view addSubview:captureImageView];
-        
-        UITapGestureRecognizer *dismissTap = [[UITapGestureRecognizer alloc] initWithTarget:weakSelf action:@selector(dismissPreview:)];
-        [captureImageView addGestureRecognizer:dismissTap];
-        
-        [UIView animateWithDuration:0.7 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.7 options:UIViewAnimationOptionAllowUserInteraction animations:^
-         {
-             captureImageView.frame = weakSelf.view.bounds;
-         } completion:nil];
-        
-    }];
-}
+//- (IBAction)onTakeButtonClick:(UIButton *)sender {
+//    
+//    __weak typeof(self) weakSelf = self;
+//    
+//    [self captureImageWithCompletionHander:^(NSString *imageFilePath) {
+//       
+//        UIImageView *captureImageView = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:imageFilePath]];
+//        captureImageView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.7];
+//        captureImageView.frame = CGRectOffset(weakSelf.view.bounds, 0, -weakSelf.view.bounds.size.height);
+//        captureImageView.alpha = 1.0;
+//        captureImageView.contentMode = UIViewContentModeScaleAspectFit;
+//        captureImageView.userInteractionEnabled = YES;
+//        [weakSelf.view addSubview:captureImageView];
+//        
+//        UITapGestureRecognizer *dismissTap = [[UITapGestureRecognizer alloc] initWithTarget:weakSelf action:@selector(dismissPreview:)];
+//        [captureImageView addGestureRecognizer:dismissTap];
+//        
+//        [UIView animateWithDuration:0.7 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.7 options:UIViewAnimationOptionAllowUserInteraction animations:^
+//         {
+//             captureImageView.frame = CGRectMake(0, 0, weakSelf.view.bounds.size.width - 100, weakSelf.view.bounds.size.height);
+//         } completion:nil];
+//        
+//    }];
+//}
 
 - (void)dismissPreview:(UITapGestureRecognizer *)dismissTap
 {
@@ -70,16 +72,29 @@
 -(void) viewDidLoad
 {
     [super viewDidLoad];
+    
     [UIApplication sharedApplication].statusBarHidden = YES;
     //[self setShowDebugInfo:YES];
     
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapTest:)];
-    tap.numberOfTapsRequired = 1;
-    [self.view setUserInteractionEnabled:YES];
-    [self.view addGestureRecognizer:tap];
+    
+//    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+//    
+//    UIView* bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, screenSize.height - 110, screenSize.width, 110)];
+//    bottomView.backgroundColor = [UIColor blackColor];
+//    [self.view addSubview:bottomView];
+//    
+//    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapTest:)];
+//    tap.numberOfTapsRequired = 1;
+//    [bottomView setUserInteractionEnabled:YES];
+//    [bottomView addGestureRecognizer:tap];
+    CannyEdgeDetectingControlView *controlView = (CannyEdgeDetectingControlView*)[[[NSBundle mainBundle] loadNibNamed:@"CannyEdgeDetectingControlView" owner:nil options:nil] firstObject];
+    controlView.frame = self.view.bounds;
+    [self.view addSubview:controlView];
+
+    [controlView.takeButton addTarget:self action:@selector(onTakeButtonClick:) forControlEvents:UIControlEventTouchUpInside];
 }
 
--(void) tapTest: (UITapGestureRecognizer *)tab
+-(void) onTakeButtonClick: (UIButton *)button
 {
     __weak typeof(self) weakSelf = self;
     
@@ -98,7 +113,7 @@
         
         [UIView animateWithDuration:0.7 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.7 options:UIViewAnimationOptionAllowUserInteraction animations:^
          {
-             captureImageView.frame = weakSelf.view.bounds;
+             captureImageView.frame = CGRectMake(0, 0, weakSelf.view.bounds.size.width - 100, weakSelf.view.bounds.size.height);
          } completion:nil];
         
     }];

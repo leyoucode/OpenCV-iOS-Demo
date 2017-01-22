@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="CannyEdgeDetectingControlView">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ccY-PO-vbr">
+                    <rect key="frame" x="0.0" y="557" width="375" height="110"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FTD-gs-tBu">
+                            <rect key="frame" x="159" y="27" width="57" height="57"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="57" id="InE-eu-Ico"/>
+                                <constraint firstAttribute="width" constant="57" id="Qdt-aR-w3P"/>
+                            </constraints>
+                            <state key="normal" image="record_idle"/>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="FTD-gs-tBu" firstAttribute="centerY" secondItem="ccY-PO-vbr" secondAttribute="centerY" id="9DZ-WQ-AMz"/>
+                        <constraint firstAttribute="height" constant="110" id="nUn-U2-pHp"/>
+                        <constraint firstItem="FTD-gs-tBu" firstAttribute="centerX" secondItem="ccY-PO-vbr" secondAttribute="centerX" id="xKX-PP-an6"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tvO-Jp-XV1">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="50"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Whk-AW-Mnh">
+                            <rect key="frame" x="0.0" y="0.0" width="80" height="50"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="80" id="6vB-eF-lvW"/>
+                            </constraints>
+                            <state key="normal" image="record_flash_off"/>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8Kj-kX-6nT">
+                            <rect key="frame" x="295" y="0.0" width="80" height="50"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="80" id="Dgy-ja-eyI"/>
+                            </constraints>
+                            <state key="normal" image="record_camera"/>
+                        </button>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00:00" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hip-rS-Gvu">
+                            <rect key="frame" x="142" y="15" width="90" height="21"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="90" id="A9H-mg-OtD"/>
+                                <constraint firstAttribute="height" constant="21" id="c5n-oG-2gN"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="hip-rS-Gvu" firstAttribute="centerX" secondItem="tvO-Jp-XV1" secondAttribute="centerX" id="3Wd-DL-WS0"/>
+                        <constraint firstAttribute="bottom" secondItem="8Kj-kX-6nT" secondAttribute="bottom" id="ALI-lo-sIA"/>
+                        <constraint firstItem="hip-rS-Gvu" firstAttribute="centerY" secondItem="tvO-Jp-XV1" secondAttribute="centerY" id="Llb-IV-a7E"/>
+                        <constraint firstAttribute="bottom" secondItem="Whk-AW-Mnh" secondAttribute="bottom" id="URU-cR-Ozr"/>
+                        <constraint firstItem="8Kj-kX-6nT" firstAttribute="top" secondItem="tvO-Jp-XV1" secondAttribute="top" id="WfL-P9-T73"/>
+                        <constraint firstItem="Whk-AW-Mnh" firstAttribute="leading" secondItem="tvO-Jp-XV1" secondAttribute="leading" id="bzJ-z9-kIW"/>
+                        <constraint firstAttribute="height" constant="50" id="ma1-sd-f7D"/>
+                        <constraint firstAttribute="trailing" secondItem="8Kj-kX-6nT" secondAttribute="trailing" id="sk9-2x-MNp"/>
+                        <constraint firstItem="Whk-AW-Mnh" firstAttribute="top" secondItem="tvO-Jp-XV1" secondAttribute="top" id="z0A-Go-Rqb"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <constraints>
+                <constraint firstItem="tvO-Jp-XV1" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="2hN-2g-rpx"/>
+                <constraint firstAttribute="trailing" secondItem="ccY-PO-vbr" secondAttribute="trailing" id="Bc0-Ju-xIP"/>
+                <constraint firstAttribute="bottom" secondItem="ccY-PO-vbr" secondAttribute="bottom" id="EkP-M3-BO2"/>
+                <constraint firstItem="ccY-PO-vbr" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="JSj-za-cN5"/>
+                <constraint firstItem="tvO-Jp-XV1" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="aZw-TX-wE9"/>
+                <constraint firstAttribute="trailing" secondItem="tvO-Jp-XV1" secondAttribute="trailing" id="qEU-eI-dEa"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <nil key="simulatedTopBarMetrics"/>
+            <nil key="simulatedBottomBarMetrics"/>
+            <connections>
+                <outlet property="takeButton" destination="FTD-gs-tBu" id="52m-M3-LAe"/>
+            </connections>
+            <point key="canvasLocation" x="34.5" y="53.5"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="record_camera" width="27" height="23"/>
+        <image name="record_flash_off" width="13" height="16"/>
+        <image name="record_idle" width="57" height="57"/>
+    </resources>
+</document>

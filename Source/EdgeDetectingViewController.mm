@@ -104,7 +104,8 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
     });
 }
 
-- (void) displayDataForVideoRect:(CGRect)rect videoOrientation:(AVCaptureVideoOrientation)videoOrientation{
+- (void) displayDataForVideoRect:(CGRect)rect videoOrientation:(AVCaptureVideoOrientation)videoOrientation
+{
     
     @synchronized (self) {
         
