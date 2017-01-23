@@ -62,10 +62,17 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
         frameNumber++;
     }
     
+    
     // Shrink video frame to 320X240
     cv::resize(mat, mat, cv::Size(), 0.25f, 0.25f, CV_INTER_LINEAR);
     rect.size.width /= 4.0f;
     rect.size.height /= 4.0f;
+
+//    float ratioW = 240.0 / rect.size.width;
+//    //float ratioH= 320.0 / rect.size.height;
+//    cv::resize(mat, mat, cv::Size(), ratioW, ratioW, CV_INTER_LINEAR);
+//    rect.size.width *= ratioW;
+//    rect.size.height *= ratioW;
     
     // Rotate video frame by 90deg to portrait by combining a transpose and a flip
     // Note that AVCaptureVideoDataOutput connection does NOT support hardware-accelerated
@@ -334,8 +341,21 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
     
     __weak typeof(self) weakSelf = self;
     
+    Rectangle* rectangle = [rectangleCALayer getCurrentRectangle];
+    
+    /*
+    if ([self.captureDevice lockForConfiguration:nil])
+    {
+        //captureDevice.activeFormat = format
+        [self.captureSession setSessionPreset:AVCaptureSessionPresetPhoto];
+        //[self.captureSession startRunning];
+        [self.captureDevice unlockForConfiguration];
+    }
+     */
+    
     [self.stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler: ^(CMSampleBufferRef imageSampleBuffer, NSError *error)
      {
+         
          if (error)
          {
              dispatch_resume(_captureQueue);
@@ -347,69 +367,20 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
          @autoreleasepool
          {
              NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
-             UIImage* myImage = [[UIImage alloc] initWithData:imageData];
+             UIImage* image = [[UIImage alloc] initWithData:imageData];
              
+             image = [image fixOrientation:image];
              
+             Rectangle *newRectangle = [self rotationRectangle:rectangle];
              
-             myImage = [myImage fixOrientation:myImage];
+             image = [weakSelf correctPerspectiveForImage:image withFeatures:newRectangle];
              
-//             myImage = [UIImage imageWithCGImage:myImage.CGImage
-//                                                         scale:myImage.scale
-//                                                   orientation:UIImageOrientationUpMirrored];
+             image = [weakSelf confirmedImage:image withFeatures:rectangle];
              
-             myImage = [myImage imageRotatedByDegrees:180];
-             
-             Rectangle* rectangle = [rectangleCALayer getCurrentRectangle];
-             
-             
-             //UIImage* mm = [self confirmedImage:myImage withFeatures:rectangle];
-             
-//             NSData *jpgData = UIImageJPEGRepresentation(myImage, 1.0f);
-//             
-//             CIImage *enhancedImage = [[CIImage alloc] initWithData:jpgData options:@{kCIImageColorSpace:[NSNull null]}];
-             
-             //myImage = [self confirmedImage:myImage withFeatures:rectangle];
-             
-             myImage = [self correctPerspectiveForImage:myImage withFeatures:rectangle];
-             
-             myImage = [myImage flipHorizontal];
-             myImage = [myImage imageRotatedByDegrees:180];
-             
-             myImage = [self confirmedImage:myImage withFeatures:rectangle];
-             
-             NSData *jpgData = UIImageJPEGRepresentation(myImage, 1.0f);
+             NSData *jpgData = UIImageJPEGRepresentation(image, 1.0f);
              [jpgData writeToFile:filePath atomically:NO];
              
-             NSLog(@"===");
-//             int w1 = abs(rectangle.topRightX - rectangle.topLeftX);
-//             int w2 = abs(rectangle.topRightX - rectangle.bottomLeftX);
-//             int w3 = abs(rectangle.bottomRightX - rectangle.bottomLeftX);
-//             int w4 = abs(rectangle.bottomRightX - rectangle.topLeftX);
-//             
-//             
-//             int h1 = abs(rectangle.bottomLeftY - rectangle.topLeftY);
-//             int h2 = abs(rectangle.bottomLeftY - rectangle.topRightY);
-//             int h3 = abs(rectangle.bottomRightY - rectangle.topRightY);
-//             int h4 = abs(rectangle.bottomRightY - rectangle.topLeftY);
-//             
-//             int maxWidth = MAX(MAX(w1,w2),MAX(w3,w4));
-//             int maxHeight = MAX(MAX(h1,h2),MAX(h3,h4));
-//
-//             CGSize imageSize = myImage.size;
-//             CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-//             float a = imageSize.width / screenSize.width;
-//             float b = imageSize.height / screenSize.height;
-//
-//             CGRect rect = CGRectMake(MIN(rectangle.topLeftX, rectangle.bottomLeftX) * a,
-//                                     MIN(rectangle.topLeftY, rectangle.topRightY) * b,
-//                                     maxWidth * a,
-//                                     maxHeight * b);
-//             // Create bitmap image from original image data,
-//             // using rectangle to specify desired crop area
-//             CGImageRef imageRef = CGImageCreateWithImageInRect(myImage.CGImage, rect);
-//             UIImage *img = [UIImage imageWithCGImage:imageRef];
-//             saveCGImageAsJPEGToFilePath(imageRef, filePath);
-//             CGImageRelease(imageRef);
+             NSLog(@"=== OK");
              
              dispatch_async(dispatch_get_main_queue(), ^
                             {
@@ -420,47 +391,6 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
      }];
 }
 
-//cv::Mat OpenWarpPerspective(const cv::Mat& _image
-//                            , const cv::Point2f& _lu
-//                            , const cv::Point2f& _ru
-//                            , const cv::Point2f& _rd
-//                            , const cv::Point2f& _ld
-//                            , const cv::Point2f& _lu_result
-//                            , const cv::Point2f& _ru_result
-//                            , const cv::Point2f& _rd_result
-//                            , const cv::Point2f& _ld_result
-//                            , cv::Mat& _transform_matrix)
-//{
-//    // todo do some checks on input.
-//    
-//    cv::Point2f source_points[4];
-//    cv::Point2f dest_points[4];
-//    
-//    
-//    source_points[0] = _lu;
-//    source_points[1] = _ru;
-//    source_points[2] = _rd;
-//    source_points[3] = _ld;
-//    
-//    dest_points[0] = _lu_result;
-//    dest_points[1] = _ru_result;
-//    dest_points[2] = _rd_result;
-//    dest_points[3] = _ld_result;
-//    
-//    dst: cv::Mat dst = _image.clone();
-//    _transform_matrix = cv::getPerspectiveTransform(source_points, dest_points);
-//    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-//    // cols rows
-//    cv::warpPerspective(_image, dst, _transform_matrix, cv::Size(screenSize.width, screenSize.height));
-//    
-//    
-//    return dst;  
-//}
-
-
-
-
-
 - (UIImage *)confirmedImage:(UIImage*)sourceImage withFeatures:(Rectangle *)rectangle
 {
     
@@ -469,15 +399,15 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
     
     float a = imageSize.width / screenSize.width;
     float b = imageSize.height / screenSize.height;
-    float c = MAX(a, b);
+    //float c = MAX(a, b);
     
     cv::Mat img = [sourceImage CVMat];
     
     std::vector<cv::Point2f> corners(4);
-    corners[0] = cv::Point2f(rectangle.topLeftX * c, rectangle.topLeftY * c );
-    corners[1] = cv::Point2f(rectangle.topRightX * c, rectangle.topRightY * c );
-    corners[2] = cv::Point2f(rectangle.bottomLeftX * c, rectangle.bottomLeftY * c );
-    corners[3] = cv::Point2f(rectangle.bottomRightX * c, rectangle.bottomRightY * c );
+    corners[0] = cv::Point2f(rectangle.topLeftX * a, rectangle.topLeftY * b );
+    corners[1] = cv::Point2f(rectangle.topRightX * a, rectangle.topRightY * b );
+    corners[2] = cv::Point2f(rectangle.bottomLeftX * a, rectangle.bottomLeftY * b );
+    corners[3] = cv::Point2f(rectangle.bottomRightX * a, rectangle.bottomRightY * b );
     
     std::vector<cv::Point2f> corners_trans(4);
 //    corners_trans[0] = cv::Point2f(0,0);
@@ -525,44 +455,57 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
     
 }
 
+cv::Point2f RotatePoint(const cv::Point2f& p, float rad)
+{
+    const float x = std::cos(rad) * p.x - std::sin(rad) * p.y;
+    const float y = std::sin(rad) * p.x + std::cos(rad) * p.y;
+    
+    const cv::Point2f rot_p(x, y);
+    return rot_p;
+}
+
+cv::Point2f RotatePoint(const cv::Point2f& cen_pt, const cv::Point2f& p, float rad)
+{
+    const cv::Point2f trans_pt = p - cen_pt;
+    const cv::Point2f rot_pt   = RotatePoint(trans_pt, rad);
+    const cv::Point2f fin_pt   = rot_pt + cen_pt;
+    
+    return fin_pt;
+}
+
+CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
+    return screenWidth - pointX;
+}
+
+-(Rectangle *)rotationRectangle:(Rectangle *)rectangle
+{
+    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+    CGFloat screenWidth = screenSize.width;
+    CGFloat screenHeight = screenSize.height;
+    
+    cv::Point2f center = cv::Point2f((screenWidth / 2), (screenHeight / 2));
+    
+    cv::Point2f topLeft = RotatePoint(center, cv::Point2f(rectangle.topLeftX, rectangle.topLeftY), M_PI);
+    cv::Point2f topRight = RotatePoint(center, cv::Point2f(rectangle.topRightX, rectangle.topRightY), M_PI);
+    cv::Point2f bottomLeft = RotatePoint(center, cv::Point2f(rectangle.bottomLeftX, rectangle.bottomLeftY), M_PI);
+    cv::Point2f bottomRight = RotatePoint(center, cv::Point2f(rectangle.bottomRightX, rectangle.bottomRightY), M_PI);
+    
+    Rectangle *newRectangle = [[Rectangle alloc] init];
+    newRectangle.topLeftX = flipHorizontalPointX(topLeft.x, screenWidth);
+    newRectangle.topLeftY = topLeft.y;
+    newRectangle.topRightX = flipHorizontalPointX(topRight.x, screenWidth);
+    newRectangle.topRightY = topRight.y;
+    newRectangle.bottomLeftX = flipHorizontalPointX(bottomLeft.x, screenWidth);
+    newRectangle.bottomLeftY = bottomLeft.y;
+    newRectangle.bottomRightX = flipHorizontalPointX(bottomRight.x, screenWidth);
+    newRectangle.bottomRightY = bottomRight.y;
+    return newRectangle;
+}
 
 - (UIImage *)correctPerspectiveForImage:(UIImage *)image withFeatures:(Rectangle *)rectangle
 {
     // 定义左上角，右上角，左下角，右下角
     CGPoint tlp, trp, blp, brp;
-    /*
-    if (rectangle.topLeftY - rectangle.topRightY > 0)
-    {
-        //(36,61),(245,56),(27,350),(330,317)
-        if (rectangle.topLeftX - rectangle.bottomLeftX > 0)
-        {
-            tlp = CGPointMake(rectangle.topLeftX - rectangle.bottomLeftX, rectangle.topLeftY - rectangle.topRightY);
-            trp = CGPointMake(rectangle.topRightX - rectangle.bottomLeftX, 1);
-            blp = CGPointMake(1, rectangle.bottomLeftY - rectangle.topRightY);
-            brp = CGPointMake(rectangle.bottomRightX - rectangle.bottomLeftX, rectangle.bottomRightY - rectangle.topRightY);
-        }
-        else{
-            tlp = CGPointMake(1, rectangle.topLeftY - rectangle.topRightY);
-            trp = CGPointMake(rectangle.topRightX - rectangle.topLeftX, 1);
-            blp = CGPointMake(rectangle.bottomLeftX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topRightY);
-            brp = CGPointMake(rectangle.bottomRightX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topRightY);
-        }
-    }
-    else {
-        if (rectangle.topLeftX - rectangle.bottomLeftX > 0)
-        {
-            tlp = CGPointMake(rectangle.topLeftX - rectangle.bottomLeftX, 1);
-            trp = CGPointMake(rectangle.topRightX - rectangle.bottomLeftX, rectangle.topRightY - rectangle.topLeftY);
-            blp = CGPointMake(1, rectangle.bottomRightY - rectangle.topLeftY);
-            brp = CGPointMake(rectangle.bottomRightX - rectangle.bottomLeftX, rectangle.bottomRightY - rectangle.topLeftY);
-        }else{
-            tlp = CGPointMake(1, 1);
-            trp = CGPointMake(rectangle.topRightX - rectangle.topLeftX, rectangle.topRightY - rectangle.topLeftY);
-            blp = CGPointMake(rectangle.bottomLeftX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topLeftY);
-            brp = CGPointMake(rectangle.bottomRightX - rectangle.topLeftX, rectangle.bottomRightY - rectangle.topLeftY);
-        }
-    }
-    */
     
     tlp = CGPointMake(rectangle.topLeftX, rectangle.topLeftY);
     trp = CGPointMake(rectangle.topRightX, rectangle.topRightY);
@@ -573,6 +516,9 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
     
     CGSize imageSize = image.size;
     CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+    float screenRatio = screenSize.width / screenSize.height;
+    imageSize.height = imageSize.width / screenRatio;
+    
     float a = imageSize.width / screenSize.width;
     float b = imageSize.height / screenSize.height;
     float c = MAX(a, b);
@@ -595,8 +541,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
     
     CGContextClosePath(context);
     CGContextClip(context);
-    //CGContextRotateCTM (context, -90/180*M_PI);
-    image = [image flipHorizontal];
+
     CGContextDrawImage(context, rect, image.CGImage);
     CGImageRef imageMasked = CGBitmapContextCreateImage(context);
     CGContextRelease(context);
@@ -604,6 +549,88 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
     CGImageRelease(imageMasked);
     return newImage;
 }
+
+//- (UIImage *)correctPerspectiveForImage:(UIImage *)image withFeatures:(Rectangle *)rectangle
+//{
+//    // 定义左上角，右上角，左下角，右下角
+//    CGPoint tlp, trp, blp, brp;
+//    /*
+//    if (rectangle.topLeftY - rectangle.topRightY > 0)
+//    {
+//        //(36,61),(245,56),(27,350),(330,317)
+//        if (rectangle.topLeftX - rectangle.bottomLeftX > 0)
+//        {
+//            tlp = CGPointMake(rectangle.topLeftX - rectangle.bottomLeftX, rectangle.topLeftY - rectangle.topRightY);
+//            trp = CGPointMake(rectangle.topRightX - rectangle.bottomLeftX, 1);
+//            blp = CGPointMake(1, rectangle.bottomLeftY - rectangle.topRightY);
+//            brp = CGPointMake(rectangle.bottomRightX - rectangle.bottomLeftX, rectangle.bottomRightY - rectangle.topRightY);
+//        }
+//        else{
+//            tlp = CGPointMake(1, rectangle.topLeftY - rectangle.topRightY);
+//            trp = CGPointMake(rectangle.topRightX - rectangle.topLeftX, 1);
+//            blp = CGPointMake(rectangle.bottomLeftX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topRightY);
+//            brp = CGPointMake(rectangle.bottomRightX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topRightY);
+//        }
+//    }
+//    else {
+//        if (rectangle.topLeftX - rectangle.bottomLeftX > 0)
+//        {
+//            tlp = CGPointMake(rectangle.topLeftX - rectangle.bottomLeftX, 1);
+//            trp = CGPointMake(rectangle.topRightX - rectangle.bottomLeftX, rectangle.topRightY - rectangle.topLeftY);
+//            blp = CGPointMake(1, rectangle.bottomRightY - rectangle.topLeftY);
+//            brp = CGPointMake(rectangle.bottomRightX - rectangle.bottomLeftX, rectangle.bottomRightY - rectangle.topLeftY);
+//        }else{
+//            tlp = CGPointMake(1, 1);
+//            trp = CGPointMake(rectangle.topRightX - rectangle.topLeftX, rectangle.topRightY - rectangle.topLeftY);
+//            blp = CGPointMake(rectangle.bottomLeftX - rectangle.topLeftX, rectangle.bottomLeftY - rectangle.topLeftY);
+//            brp = CGPointMake(rectangle.bottomRightX - rectangle.topLeftX, rectangle.bottomRightY - rectangle.topLeftY);
+//        }
+//    }
+//    */
+//    
+//    tlp = CGPointMake(rectangle.topLeftX, rectangle.topLeftY);
+//    trp = CGPointMake(rectangle.topRightX, rectangle.topRightY);
+//    blp = CGPointMake(rectangle.bottomLeftX, rectangle.bottomLeftY);
+//    brp = CGPointMake(rectangle.bottomRightX, rectangle.bottomRightY);
+//    
+//    NSLog(@"LT:%@ RT:%@ LB:%@ RB:%@", NSStringFromCGPoint(tlp),NSStringFromCGPoint(trp),NSStringFromCGPoint(blp),NSStringFromCGPoint(brp));
+//    
+//    CGSize imageSize = image.size;
+//    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+//    float screenRatio = screenSize.width / screenSize.height;
+//    imageSize.height = imageSize.width / screenRatio;
+//    
+//    float a = imageSize.width / screenSize.width;
+//    float b = imageSize.height / screenSize.height;
+//    //float c = MAX(a, b);
+//    
+//    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+//    CGContextRef context = CGBitmapContextCreate(NULL, image.size.width, image.size.height, 8, 4 * image.size.width, colorSpace, kCGImageAlphaPremultipliedLast);
+//    
+//    CGRect rect = CGRectMake(0, 0, image.size.width, image.size.height);
+//    
+//    [[UIColor blackColor] setFill];
+//    CGContextFillRect(context, rect);
+//    
+//    CGColorRef fillColor = [[UIColor whiteColor] CGColor];
+//    CGContextSetFillColor(context, CGColorGetComponents(fillColor));
+//    
+//    CGContextMoveToPoint(context, tlp.x * a, tlp.y * a);
+//    CGContextAddLineToPoint(context, trp.x * a, trp.y * a);
+//    CGContextAddLineToPoint(context, brp.x * a, brp.y * a);
+//    CGContextAddLineToPoint(context, blp.x * a, blp.y * a);
+//    
+//    CGContextClosePath(context);
+//    CGContextClip(context);
+//    //CGContextRotateCTM (context, -90/180*M_PI);
+//    image = [image flipHorizontal];
+//    CGContextDrawImage(context, rect, image.CGImage);
+//    CGImageRef imageMasked = CGBitmapContextCreateImage(context);
+//    CGContextRelease(context);
+//    UIImage *newImage = [UIImage imageWithCGImage:imageMasked];
+//    CGImageRelease(imageMasked);
+//    return newImage;
+//}
 
 void saveCGImageAsJPEGToFilePath(CGImageRef imageRef, NSString *filePath)
 {

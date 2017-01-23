@@ -58,7 +58,7 @@
     //    [_srcollView setMinimumZoomScale:minimumScale];
     //    [_srcollView setZoomScale:0.5f];
     
-    [_srcollView setMinimumZoomScale:0.25f];
+    [_srcollView setMinimumZoomScale:0.5f];
     [_srcollView setMaximumZoomScale:3.0f];
     [_srcollView setZoomScale:1.0f animated:NO];
     
