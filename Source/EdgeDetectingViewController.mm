@@ -375,7 +375,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
              
              image = [weakSelf correctPerspectiveForImage:image withFeatures:newRectangle];
              
-             image = [weakSelf confirmedImage:image withFeatures:rectangle];
+             //image = [weakSelf confirmedImage:image withFeatures:rectangle];
              
              NSData *jpgData = UIImageJPEGRepresentation(image, 1.0f);
              [jpgData writeToFile:filePath atomically:NO];
@@ -390,6 +390,8 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
          }
      }];
 }
+
+
 
 - (UIImage *)confirmedImage:(UIImage*)sourceImage withFeatures:(Rectangle *)rectangle
 {
@@ -409,29 +411,38 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
     corners[2] = cv::Point2f(rectangle.bottomLeftX * a, rectangle.bottomLeftY * b );
     corners[3] = cv::Point2f(rectangle.bottomRightX * a, rectangle.bottomRightY * b );
     
+    float leftX = MIN(rectangle.topLeftX, rectangle.bottomLeftX);
+    float topY = MIN(rectangle.topLeftY, rectangle.topRightY);
+    float rightX = MAX(rectangle.topRightX, rectangle.bottomRightX);
+    float bottomY = MAX(rectangle.bottomLeftY, rectangle.bottomRightY);
+    
     std::vector<cv::Point2f> corners_trans(4);
-//    corners_trans[0] = cv::Point2f(0,0);
-//    corners_trans[1] = cv::Point2f(img.cols,0);
-//    corners_trans[2] = cv::Point2f(img.cols,img.rows);
-//    corners_trans[3] = cv::Point2f(0,img.rows);
+    corners_trans[0] = cv::Point2f(leftX,topY);
+    corners_trans[1] = cv::Point2f(rightX,topY);
+    corners_trans[2] = cv::Point2f(leftX,bottomY);
+    corners_trans[3] = cv::Point2f(rightX,bottomY);
     
-    // Assemble a rotated rectangle out of that info
-    cv::RotatedRect box = minAreaRect(cv::Mat(corners));
-    std::cout << "Rotated box set to (" << box.boundingRect().x << "," << box.boundingRect().y << ") " << box.size.width << "x" << box.size.height << std::endl;
+//    // Assemble a rotated rectangle out of that info
+//    cv::RotatedRect box = minAreaRect(cv::Mat(corners));
+//    std::cout << "Rotated box set to (" << box.boundingRect().x << "," << box.boundingRect().y << ") " << box.size.width << "x" << box.size.height << std::endl;
+//    
+////    cv::Point2f pts[4];
+////    box.points(pts);
+//
+//    corners_trans[0] = cv::Point(0, 0);
+//    corners_trans[1] = cv::Point(box.boundingRect().width - 1, 0);
+//    corners_trans[2] = cv::Point(0, box.boundingRect().height - 1);
+//    corners_trans[3] = cv::Point(box.boundingRect().width - 1, box.boundingRect().height - 1);
     
-//    cv::Point2f pts[4];
-//    box.points(pts);
-
-    corners_trans[0] = cv::Point(0, 0);
-    corners_trans[1] = cv::Point(box.boundingRect().width - 1, 0);
-    corners_trans[2] = cv::Point(0, box.boundingRect().height - 1);
-    corners_trans[3] = cv::Point(box.boundingRect().width - 1, box.boundingRect().height - 1);
-    
+    //自由变换 透视变换矩阵3*3
+    cv::Mat warp_matrix( 3, 3, CV_32FC1 );
+    // 求解变换公式的函数
     cv::Mat warpMatrix = getPerspectiveTransform(corners, corners_trans);
     //cv::Mat rotated;
     
+    //cv::RotatedRect box = minAreaRect(cv::Mat(corners_trans));
     cv::Mat outt;
-    cv::Size size(box.boundingRect().width, box.boundingRect().height);
+    cv::Size size(std::abs(rightX - leftX), std::abs(bottomY - topY));
     warpPerspective(img, outt, warpMatrix,size, 1, 0, 0);
     
     //cv::warpPerspective(img, quad, warpMatrix, quad.size());
@@ -507,13 +518,6 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     // 定义左上角，右上角，左下角，右下角
     CGPoint tlp, trp, blp, brp;
     
-    tlp = CGPointMake(rectangle.topLeftX, rectangle.topLeftY);
-    trp = CGPointMake(rectangle.topRightX, rectangle.topRightY);
-    blp = CGPointMake(rectangle.bottomLeftX, rectangle.bottomLeftY);
-    brp = CGPointMake(rectangle.bottomRightX, rectangle.bottomRightY);
-    
-    NSLog(@"LT:%@ RT:%@ LB:%@ RB:%@", NSStringFromCGPoint(tlp),NSStringFromCGPoint(trp),NSStringFromCGPoint(blp),NSStringFromCGPoint(brp));
-    
     CGSize imageSize = image.size;
     CGSize screenSize = [[UIScreen mainScreen] bounds].size;
     float screenRatio = screenSize.width / screenSize.height;
@@ -521,7 +525,14 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     
     float a = imageSize.width / screenSize.width;
     float b = imageSize.height / screenSize.height;
-    float c = MAX(a, b);
+    //float c = MAX(a, b);
+    
+    tlp = CGPointMake(rectangle.topLeftX * a, rectangle.topLeftY * b);
+    trp = CGPointMake(rectangle.topRightX * a, rectangle.topRightY * b);
+    blp = CGPointMake(rectangle.bottomLeftX * a, rectangle.bottomLeftY * b);
+    brp = CGPointMake(rectangle.bottomRightX * a, rectangle.bottomRightY * b);
+    
+    NSLog(@"LT:%@ RT:%@ LB:%@ RB:%@", NSStringFromCGPoint(tlp),NSStringFromCGPoint(trp),NSStringFromCGPoint(blp),NSStringFromCGPoint(brp));
     
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGContextRef context = CGBitmapContextCreate(NULL, image.size.width, image.size.height, 8, 4 * image.size.width, colorSpace, kCGImageAlphaPremultipliedLast);
@@ -534,10 +545,10 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     CGColorRef fillColor = [[UIColor whiteColor] CGColor];
     CGContextSetFillColor(context, CGColorGetComponents(fillColor));
     
-    CGContextMoveToPoint(context, tlp.x * c, tlp.y * c);
-    CGContextAddLineToPoint(context, trp.x * c, trp.y * c);
-    CGContextAddLineToPoint(context, brp.x * c, brp.y * c);
-    CGContextAddLineToPoint(context, blp.x * c, blp.y * c);
+    CGContextMoveToPoint(context, tlp.x, tlp.y);
+    CGContextAddLineToPoint(context, trp.x, trp.y);
+    CGContextAddLineToPoint(context, brp.x, brp.y);
+    CGContextAddLineToPoint(context, blp.x, blp.y);
     
     CGContextClosePath(context);
     CGContextClip(context);
@@ -547,8 +558,31 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     CGContextRelease(context);
     UIImage *newImage = [UIImage imageWithCGImage:imageMasked];
     CGImageRelease(imageMasked);
+    
+    /* TODO 这里需要优化 需要抠出需要的图片
+       调研一下 OpenCV提取轮廓
+    float leftX = MIN(rectangle.topLeftX * a, rectangle.bottomLeftX * b);
+    float topY = MIN(rectangle.topLeftY * a, rectangle.topRightY * b);
+    float rightX = MAX(rectangle.topRightX * a, rectangle.bottomRightX * b);
+    float bottomY = MAX(rectangle.bottomLeftY * a, rectangle.bottomRightY * b);
+    
+    CGImageRef imagRef = CGImageCreateWithImageInRect([image CGImage], CGRectMake(leftX, topY, (rightX - leftX), (bottomY - topY)));
+    UIImage* finalImage = [UIImage imageWithCGImage: imagRef];
+    CGImageRelease(imagRef);
+    */
+    
     return newImage;
 }
+
+//- (CIImage *)correctPerspectiveForImage:(CIImage *)image withRectangle:(Rectangle *)rectangle
+//{
+//    NSMutableDictionary *rectangleCoordinates = [NSMutableDictionary new];
+//    rectangleCoordinates[@"inputTopLeft"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.topLeftX, rectangle.topLeftY)];
+//    rectangleCoordinates[@"inputTopRight"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.topRightX, rectangle.topRightY)];
+//    rectangleCoordinates[@"inputBottomLeft"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.bottomLeftX, rectangle.bottomLeftY)];
+//    rectangleCoordinates[@"inputBottomRight"] = [CIVector vectorWithCGPoint:CGPointMake(rectangle.bottomRightX, rectangle.bottomRightY)];
+//    return [image imageByApplyingFilter:@"CIPerspectiveCorrection" withInputParameters:rectangleCoordinates];
+//}
 
 //- (UIImage *)correctPerspectiveForImage:(UIImage *)image withFeatures:(Rectangle *)rectangle
 //{

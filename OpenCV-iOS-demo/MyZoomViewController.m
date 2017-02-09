@@ -24,6 +24,7 @@
 {
     [super viewDidLoad];
     _srcollView = [[UIScrollView alloc]init];
+    _srcollView.backgroundColor = [UIColor blueColor];
     _srcollView.delegate = self;
     
     _srcollView.userInteractionEnabled = YES;
@@ -35,7 +36,8 @@
     
     UIImage *img = [UIImage imageWithContentsOfFile:_imagePath];
     _imageView = [[UIImageView alloc]initWithImage:img];
-    //设置这个_imageView能被缩放的最大尺寸，这句话很重要，一定不能少,如果没有这句话，图片不能缩放
+    _imageView.contentMode = UIViewContentModeScaleAspectFit;
+    _imageView.backgroundColor = [UIColor redColor];
     _imageView.frame = CGRectMake(0, 0, MRScreenWidth, MRScreenHeight);
     
     [self.view addSubview:_srcollView];
