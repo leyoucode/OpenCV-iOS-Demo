@@ -1,18 +1,12 @@
 //
-//  OpenCVClientViewController.m
-//  OpenCVClient
+//  CXVideoCaptureViewController.h
+//  OpenCV-iOS-demo
 //
-//  Created by Robin Summerhill on 02/09/2011.
-//  Copyright 2011 Aptogo Limited. All rights reserved.
-//
-//  Permission is given to use this source code file without charge in any
-//  project, commercial or otherwise, entirely at your risk, with the condition
-//  that any redistribution (in part or whole) of source code must retain
-//  this copyright and permission notice. Attribution in compiled projects is
-//  appreciated but not required.
+//  Created by 刘伟 on 12/01/2017.
+//  Copyright © 2017 上海凌晋信息技术有限公司. All rights reserved.
 //
 
-#import "VideoCaptureViewController.h"
+#import "CXVideoCaptureViewController.h"
 #import "UIView+Ext.h"
 
 #include <opencv2/imgproc/imgproc.hpp>
@@ -24,14 +18,14 @@
 #import "UIImage+OpenCV.h"
 
 // Private interface
-@interface VideoCaptureViewController ()
+@interface CXVideoCaptureViewController ()
 - (BOOL)createCaptureSessionForCamera:(NSInteger)camera qualityPreset:(NSString *)qualityPreset grayscale:(BOOL)grayscale;
 - (void)destroyCaptureSession;
 - (void)processFrame:(cv::Mat&)mat videoRect:(CGRect)rect videoOrientation:(AVCaptureVideoOrientation)orientation;
 @end
 
 
-@interface VideoCaptureViewController()
+@interface CXVideoCaptureViewController()
 {
     dispatch_queue_t _captureQueue;
 }
@@ -78,7 +72,7 @@
 @property (strong, nonatomic) UIButton *cancelButton;
 @end
 
-@implementation VideoCaptureViewController
+@implementation CXVideoCaptureViewController
 
 NSMutableArray * queue;
 

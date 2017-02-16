@@ -8,11 +8,11 @@
 
 #import "CXCameraViewController.h"
 #import <AVFoundation/AVFoundation.h>
-#import "VideoCaptureViewController.h"
+#import "CXVideoCaptureViewController.h"
 
 @interface CXCameraViewController ()
 
-@property(strong,nonatomic) VideoCaptureViewController *videoCaptureViewController;
+@property(strong,nonatomic) CXVideoCaptureViewController *videoCaptureViewController;
 
 @end
 
@@ -78,10 +78,10 @@
     [controller presentViewController:alert animated:YES completion:nil];
 }
 
--(VideoCaptureViewController *) videoCaptureViewController
+-(CXVideoCaptureViewController *) videoCaptureViewController
 {
     if (!_videoCaptureViewController) {
-        _videoCaptureViewController = [[VideoCaptureViewController alloc] init];
+        _videoCaptureViewController = [[CXVideoCaptureViewController alloc] init];
     }
     return  _videoCaptureViewController;
 }

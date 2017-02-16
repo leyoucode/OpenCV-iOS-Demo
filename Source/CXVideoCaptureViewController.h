@@ -1,21 +1,15 @@
 //
-//  ViewController.h
-//  FaceTracker
+//  CXVideoCaptureViewController.h
+//  OpenCV-iOS-demo
 //
-//  Created by Robin Summerhill on 9/22/11.
-//  Copyright 2011 Aptogo Limited. All rights reserved.
-//
-//  Permission is given to use this source code file without charge in any
-//  project, commercial or otherwise, entirely at your risk, with the condition
-//  that any redistribution (in part or whole) of source code must retain
-//  this copyright and permission notice. Attribution in compiled projects is
-//  appreciated but not required.
+//  Created by 刘伟 on 12/01/2017.
+//  Copyright © 2017 上海凌晋信息技术有限公司. All rights reserved.
 //
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import "CameraMediaType.h"
 
-@interface VideoCaptureViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate>
+@interface CXVideoCaptureViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate>
 
 @property (nonatomic, assign) CameraMediaType cameraMediaType;
 
