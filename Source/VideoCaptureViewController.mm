@@ -648,8 +648,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     [self.view addSubview:self.takeButton];
     [self.takeButton modifySize:CGSizeMake(57, 57)];
-    //[self.takeButton fitToHorizontalCenterWithView:self.bottomContentView];
-    //[self.takeButton fitToVerticalCenterWithView:self.bottomContentView];
     [self.takeButton modifyCenterX:self.bottomContentView.center.x];
     [self.takeButton modifyCenterY:self.bottomContentView.center.y + 10];
     [self.takeButton modifyY:VIEW_TOP(self.takeButton) + 10];
@@ -715,7 +713,38 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     }
     // 点击拍照／录制按钮
     if (sender == self.takeButton) {
-        
+        switch (self.cameraMediaType) {
+            case kCameraMediaTypeVideo:// 录制视频
+                
+                if (self.takeButton.tag == 0) {
+                    self.takeButton.tag = 1;
+                    [self.takeButton setImage:[UIImage imageNamed:@"record_ing"] forState:UIControlStateNormal];
+                    self.bottomContentView.hidden = YES;
+                    self.cameraButton.hidden = YES;
+                    self.cancelButton.hidden = YES;
+                    
+                }else{
+                    self.takeButton.tag = 0;
+                    [self.takeButton setImage:[UIImage imageNamed:@"record_idle"] forState:UIControlStateNormal];
+                    self.bottomContentView.hidden = NO;
+                    self.cameraButton.hidden = NO;
+                    self.cancelButton.hidden = NO;
+                }
+                
+                
+                
+                break;
+            case kCameraMediaTypePhoto:// 拍照
+                
+                
+                break;
+            case kCameraMediaTypeDocument:// 拍摄文档
+                
+                
+                break;
+            default:
+                break;
+        }
     }
 }
 
