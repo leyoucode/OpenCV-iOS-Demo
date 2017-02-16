@@ -28,6 +28,10 @@
 
 
 @interface VideoCaptureViewController()
+{
+    dispatch_queue_t _captureQueue;
+}
+
 /**
  顶部容器视图
  */
@@ -165,7 +169,22 @@
 didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer 
        fromConnection:(AVCaptureConnection *)connection
 {
-    
+    if (self.cameraMediaType == kCameraMediaTypeDocument)
+    {
+        [self processDocumentBuffer:sampleBuffer];
+    }
+    else if(self.cameraMediaType == kCameraMediaTypePhoto)
+    {
+        NSLog(@"kCameraMediaTypePhoto");
+    }
+    else if(self.cameraMediaType == kCameraMediaTypeVideo)
+    {
+        NSLog(@"kCameraMediaTypeVideo");
+    }
+}
+
+- (void) processDocumentBuffer:(CMSampleBufferRef)sampleBuffer
+{
     CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     OSType format = CVPixelBufferGetPixelFormatType(pixelBuffer);
     CGRect videoRect = CGRectMake(0.0f, 0.0f, CVPixelBufferGetWidth(pixelBuffer), CVPixelBufferGetHeight(pixelBuffer));
@@ -180,7 +199,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         
         [self processFrame:mat videoRect:videoRect videoOrientation:videoOrientation];
         
-        CVPixelBufferUnlockBaseAddress(pixelBuffer, 0); 
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
     }
     else if (format == kCVPixelFormatType_32BGRA) {
         // For color mode a 4-channel cv::Mat is created from the BGRA data
@@ -191,7 +210,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         
         [self processFrame:mat videoRect:videoRect videoOrientation:videoOrientation];
         
-        CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);    
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
     }
     else {
         NSLog(@"Unsupported video format");
@@ -298,11 +317,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 //
 - (BOOL)createCaptureSessionForCamera:(NSInteger)camera qualityPreset:(NSString *)qualityPreset grayscale:(BOOL)grayscale
 {
-//    _lastFrameTimestamp = 0;
-//    _frameTimesIndex = 0;
-//    _captureQueueFps = 0.0f;
-//    _fps = 0.0f;
-	
     // Set up AV capture
     NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
     

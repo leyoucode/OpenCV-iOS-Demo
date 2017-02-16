@@ -39,7 +39,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    [_videoPreviewLayer addSublayer:rectangleCALayer];
+    [self.videoPreviewLayer addSublayer:rectangleCALayer];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -178,7 +178,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
         
 //        if (aggregateRectangle)
 //        {
-            [rectangleCALayer setFrame:_videoPreviewLayer.frame];
+            [rectangleCALayer setFrame:self.videoPreviewLayer.frame];
             [rectangleCALayer updateDetect:aggregateRectangle];
 //        }
         
@@ -323,7 +323,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 - (void)captureImageWithCompletionHander:(void(^)(NSString *imageFilePath))completionHandler
 {
     
-    dispatch_suspend(_captureQueue);
+    //dispatch_suspend(_captureQueue);
     
     AVCaptureConnection *videoConnection = nil;
     for (AVCaptureConnection *connection in self.stillImageOutput.connections)
@@ -358,7 +358,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
          
          if (error)
          {
-             dispatch_resume(_captureQueue);
+             //dispatch_resume(_captureQueue);
              return;
          }
          
@@ -385,7 +385,7 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
              dispatch_async(dispatch_get_main_queue(), ^
                             {
                                 completionHandler(filePath);
-                                dispatch_resume(_captureQueue);
+                                //dispatch_resume(_captureQueue);
                             });
          }
      }];

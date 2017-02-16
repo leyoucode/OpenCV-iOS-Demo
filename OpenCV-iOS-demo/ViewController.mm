@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import "OpenCVWrapper.h"
 #import "CannyEdgeDetectingViewController.h"
-#import "HoughLineEdgeDetectingViewController.h"
+//#import "HoughLineEdgeDetectingViewController.h"
 
 #import "CXCameraViewController.h"
 
