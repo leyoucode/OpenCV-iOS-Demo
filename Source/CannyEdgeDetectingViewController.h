@@ -1,13 +1,13 @@
+////
+////  EdgeDetectingViewController.h
+////  OpenCVVideoFeedSample
+////
+////  Created by Dan Bucholtz on 9/2/14.
+////  Copyright (c) 2014 NXSW. All rights reserved.
+////
 //
-//  EdgeDetectingViewController.h
-//  OpenCVVideoFeedSample
+//#import "VideoCaptureViewController.h"
 //
-//  Created by Dan Bucholtz on 9/2/14.
-//  Copyright (c) 2014 NXSW. All rights reserved.
+//@interface CannyEdgeDetectingViewController : VideoCaptureViewController
 //
-
-#import "EdgeDetectingViewController.h"
-
-@interface CannyEdgeDetectingViewController : EdgeDetectingViewController
-
-@end
+//@end

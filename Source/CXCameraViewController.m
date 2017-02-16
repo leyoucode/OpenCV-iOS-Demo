@@ -8,11 +8,11 @@
 
 #import "CXCameraViewController.h"
 #import <AVFoundation/AVFoundation.h>
-#import "CannyEdgeDetectingViewController.h"
+#import "VideoCaptureViewController.h"
 
 @interface CXCameraViewController ()
 
-@property(strong,nonatomic) CannyEdgeDetectingViewController *cannyEdgeDetectingViewController;
+@property(strong,nonatomic) VideoCaptureViewController *videoCaptureViewController;
 
 @end
 
@@ -60,10 +60,10 @@
 
 -(void)showController:(UIViewController *)controller withType:(CameraMediaType)cameraMediaType result:(CXCameraResult)result
 {
-    self.cannyEdgeDetectingViewController.cameraMediaType = cameraMediaType;
-    self.cannyEdgeDetectingViewController.camera = 0; // 0表示后置摄像头
+    self.videoCaptureViewController.cameraMediaType = cameraMediaType;
+    self.videoCaptureViewController.camera = 0; // 0表示后置摄像头
     
-    UINavigationController* navigationVC = [[UINavigationController alloc] initWithRootViewController:self.cannyEdgeDetectingViewController];
+    UINavigationController* navigationVC = [[UINavigationController alloc] initWithRootViewController:self.videoCaptureViewController];
     navigationVC.navigationBarHidden = YES;
     [controller presentViewController:navigationVC animated:YES completion:nil];
 }
@@ -78,12 +78,12 @@
     [controller presentViewController:alert animated:YES completion:nil];
 }
 
--(CannyEdgeDetectingViewController *) cannyEdgeDetectingViewController
+-(VideoCaptureViewController *) videoCaptureViewController
 {
-    if (!_cannyEdgeDetectingViewController) {
-        _cannyEdgeDetectingViewController = [[CannyEdgeDetectingViewController alloc] init];
+    if (!_videoCaptureViewController) {
+        _videoCaptureViewController = [[VideoCaptureViewController alloc] init];
     }
-    return  _cannyEdgeDetectingViewController;
+    return  _videoCaptureViewController;
 }
 
 @end

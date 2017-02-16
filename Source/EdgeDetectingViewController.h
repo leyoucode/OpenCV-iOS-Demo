@@ -1,15 +1,15 @@
+////
+////  EdgeDetectingViewController.h
+////  OpenCVCameraSample
+////
+////  Created by Dan Bucholtz on 9/7/14.
+////  Copyright (c) 2014 NXSW. All rights reserved.
+////
 //
-//  EdgeDetectingViewController.h
-//  OpenCVCameraSample
+//#import "VideoCaptureViewController.h"
 //
-//  Created by Dan Bucholtz on 9/7/14.
-//  Copyright (c) 2014 NXSW. All rights reserved.
+//@interface EdgeDetectingViewController : VideoCaptureViewController
 //
-
-#import "VideoCaptureViewController.h"
-
-@interface EdgeDetectingViewController : VideoCaptureViewController<CALayerDelegate>
-
-- (void)captureImageWithCompletionHander:(void(^)(NSString *imageFilePath))completionHandler;
-
-@end
+//- (void)captureImageWithCompletionHander:(void(^)(NSString *imageFilePath))completionHandler;
+//
+//@end
