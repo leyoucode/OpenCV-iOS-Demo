@@ -13,10 +13,12 @@
 //
 
 #import "VideoCaptureViewController.h"
+#import "UIView+Ext.h"
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
+
 
 // Number of frames to average for FPS calculation
 const int kFrameTimeBufferSize = 5;
@@ -148,6 +150,43 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
 @end
 
 
+@interface VideoCaptureViewController()
+
+/**
+ 顶部容器视图
+ */
+@property (strong, nonatomic) UIView *topContentView;
+/**
+ 闪光灯
+ */
+@property (strong, nonatomic) UIButton *torchButton;
+/**
+ 前后摄像头切换
+ */
+@property (strong, nonatomic) UIButton *cameraButton;
+/**
+ 录制视频时长显示
+ */
+@property (strong, nonatomic) UILabel *recordDurationLabel;
+/**
+ 底部容器视图
+ */
+@property (strong, nonatomic) UIView *bottomContentView;
+/**
+ 拍照/录制按钮
+ */
+@property (strong, nonatomic) UIButton *takeButton;
+/**
+ 切换为拍照模式
+ */
+@property (strong, nonatomic) UIButton *photoTabButton;
+/**
+ 切换为视屏录制模式
+ */
+@property (strong, nonatomic) UIButton *videoTabButton;
+
+@end
+
 @implementation VideoCaptureViewController
 
 @synthesize fps = _fps;
@@ -192,6 +231,8 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
     _captureQueue = dispatch_queue_create("com.linkim.AVCameraCaptureQueue", DISPATCH_QUEUE_SERIAL);
     [self createCaptureSessionForCamera:_camera qualityPreset:_qualityPreset grayscale:_captureGrayscale];
     [_captureSession startRunning];
+    
+    [self setupControl];
 }
 
 - (void)viewDidUnload
@@ -575,4 +616,139 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         _fpsLabel.text = [NSString stringWithFormat:@"FPS: %0.1f", _fps];
     }
 }
+
+#pragma mark - UI Element
+
+- (void) setupControl
+{
+    [self.view addSubview:self.topContentView];
+    self.topContentView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
+    
+    [self.topContentView addSubview:self.torchButton];
+    self.torchButton.frame = CGRectMake(0, 0, VIEW_HEIGHT(self.topContentView), VIEW_HEIGHT(self.topContentView));
+    
+    [self.topContentView addSubview:self.cameraButton];
+    self.cameraButton.frame = CGRectMake(0, 0, VIEW_HEIGHT(self.topContentView), VIEW_HEIGHT(self.topContentView));
+    [self.cameraButton modifyX:SCREEN_WIDTH - VIEW_WIDTH(self.cameraButton)];
+    
+    [self.topContentView addSubview:self.recordDurationLabel];
+    self.recordDurationLabel.frame = CGRectMake(VIEW_WIDTH(self.torchButton), 0, (SCREEN_WIDTH - VIEW_WIDTH(self.torchButton) - VIEW_WIDTH(self.cameraButton)), VIEW_HEIGHT(self.topContentView));
+    
+    self.bottomContentView.frame = CGRectMake(0, SCREEN_HEIGHT - 120, SCREEN_WIDTH, 120);
+    [self.view addSubview:self.bottomContentView];
+    
+    [self.bottomContentView addSubview:self.takeButton];
+    [self.takeButton modifySize:CGSizeMake(57, 57)];
+    [self.takeButton fitToHorizontalCenterWithView:self.bottomContentView];
+    [self.takeButton fitToVerticalCenterWithView:self.bottomContentView];
+    [self.takeButton modifyY:VIEW_TOP(self.takeButton) + 10];
+    
+    [self.bottomContentView addSubview:self.photoTabButton];
+    self.photoTabButton.frame = CGRectMake(0, 6, 50, 30);
+    [self.photoTabButton fitToHorizontalCenterWithView:self.bottomContentView];
+    
+    [self.bottomContentView addSubview:self.videoTabButton];
+    self.videoTabButton.frame = CGRectMake(VIEW_RIGHT(self.photoTabButton), VIEW_TOP(self.photoTabButton), VIEW_WIDTH(self.photoTabButton), VIEW_HEIGHT(self.photoTabButton));
+    
+}
+
+/**
+ 顶部容器视图
+ */
+- (UIView *) topContentView
+{
+    if(!_topContentView)
+    {
+        _topContentView = [[UIView alloc] init];
+        [_topContentView setBackgroundColor:[UIColor blackColor]];
+    }
+    return _topContentView;
+}
+
+/**
+ 闪光灯
+ */
+- (UIButton *) torchButton
+{
+    if (!_torchButton) {
+        _torchButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_torchButton setImage:[UIImage imageNamed:@"record_flash_off"] forState:UIControlStateNormal];
+    }
+    return _torchButton;
+}
+/**
+ 前后摄像头切换
+ */
+- (UIButton *) cameraButton
+{
+    if (!_cameraButton) {
+        _cameraButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_cameraButton setImage:[UIImage imageNamed:@"record_camera"] forState:UIControlStateNormal];
+    }
+    return _cameraButton;
+}
+/**
+ 录制视频时长显示
+ */
+- (UILabel *) recordDurationLabel
+{
+    if (!_recordDurationLabel) {
+        _recordDurationLabel = [[UILabel alloc] init];
+        _recordDurationLabel.textAlignment = NSTextAlignmentCenter;
+        _recordDurationLabel.text = @"00:00:00";
+        _recordDurationLabel.textColor = [UIColor whiteColor];
+    }
+    return _recordDurationLabel;
+}
+/**
+ 底部容器视图
+ */
+- (UIView *) bottomContentView
+{
+    if (!_bottomContentView) {
+        _bottomContentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 120)];
+        [_bottomContentView setBackgroundColor:[UIColor blackColor]];
+    }
+    return _bottomContentView;
+}
+/**
+ 拍照/录制按钮
+ */
+- (UIButton *) takeButton
+{
+    if (!_takeButton) {
+        _takeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_takeButton setImage:[UIImage imageNamed:@"record_idle"] forState:UIControlStateNormal];
+    }
+    return _takeButton;
+}
+/**
+ 切换为拍照模式
+ */
+- (UIButton *) photoTabButton
+{
+    if (!_photoTabButton) {
+        _photoTabButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_photoTabButton setTitle:@"照片" forState:UIControlStateNormal];
+        _photoTabButton.titleLabel.font = [UIFont systemFontOfSize:13];
+    }
+    return _photoTabButton;
+}
+/**
+ 切换为视屏录制模式
+ */
+- (UIButton *) videoTabButton
+{
+    if (!_videoTabButton) {
+        _videoTabButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_videoTabButton setTitle:@"视频" forState:UIControlStateNormal];
+        _videoTabButton.titleLabel.font = [UIFont systemFontOfSize:13];
+    }
+    return _videoTabButton;
+}
+
+
+
+
+
 @end

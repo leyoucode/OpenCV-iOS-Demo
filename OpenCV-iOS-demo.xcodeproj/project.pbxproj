@@ -16,11 +16,10 @@
 		FE0083D31E2884C500299936 /* RectangleCALayer.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CA1E2884C500299936 /* RectangleCALayer.m */; };
 		FE0083D41E2884C500299936 /* UIImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CC1E2884C500299936 /* UIImage+OpenCV.mm */; };
 		FE0083D51E2884C500299936 /* VideoCaptureViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CE1E2884C500299936 /* VideoCaptureViewController.mm */; };
+		FE0520841E52A0DC00355DA1 /* UIView+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0520831E52A0DC00355DA1 /* UIView+Ext.m */; };
 		FE342FB21E30B88500F0D071 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE342FB11E30B88500F0D071 /* MobileCoreServices.framework */; };
 		FE342FB41E30B89000F0D071 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE342FB31E30B89000F0D071 /* ImageIO.framework */; };
 		FE342FB71E3211BB00F0D071 /* UIImage+UIImage_Rotate.m in Sources */ = {isa = PBXBuildFile; fileRef = FE342FB61E3211BB00F0D071 /* UIImage+UIImage_Rotate.m */; };
-		FE342FC11E34807100F0D071 /* CannyEdgeDetectingControlView.xib in Resources */ = {isa = PBXBuildFile; fileRef = FE342FC01E34807100F0D071 /* CannyEdgeDetectingControlView.xib */; };
-		FE342FC41E34811C00F0D071 /* CannyEdgeDetectingControlView.m in Sources */ = {isa = PBXBuildFile; fileRef = FE342FC31E34811C00F0D071 /* CannyEdgeDetectingControlView.m */; };
 		FE89BC761E34B23600179706 /* MyZoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE89BC751E34B23600179706 /* MyZoomViewController.m */; };
 		FEC619581E2F3ED100A45533 /* CannyEdgeDetectingViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FEC619571E2F3ED100A45533 /* CannyEdgeDetectingViewController.mm */; };
 		FEF47F8D1E2645B500AF034B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF47F8C1E2645B500AF034B /* AppDelegate.swift */; };
@@ -51,13 +50,12 @@
 		FE0083CC1E2884C500299936 /* UIImage+OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+OpenCV.mm"; sourceTree = "<group>"; };
 		FE0083CD1E2884C500299936 /* VideoCaptureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoCaptureViewController.h; sourceTree = "<group>"; };
 		FE0083CE1E2884C500299936 /* VideoCaptureViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VideoCaptureViewController.mm; sourceTree = "<group>"; };
+		FE0520821E52A0DC00355DA1 /* UIView+Ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Ext.h"; sourceTree = "<group>"; };
+		FE0520831E52A0DC00355DA1 /* UIView+Ext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Ext.m"; sourceTree = "<group>"; };
 		FE342FB11E30B88500F0D071 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		FE342FB31E30B89000F0D071 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		FE342FB51E3211BB00F0D071 /* UIImage+UIImage_Rotate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+UIImage_Rotate.h"; sourceTree = "<group>"; };
 		FE342FB61E3211BB00F0D071 /* UIImage+UIImage_Rotate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+UIImage_Rotate.m"; sourceTree = "<group>"; };
-		FE342FC01E34807100F0D071 /* CannyEdgeDetectingControlView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CannyEdgeDetectingControlView.xib; sourceTree = "<group>"; };
-		FE342FC21E34811C00F0D071 /* CannyEdgeDetectingControlView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CannyEdgeDetectingControlView.h; sourceTree = "<group>"; };
-		FE342FC31E34811C00F0D071 /* CannyEdgeDetectingControlView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CannyEdgeDetectingControlView.m; sourceTree = "<group>"; };
 		FE89BC741E34B23600179706 /* MyZoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyZoomViewController.h; sourceTree = "<group>"; };
 		FE89BC751E34B23600179706 /* MyZoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyZoomViewController.m; sourceTree = "<group>"; };
 		FEC619561E2F3ED100A45533 /* CannyEdgeDetectingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CannyEdgeDetectingViewController.h; sourceTree = "<group>"; };
@@ -107,9 +105,8 @@
 		FE0083C01E2884C500299936 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				FE342FC01E34807100F0D071 /* CannyEdgeDetectingControlView.xib */,
-				FE342FC21E34811C00F0D071 /* CannyEdgeDetectingControlView.h */,
-				FE342FC31E34811C00F0D071 /* CannyEdgeDetectingControlView.m */,
+				FE0520821E52A0DC00355DA1 /* UIView+Ext.h */,
+				FE0520831E52A0DC00355DA1 /* UIView+Ext.m */,
 				FE0083CD1E2884C500299936 /* VideoCaptureViewController.h */,
 				FE0083CE1E2884C500299936 /* VideoCaptureViewController.mm */,
 				FE0083C31E2884C500299936 /* EdgeDetectingViewController.h */,
@@ -232,7 +229,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FE342FC11E34807100F0D071 /* CannyEdgeDetectingControlView.xib in Resources */,
 				FEF47F971E2645B500AF034B /* LaunchScreen.storyboard in Resources */,
 				FEF47F941E2645B500AF034B /* Assets.xcassets in Resources */,
 				FEF47F921E2645B500AF034B /* Main.storyboard in Resources */,
@@ -297,7 +293,7 @@
 				FE0083D11E2884C500299936 /* HoughLineEdgeDetectingViewController.mm in Sources */,
 				FE0083A21E2784D900299936 /* ViewController.mm in Sources */,
 				FE0083D21E2884C500299936 /* Rectangle.m in Sources */,
-				FE342FC41E34811C00F0D071 /* CannyEdgeDetectingControlView.m in Sources */,
+				FE0520841E52A0DC00355DA1 /* UIView+Ext.m in Sources */,
 				FE0083D41E2884C500299936 /* UIImage+OpenCV.mm in Sources */,
 				FE342FB71E3211BB00F0D071 /* UIImage+UIImage_Rotate.m in Sources */,
 				FEF47F8D1E2645B500AF034B /* AppDelegate.swift in Sources */,

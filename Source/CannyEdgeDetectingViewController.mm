@@ -14,8 +14,14 @@
 
 #import "Rectangle.h"
 
-#import "CannyEdgeDetectingControlView.h"
+//#import "CannyEdgeDetectingControlView.h"
 #import "MyZoomViewController.h"
+
+@interface CannyEdgeDetectingViewController()
+
+
+
+@end
 
 @implementation CannyEdgeDetectingViewController
 
@@ -75,13 +81,16 @@
     [super viewDidLoad];
     
     [UIApplication sharedApplication].statusBarHidden = YES;
+    
     //[self setShowDebugInfo:YES];
     
-    CannyEdgeDetectingControlView *controlView = (CannyEdgeDetectingControlView*)[[[NSBundle mainBundle] loadNibNamed:@"CannyEdgeDetectingControlView" owner:nil options:nil] firstObject];
-    controlView.frame = self.view.bounds;
-    [self.view addSubview:controlView];
-
-    [controlView.takeButton addTarget:self action:@selector(onTakeButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+//    CannyEdgeDetectingControlView *controlView = (CannyEdgeDetectingControlView*)[[[NSBundle mainBundle] loadNibNamed:@"CannyEdgeDetectingControlView" owner:nil options:nil] firstObject];
+//    controlView.frame = self.view.bounds;
+//    [self.view addSubview:controlView];
+//
+//    [controlView.takeButton addTarget:self action:@selector(onTakeButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+    
+    
 }
 
 -(void) onTakeButtonClick: (UIButton *)button
