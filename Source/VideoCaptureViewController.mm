@@ -19,141 +19,15 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 
-// Number of frames to average for FPS calculation
-const int kFrameTimeBufferSize = 5;
-
 // Private interface
 @interface VideoCaptureViewController ()
 - (BOOL)createCaptureSessionForCamera:(NSInteger)camera qualityPreset:(NSString *)qualityPreset grayscale:(BOOL)grayscale;
 - (void)destroyCaptureSession;
 - (void)processFrame:(cv::Mat&)mat videoRect:(CGRect)rect videoOrientation:(AVCaptureVideoOrientation)orientation;
-- (void)updateDebugInfo;
-
-@property (nonatomic, assign) float fps;
-
-@end
-
-static const NSString * AVCaptureStillImageIsCapturingStillImageContext = @"AVCaptureStillImageIsCapturingStillImageContext";
-
-static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
-
-static void ReleaseCVPixelBuffer(void *pixel, const void *data, size_t size);
-static void ReleaseCVPixelBuffer(void *pixel, const void *data, size_t size)
-{
-	CVPixelBufferRef pixelBuffer = (CVPixelBufferRef)pixel;
-	CVPixelBufferUnlockBaseAddress( pixelBuffer, 0 );
-	CVPixelBufferRelease( pixelBuffer );
-}
-
-// create a CGImage with provided pixel buffer, pixel buffer must be uncompressed kCVPixelFormatType_32ARGB or kCVPixelFormatType_32BGRA
-static OSStatus CreateCGImageFromCVPixelBuffer(CVPixelBufferRef pixelBuffer, CGImageRef *imageOut);
-static OSStatus CreateCGImageFromCVPixelBuffer(CVPixelBufferRef pixelBuffer, CGImageRef *imageOut)
-{
-	OSStatus err = noErr;
-	OSType sourcePixelFormat;
-	size_t width, height, sourceRowBytes;
-	void *sourceBaseAddr = NULL;
-	CGBitmapInfo bitmapInfo;
-	CGColorSpaceRef colorspace = NULL;
-	CGDataProviderRef provider = NULL;
-	CGImageRef image = NULL;
-	
-	sourcePixelFormat = CVPixelBufferGetPixelFormatType( pixelBuffer );
-	if ( kCVPixelFormatType_32ARGB == sourcePixelFormat )
-		bitmapInfo = kCGBitmapByteOrder32Big | kCGImageAlphaNoneSkipFirst;
-	else if ( kCVPixelFormatType_32BGRA == sourcePixelFormat )
-		bitmapInfo = kCGBitmapByteOrder32Little | kCGImageAlphaNoneSkipFirst;
-	else
-		return -95014; // only uncompressed pixel formats
-	
-	sourceRowBytes = CVPixelBufferGetBytesPerRow( pixelBuffer );
-	width = CVPixelBufferGetWidth( pixelBuffer );
-	height = CVPixelBufferGetHeight( pixelBuffer );
-	
-	CVPixelBufferLockBaseAddress( pixelBuffer, 0 );
-	sourceBaseAddr = CVPixelBufferGetBaseAddress( pixelBuffer );
-	
-	colorspace = CGColorSpaceCreateDeviceRGB();
-    
-	CVPixelBufferRetain( pixelBuffer );
-	provider = CGDataProviderCreateWithData( (void *)pixelBuffer, sourceBaseAddr, sourceRowBytes * height, ReleaseCVPixelBuffer);
-	image = CGImageCreate(width, height, 8, 32, sourceRowBytes, colorspace, bitmapInfo, provider, NULL, true, kCGRenderingIntentDefault);
-	
-bail:
-	if ( err && image ) {
-		CGImageRelease( image );
-		image = NULL;
-	}
-	if ( provider ) CGDataProviderRelease( provider );
-	if ( colorspace ) CGColorSpaceRelease( colorspace );
-	*imageOut = image;
-	return err;
-}
-
-static CGContextRef CreateCGBitmapContextForSize(CGSize size);
-static CGContextRef CreateCGBitmapContextForSize(CGSize size)
-{
-    CGContextRef    context = NULL;
-    CGColorSpaceRef colorSpace;
-    int             bitmapBytesPerRow;
-	
-    bitmapBytesPerRow = (size.width * 4);
-	
-    colorSpace = CGColorSpaceCreateDeviceRGB();
-    context = CGBitmapContextCreate (NULL,
-									 size.width,
-									 size.height,
-									 8,      // bits per component
-									 bitmapBytesPerRow,
-									 colorSpace,
-									 kCGImageAlphaPremultipliedLast);
-	CGContextSetAllowsAntialiasing(context, NO);
-    CGColorSpaceRelease( colorSpace );
-    return context;
-}
-
-@interface UIImage (RotationMethods)
-- (UIImage *)imageRotatedByDegrees:(CGFloat)degrees;
-@end
-
-@implementation UIImage (RotationMethods)
-
-- (UIImage *)imageRotatedByDegrees:(CGFloat)degrees
-{
-	// calculate the size of the rotated view's containing box for our drawing space
-	UIView *rotatedViewBox = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.size.width, self.size.height)];
-	CGAffineTransform t = CGAffineTransformMakeRotation(DegreesToRadians(degrees));
-	rotatedViewBox.transform = t;
-	CGSize rotatedSize = rotatedViewBox.frame.size;
-	
-	// Create the bitmap context
-	UIGraphicsBeginImageContext(rotatedSize);
-	CGContextRef bitmap = UIGraphicsGetCurrentContext();
-	
-	// Move the origin to the middle of the image so we will rotate and scale around the center.
-	CGContextTranslateCTM(bitmap, rotatedSize.width/2, rotatedSize.height/2);
-	
-	//   // Rotate the image context
-	CGContextRotateCTM(bitmap, DegreesToRadians(degrees));
-	
-	// Now, draw the rotated/scaled image into the context
-	CGContextScaleCTM(bitmap, 1.0, -1.0);
-	CGContextDrawImage(bitmap, CGRectMake(-self.size.width / 2, -self.size.height / 2, self.size.width, self.size.height), [self CGImage]);
-	
-	UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-	UIGraphicsEndImageContext();
-	return newImage;
-	
-}
-
 @end
 
 
 @interface VideoCaptureViewController()
-{
-    CameraMediaType _cameraMediaType;
-}
-
 /**
  顶部容器视图
  */
@@ -198,19 +72,6 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
 
 @implementation VideoCaptureViewController
 
-@synthesize fps = _fps;
-@synthesize camera = _camera;
-@synthesize captureGrayscale = _captureGrayscale;
-@synthesize qualityPreset = _qualityPreset;
-@synthesize captureSession = _captureSession;
-@synthesize captureDevice = _captureDevice;
-@synthesize videoOutput = _videoOutput;
-@synthesize videoPreviewLayer = _videoPreviewLayer;
-@synthesize stillImageOutput = _stillImageOutput;
-
-@dynamic showDebugInfo;
-@dynamic torchOn;
-
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -218,18 +79,8 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
         _camera = -1;
         _qualityPreset = AVCaptureSessionPresetHigh;//AVCaptureSessionPresetMedium
         _captureGrayscale = YES;
-        
-        // Create frame time circular buffer for calculating averaged fps
-        _frameTimes = (float*)malloc(sizeof(float) * kFrameTimeBufferSize);
     }
     return self;
-}
-
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Release any cached data, images, etc that aren't in use.
 }
 
 #pragma mark - View lifecycle
@@ -244,48 +95,10 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
     [self setupControl];
 }
 
-- (void)viewDidUnload
+- (void)viewDidDisappear:(BOOL)animated
 {
-    [super viewDidUnload];
-    
+    [super viewDidDisappear:animated];
     [self destroyCaptureSession];
-    _fpsLabel = nil;
-}
-
-// MARK: Accessors
-- (void)setFps:(float)fps
-{
-    [self willChangeValueForKey:@"fps"];
-    _fps = fps;
-    [self didChangeValueForKey:@"fps"];
-    
-    [self updateDebugInfo];
-}
-
-- (BOOL)showDebugInfo
-{
-    return (_fpsLabel != nil);
-}
-
-// Show/hide debug panel with current FPS 
-- (void)setShowDebugInfo:(BOOL)showDebugInfo
-{
-    if (!showDebugInfo && _fpsLabel) {
-        [_fpsLabel removeFromSuperview];
-        _fpsLabel = nil;
-    }
-    
-    if (showDebugInfo && !_fpsLabel) {
-        // Create label to show FPS
-        CGRect frame = self.view.bounds;
-        frame.size.height = 40.0f;
-        _fpsLabel = [[UILabel alloc] initWithFrame:frame];
-        _fpsLabel.textColor = [UIColor whiteColor];
-        _fpsLabel.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.5f];
-        [self.view addSubview:_fpsLabel];
-        
-        [self updateDebugInfo];
-    }
 }
 
 // Set torch on or off (if supported)
@@ -382,44 +195,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     }
     else {
         NSLog(@"Unsupported video format");
-    }
-    
-    // Update FPS calculation
-    CMTime presentationTime = CMSampleBufferGetOutputPresentationTimeStamp(sampleBuffer);
-    
-    if (_lastFrameTimestamp == 0) {
-        _lastFrameTimestamp = presentationTime.value;
-        _framesToAverage = 1;
-    }
-    else {
-        float frameTime = (float)(presentationTime.value - _lastFrameTimestamp) / presentationTime.timescale;
-        _lastFrameTimestamp = presentationTime.value;
-        
-        _frameTimes[_frameTimesIndex++] = frameTime;
-        
-        if (_frameTimesIndex >= kFrameTimeBufferSize) {
-            _frameTimesIndex = 0;
-        }
-        
-        float totalFrameTime = 0.0f;
-        for (int i = 0; i < _framesToAverage; i++) {
-            totalFrameTime += _frameTimes[i];
-        }
-        
-        float averageFrameTime = totalFrameTime / _framesToAverage;
-        float fps = 1.0f / averageFrameTime;
-        
-        if (fabsf(fps - _captureQueueFps) > 0.1f) {
-            _captureQueueFps = fps;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self setFps:fps];
-            });    
-        }
-        
-        _framesToAverage++;
-        if (_framesToAverage > kFrameTimeBufferSize) {
-            _framesToAverage = kFrameTimeBufferSize;
-        }
     }
 }
 
@@ -523,10 +298,10 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 //
 - (BOOL)createCaptureSessionForCamera:(NSInteger)camera qualityPreset:(NSString *)qualityPreset grayscale:(BOOL)grayscale
 {
-    _lastFrameTimestamp = 0;
-    _frameTimesIndex = 0;
-    _captureQueueFps = 0.0f;
-    _fps = 0.0f;
+//    _lastFrameTimestamp = 0;
+//    _frameTimesIndex = 0;
+//    _captureQueueFps = 0.0f;
+//    _fps = 0.0f;
 	
     // Set up AV capture
     NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
@@ -572,11 +347,13 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     // For color mode, BGRA format is used
     OSType format = kCVPixelFormatType_32BGRA;
 
+    /*
     // Check YUV format is available before selecting it (iPhone 3 does not support it)
     if (NO && grayscale && [_videoOutput.availableVideoCVPixelFormatTypes containsObject:
                       [NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarFullRange]]) {
         format = kCVPixelFormatType_420YpCbCr8BiPlanarFullRange;
     }
+     */
     
     _videoOutput.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedInt:format]
                                                              forKey:(id)kCVPixelBufferPixelFormatTypeKey];
@@ -618,12 +395,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     _videoOutput = nil;
     _captureDevice = nil;
     _captureSession = nil;
-}
-
-- (void)updateDebugInfo {
-    if (_fpsLabel) {
-        _fpsLabel.text = [NSString stringWithFormat:@"FPS: %0.1f", _fps];
-    }
 }
 
 #pragma mark - UI Element

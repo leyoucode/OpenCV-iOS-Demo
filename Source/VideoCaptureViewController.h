@@ -23,21 +23,21 @@
     AVCaptureVideoPreviewLayer *_videoPreviewLayer;
     AVCaptureStillImageOutput *_stillImageOutput;
     
-    int _camera;
-    NSString * qualityPreset;
-    BOOL _captureGrayscale;
+//    int _camera;
+//    NSString * qualityPreset;
+//    BOOL _captureGrayscale;
     
     // Fps calculation
-    CMTimeValue _lastFrameTimestamp;
-    float *_frameTimes;
-    int _frameTimesIndex;
-    int _framesToAverage;
+//    CMTimeValue _lastFrameTimestamp;
+//    float *_frameTimes;
+//    int _frameTimesIndex;
+//    int _framesToAverage;
     
-    float _captureQueueFps;
-    float _fps;
+//    float _captureQueueFps;
+//    float _fps;
     
     // Debug UI
-    UILabel *_fpsLabel;
+//    UILabel *_fpsLabel;
     
     BOOL _isCapturing;
     dispatch_queue_t _captureQueue;
@@ -46,9 +46,9 @@
 @property (nonatomic, assign) CameraMediaType cameraMediaType;
 
 // Current frames per second
-@property (nonatomic, readonly) float fps;
+//@property (nonatomic, readonly) float fps;
 @property (nonatomic, strong)  NSString * qualityPreset;
-@property (nonatomic, assign) BOOL showDebugInfo;
+//@property (nonatomic, assign) BOOL showDebugInfo;
 @property (nonatomic, assign) BOOL torchOn;
 
 // AVFoundation components
