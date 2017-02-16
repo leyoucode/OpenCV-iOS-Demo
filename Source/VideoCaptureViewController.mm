@@ -19,14 +19,6 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 
-typedef enum :NSInteger {
-    kCameraMoveDirectionNone,
-    kCameraMoveDirectionUp,
-    kCameraMoveDirectionDown,
-    kCameraMoveDirectionRight,
-    kCameraMoveDirectionLeft
-} CameraMoveDirection;
-
 // Number of frames to average for FPS calculation
 const int kFrameTimeBufferSize = 5;
 
@@ -158,6 +150,9 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
 
 
 @interface VideoCaptureViewController()
+{
+    CameraMediaType _cameraMediaType;
+}
 
 /**
  顶部容器视图
@@ -184,13 +179,17 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
  */
 @property (strong, nonatomic) UIButton *takeButton;
 /**
+ 切换为视屏录制模式
+ */
+@property (strong, nonatomic) UIButton *videoTabButton;
+/**
  切换为拍照模式
  */
 @property (strong, nonatomic) UIButton *photoTabButton;
 /**
- 切换为视屏录制模式
+ 切换为拍摄文档模式
  */
-@property (strong, nonatomic) UIButton *videoTabButton;
+@property (strong, nonatomic) UIButton *documentTabButton;
 
 @end
 
@@ -650,15 +649,12 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self.takeButton fitToVerticalCenterWithView:self.bottomContentView];
     [self.takeButton modifyY:VIEW_TOP(self.takeButton) + 10];
     
-    [self.bottomContentView addSubview:self.photoTabButton];
-    self.photoTabButton.frame = CGRectMake(0, 6, 50, 30);
-    [self.photoTabButton fitToHorizontalCenterWithView:self.bottomContentView];
     
     [self.bottomContentView addSubview:self.videoTabButton];
-    self.videoTabButton.frame = CGRectMake(VIEW_RIGHT(self.photoTabButton), VIEW_TOP(self.photoTabButton), VIEW_WIDTH(self.photoTabButton), VIEW_HEIGHT(self.photoTabButton));
+    [self.bottomContentView addSubview:self.photoTabButton];
+    [self.bottomContentView addSubview:self.documentTabButton];
     
-    [self.photoTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
-    [self.videoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self setupTabWithAnimated:NO];
     
     UISwipeGestureRecognizer *swipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeRight:)];
     swipeRight.direction = UISwipeGestureRecognizerDirectionRight;
@@ -671,18 +667,118 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self.view addGestureRecognizer:swipeLeft];
 }
 
+- (void) setupTabWithAnimated:(BOOL)animated
+{
+    switch (self.cameraMediaType) {
+        case kCameraMediaTypeVideo:
+            if (animated) {
+                [UIView animateWithDuration:0.4 animations:^{
+                    [self setVideoTabSelected];
+                } completion:^(BOOL finished) {
+                    
+                }];
+            }
+            else
+            {
+                [self setVideoTabSelected];
+            }
+            break;
+        case kCameraMediaTypePhoto:
+            if (animated) {
+                [UIView animateWithDuration:0.4 animations:^{
+                    [self setPhotoTabSelected];
+                } completion:^(BOOL finished) {
+                    
+                }];
+            }
+            else
+            {
+                [self setPhotoTabSelected];
+            }
+            break;
+        case kCameraMediaTypeDocument:
+            if (animated) {
+                [UIView animateWithDuration:0.4 animations:^{
+                    [self setDocumentTabSelected];
+                } completion:^(BOOL finished) {
+                    
+                }];
+            }
+            else
+            {
+                [self setDocumentTabSelected];
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+-(void) setPhotoTabSelected
+{
+    self.photoTabButton.frame = CGRectMake(0, 6, 50, 30);
+    [self.photoTabButton fitToHorizontalCenterWithView:self.bottomContentView];
+    
+    [self.videoTabButton modifyY:VIEW_TOP(self.photoTabButton)];
+    [self.videoTabButton modifySize:CGSizeMake(VIEW_WIDTH(self.photoTabButton), VIEW_HEIGHT(self.photoTabButton))];
+    [self.videoTabButton modifyRight:VIEW_LEFT(self.photoTabButton)];
+    
+    [self.documentTabButton modifyY:VIEW_TOP(self.photoTabButton)];
+    [self.documentTabButton modifySize:CGSizeMake(VIEW_WIDTH(self.photoTabButton), VIEW_HEIGHT(self.photoTabButton))];
+    [self.documentTabButton modifyX:VIEW_RIGHT(self.photoTabButton)];
+    
+    [self.videoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.photoTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
+    [self.documentTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+}
+
+-(void) setVideoTabSelected
+{
+    self.videoTabButton.frame = CGRectMake(0, 6, 50, 30);
+    self.videoTabButton.frame = CGRectMake(0, 6, 50, 30);
+    [self.videoTabButton fitToHorizontalCenterWithView:self.bottomContentView];
+    
+    [self.photoTabButton modifyY:VIEW_TOP(self.videoTabButton)];
+    [self.photoTabButton modifySize:CGSizeMake(VIEW_WIDTH(self.videoTabButton), VIEW_HEIGHT(self.videoTabButton))];
+    [self.photoTabButton modifyX:VIEW_RIGHT(self.videoTabButton)];
+    
+    [self.documentTabButton modifyY:VIEW_TOP(self.videoTabButton)];
+    [self.documentTabButton modifySize:CGSizeMake(VIEW_WIDTH(self.videoTabButton), VIEW_HEIGHT(self.videoTabButton))];
+    [self.documentTabButton modifyX:VIEW_RIGHT(self.photoTabButton)];
+    
+    [self.videoTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
+    [self.photoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.documentTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+}
+
+-(void) setDocumentTabSelected
+{
+    self.documentTabButton.frame = CGRectMake(0, 6, 50, 30);
+    [self.documentTabButton fitToHorizontalCenterWithView:self.bottomContentView];
+    
+    [self.photoTabButton modifyY:VIEW_TOP(self.documentTabButton)];
+    [self.photoTabButton modifySize:CGSizeMake(VIEW_WIDTH(self.documentTabButton), VIEW_HEIGHT(self.documentTabButton))];
+    [self.photoTabButton modifyRight:VIEW_LEFT(self.documentTabButton)];
+    
+    [self.videoTabButton modifyY:VIEW_TOP(self.documentTabButton)];
+    [self.videoTabButton modifySize:CGSizeMake(VIEW_WIDTH(self.documentTabButton), VIEW_HEIGHT(self.documentTabButton))];
+    [self.videoTabButton modifyRight:VIEW_LEFT(self.photoTabButton)];
+    
+    [self.videoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.photoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.documentTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
+}
 
 -(void)handleSwipeRight:(UISwipeGestureRecognizer *)gesture
 {
     if (gesture.direction == UISwipeGestureRecognizerDirectionRight) {
         //NSLog(@"right %f, %f, %f",self.photoTabButton.center.x, self.videoTabButton.center.x, self.bottomContentView.center.x);
-        if (self.videoTabButton.center.x == self.bottomContentView.center.x) {
-            [UIView animateWithDuration:0.4 animations:^{
-                [self.photoTabButton fitToHorizontalCenterWithView:self.bottomContentView];
-                [self.videoTabButton modifyX:VIEW_RIGHT(self.photoTabButton)];
-            }];
-            [self.photoTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
-            [self.videoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        if (self.photoTabButton.center.x == self.bottomContentView.center.x) {
+            self.cameraMediaType = kCameraMediaTypeVideo;
+            [self setupTabWithAnimated:YES];
+        }else if (self.documentTabButton.center.x == self.bottomContentView.center.x) {
+            self.cameraMediaType = kCameraMediaTypePhoto;
+            [self setupTabWithAnimated:YES];
         }
     }
 }
@@ -692,13 +788,13 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     if (gesture.direction == UISwipeGestureRecognizerDirectionLeft) {
         //NSLog(@"left %f, %f, %f",self.photoTabButton.center.x, self.videoTabButton.center.x, self.bottomContentView.center.x);
         
-        if (self.photoTabButton.center.x == self.bottomContentView.center.x) {
-            [UIView animateWithDuration:0.4 animations:^{
-                [self.videoTabButton fitToHorizontalCenterWithView:self.bottomContentView];
-                [self.photoTabButton modifyRight:VIEW_LEFT(self.videoTabButton)];
-            }];
-            [self.photoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-            [self.videoTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
+        if (self.videoTabButton.center.x == self.bottomContentView.center.x) {
+            self.cameraMediaType = kCameraMediaTypePhoto;
+            [self setupTabWithAnimated:YES];
+        }
+        else if (self.photoTabButton.center.x == self.bottomContentView.center.x) {
+            self.cameraMediaType = kCameraMediaTypeDocument;
+            [self setupTabWithAnimated:YES];
         }
     }
 }
@@ -773,6 +869,20 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     }
     return _takeButton;
 }
+
+/**
+ 切换为视屏录制模式
+ */
+- (UIButton *) videoTabButton
+{
+    if (!_videoTabButton) {
+        _videoTabButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_videoTabButton setTitle:@"视频" forState:UIControlStateNormal];
+        _videoTabButton.titleLabel.font = [UIFont systemFontOfSize:13];
+    }
+    return _videoTabButton;
+}
+
 /**
  切换为拍照模式
  */
@@ -786,16 +896,16 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     return _photoTabButton;
 }
 /**
- 切换为视屏录制模式
+ 切换为拍摄文档模式
  */
-- (UIButton *) videoTabButton
+- (UIButton *) documentTabButton
 {
-    if (!_videoTabButton) {
-        _videoTabButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_videoTabButton setTitle:@"视频" forState:UIControlStateNormal];
-        _videoTabButton.titleLabel.font = [UIFont systemFontOfSize:13];
+    if (!_documentTabButton) {
+        _documentTabButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_documentTabButton setTitle:@"文档" forState:UIControlStateNormal];
+        _documentTabButton.titleLabel.font = [UIFont systemFontOfSize:13];
     }
-    return _videoTabButton;
+    return _documentTabButton;
 }
 
 

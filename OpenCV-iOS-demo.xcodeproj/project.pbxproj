@@ -17,6 +17,7 @@
 		FE0083D41E2884C500299936 /* UIImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CC1E2884C500299936 /* UIImage+OpenCV.mm */; };
 		FE0083D51E2884C500299936 /* VideoCaptureViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CE1E2884C500299936 /* VideoCaptureViewController.mm */; };
 		FE0520841E52A0DC00355DA1 /* UIView+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0520831E52A0DC00355DA1 /* UIView+Ext.m */; };
+		FE0520901E5578CF00355DA1 /* CXCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE05208F1E5578CF00355DA1 /* CXCameraViewController.m */; };
 		FE342FB21E30B88500F0D071 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE342FB11E30B88500F0D071 /* MobileCoreServices.framework */; };
 		FE342FB41E30B89000F0D071 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE342FB31E30B89000F0D071 /* ImageIO.framework */; };
 		FE342FB71E3211BB00F0D071 /* UIImage+UIImage_Rotate.m in Sources */ = {isa = PBXBuildFile; fileRef = FE342FB61E3211BB00F0D071 /* UIImage+UIImage_Rotate.m */; };
@@ -52,6 +53,9 @@
 		FE0083CE1E2884C500299936 /* VideoCaptureViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VideoCaptureViewController.mm; sourceTree = "<group>"; };
 		FE0520821E52A0DC00355DA1 /* UIView+Ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Ext.h"; sourceTree = "<group>"; };
 		FE0520831E52A0DC00355DA1 /* UIView+Ext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Ext.m"; sourceTree = "<group>"; };
+		FE05208E1E5578CF00355DA1 /* CXCameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CXCameraViewController.h; sourceTree = "<group>"; };
+		FE05208F1E5578CF00355DA1 /* CXCameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CXCameraViewController.m; sourceTree = "<group>"; };
+		FE0520911E557FD100355DA1 /* CameraMediaType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraMediaType.h; sourceTree = "<group>"; };
 		FE342FB11E30B88500F0D071 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		FE342FB31E30B89000F0D071 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		FE342FB51E3211BB00F0D071 /* UIImage+UIImage_Rotate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+UIImage_Rotate.h"; sourceTree = "<group>"; };
@@ -107,6 +111,8 @@
 			children = (
 				FE0520821E52A0DC00355DA1 /* UIView+Ext.h */,
 				FE0520831E52A0DC00355DA1 /* UIView+Ext.m */,
+				FE05208E1E5578CF00355DA1 /* CXCameraViewController.h */,
+				FE05208F1E5578CF00355DA1 /* CXCameraViewController.m */,
 				FE0083CD1E2884C500299936 /* VideoCaptureViewController.h */,
 				FE0083CE1E2884C500299936 /* VideoCaptureViewController.mm */,
 				FE0083C31E2884C500299936 /* EdgeDetectingViewController.h */,
@@ -123,6 +129,7 @@
 				FE0083CC1E2884C500299936 /* UIImage+OpenCV.mm */,
 				FE342FB51E3211BB00F0D071 /* UIImage+UIImage_Rotate.h */,
 				FE342FB61E3211BB00F0D071 /* UIImage+UIImage_Rotate.m */,
+				FE0520911E557FD100355DA1 /* CameraMediaType.h */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -292,6 +299,7 @@
 			files = (
 				FE0083D11E2884C500299936 /* HoughLineEdgeDetectingViewController.mm in Sources */,
 				FE0083A21E2784D900299936 /* ViewController.mm in Sources */,
+				FE0520901E5578CF00355DA1 /* CXCameraViewController.m in Sources */,
 				FE0083D21E2884C500299936 /* Rectangle.m in Sources */,
 				FE0520841E52A0DC00355DA1 /* UIView+Ext.m in Sources */,
 				FE0083D41E2884C500299936 /* UIImage+OpenCV.mm in Sources */,

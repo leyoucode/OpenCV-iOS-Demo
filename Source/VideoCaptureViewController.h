@@ -13,6 +13,7 @@
 //
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
+#import "CameraMediaType.h"
 
 @interface VideoCaptureViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate>
 {
@@ -41,6 +42,8 @@
     BOOL _isCapturing;
     dispatch_queue_t _captureQueue;
 }
+
+@property (nonatomic, assign) CameraMediaType cameraMediaType;
 
 // Current frames per second
 @property (nonatomic, readonly) float fps;

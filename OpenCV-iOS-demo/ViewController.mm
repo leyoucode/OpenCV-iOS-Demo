@@ -11,6 +11,9 @@
 #import "CannyEdgeDetectingViewController.h"
 #import "HoughLineEdgeDetectingViewController.h"
 
+#import "CXCameraViewController.h"
+
+
 @interface ViewController ()
 
 {
@@ -31,17 +34,40 @@
 }
 
 #pragma mark - UI Actions
-- (IBAction)OnCannyEdgeDetectButtonClick:(id)sender
-{
-    CannyEdgeDetectingViewController* controller = [[CannyEdgeDetectingViewController alloc] init];
-    [self.navigationController pushViewController:controller animated:YES];
-    //[self presentViewController:controller animated:YES completion:nil];
+
+- (IBAction)recordVedio:(id)sender {
+    CXCameraViewController *controller = [[CXCameraViewController alloc] init];
+    [controller showIn:self withType:kCameraMediaTypeVideo result:^(id responseObject) {
+        
+    }];
 }
 
-- (IBAction)OnHoughLineEdgeDetectButtonClick:(id)sender
-{
-    HoughLineEdgeDetectingViewController* controller = [[HoughLineEdgeDetectingViewController alloc] init];
-    [self presentViewController:controller animated:YES completion:nil];
+- (IBAction)takeNormalPhoto:(id)sender {
+    CXCameraViewController *controller = [[CXCameraViewController alloc] init];
+    [controller showIn:self withType:kCameraMediaTypePhoto result:^(id responseObject) {
+        
+    }];
 }
+
+- (IBAction)takeDocumentPhoto:(id)sender {
+    CXCameraViewController *controller = [[CXCameraViewController alloc] init];
+    [controller showIn:self withType:kCameraMediaTypeDocument result:^(id responseObject) {
+        
+    }];
+}
+
+- (IBAction)defaultTest:(id)sender {
+    CXCameraViewController *controller = [[CXCameraViewController alloc] init];
+    [controller showIn:self result:^(id responseObject) {
+        
+    }];
+}
+
+
+//- (IBAction)OnHoughLineEdgeDetectButtonClick:(id)sender
+//{
+//    HoughLineEdgeDetectingViewController* controller = [[HoughLineEdgeDetectingViewController alloc] init];
+//    [self presentViewController:controller animated:YES completion:nil];
+//}
 
 @end
