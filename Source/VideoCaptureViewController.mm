@@ -19,6 +19,13 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 
+typedef enum :NSInteger {
+    kCameraMoveDirectionNone,
+    kCameraMoveDirectionUp,
+    kCameraMoveDirectionDown,
+    kCameraMoveDirectionRight,
+    kCameraMoveDirectionLeft
+} CameraMoveDirection;
 
 // Number of frames to average for FPS calculation
 const int kFrameTimeBufferSize = 5;
@@ -650,6 +657,50 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self.bottomContentView addSubview:self.videoTabButton];
     self.videoTabButton.frame = CGRectMake(VIEW_RIGHT(self.photoTabButton), VIEW_TOP(self.photoTabButton), VIEW_WIDTH(self.photoTabButton), VIEW_HEIGHT(self.photoTabButton));
     
+    [self.photoTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
+    [self.videoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    
+    UISwipeGestureRecognizer *swipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeRight:)];
+    swipeRight.direction = UISwipeGestureRecognizerDirectionRight;
+    
+    UISwipeGestureRecognizer *swipeLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeLeft:)];
+    swipeLeft.direction = UISwipeGestureRecognizerDirectionLeft;
+    
+    self.view.userInteractionEnabled = YES;
+    [self.view addGestureRecognizer:swipeRight];
+    [self.view addGestureRecognizer:swipeLeft];
+}
+
+
+-(void)handleSwipeRight:(UISwipeGestureRecognizer *)gesture
+{
+    if (gesture.direction == UISwipeGestureRecognizerDirectionRight) {
+        //NSLog(@"right %f, %f, %f",self.photoTabButton.center.x, self.videoTabButton.center.x, self.bottomContentView.center.x);
+        if (self.videoTabButton.center.x == self.bottomContentView.center.x) {
+            [UIView animateWithDuration:0.4 animations:^{
+                [self.photoTabButton fitToHorizontalCenterWithView:self.bottomContentView];
+                [self.videoTabButton modifyX:VIEW_RIGHT(self.photoTabButton)];
+            }];
+            [self.photoTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
+            [self.videoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        }
+    }
+}
+
+-(void)handleSwipeLeft:(UISwipeGestureRecognizer *)gesture
+{
+    if (gesture.direction == UISwipeGestureRecognizerDirectionLeft) {
+        //NSLog(@"left %f, %f, %f",self.photoTabButton.center.x, self.videoTabButton.center.x, self.bottomContentView.center.x);
+        
+        if (self.photoTabButton.center.x == self.bottomContentView.center.x) {
+            [UIView animateWithDuration:0.4 animations:^{
+                [self.videoTabButton fitToHorizontalCenterWithView:self.bottomContentView];
+                [self.photoTabButton modifyRight:VIEW_LEFT(self.videoTabButton)];
+            }];
+            [self.photoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            [self.videoTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
+        }
+    }
 }
 
 /**
