@@ -190,7 +190,10 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
  切换为拍摄文档模式
  */
 @property (strong, nonatomic) UIButton *documentTabButton;
-
+/**
+ 取消按钮
+ */
+@property (strong, nonatomic) UIButton *cancelButton;
 @end
 
 @implementation VideoCaptureViewController
@@ -649,6 +652,11 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self.takeButton fitToVerticalCenterWithView:self.bottomContentView];
     [self.takeButton modifyY:VIEW_TOP(self.takeButton) + 10];
     
+    [self.bottomContentView addSubview:self.cancelButton];
+    [self.cancelButton modifyX:10];
+    [self.cancelButton modifySize:CGSizeMake(50, 40)];
+    [self.cancelButton modifyCenterY:self.takeButton.center.y];
+
     
     [self.bottomContentView addSubview:self.videoTabButton];
     [self.bottomContentView addSubview:self.photoTabButton];
@@ -656,6 +664,12 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     [self setupTabWithAnimated:NO];
     
+    [self setSwipe];
+    [self setClick];
+}
+
+- (void) setSwipe
+{
     UISwipeGestureRecognizer *swipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeRight:)];
     swipeRight.direction = UISwipeGestureRecognizerDirectionRight;
     
@@ -665,6 +679,21 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     self.view.userInteractionEnabled = YES;
     [self.view addGestureRecognizer:swipeRight];
     [self.view addGestureRecognizer:swipeLeft];
+}
+
+- (void) setClick
+{
+    [self.cancelButton addTarget:self action:@selector(onControlElementClick:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void) onControlElementClick:(id) sender
+{
+    if (sender == self.cancelButton) {
+        // 取消按钮点击
+        [self dismissViewControllerAnimated:YES completion:^{
+            
+        }];
+    }
 }
 
 - (void) setupTabWithAnimated:(BOOL)animated
@@ -907,8 +936,19 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     }
     return _documentTabButton;
 }
-
-
+/**
+ 取消按钮
+ */
+- (UIButton *) cancelButton
+{
+    if (!_cancelButton) {
+        _cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_cancelButton setTitle:@"取消" forState:UIControlStateNormal];
+        _cancelButton.titleLabel.font = [UIFont systemFontOfSize:17];
+        [_cancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    }
+    return _cancelButton;
+}
 
 
 
