@@ -646,13 +646,15 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     self.bottomContentView.frame = CGRectMake(0, SCREEN_HEIGHT - 120, SCREEN_WIDTH, 120);
     [self.view addSubview:self.bottomContentView];
     
-    [self.bottomContentView addSubview:self.takeButton];
+    [self.view addSubview:self.takeButton];
     [self.takeButton modifySize:CGSizeMake(57, 57)];
-    [self.takeButton fitToHorizontalCenterWithView:self.bottomContentView];
-    [self.takeButton fitToVerticalCenterWithView:self.bottomContentView];
+    //[self.takeButton fitToHorizontalCenterWithView:self.bottomContentView];
+    //[self.takeButton fitToVerticalCenterWithView:self.bottomContentView];
+    [self.takeButton modifyCenterX:self.bottomContentView.center.x];
+    [self.takeButton modifyCenterY:self.bottomContentView.center.y + 10];
     [self.takeButton modifyY:VIEW_TOP(self.takeButton) + 10];
     
-    [self.bottomContentView addSubview:self.cancelButton];
+    [self.view addSubview:self.cancelButton];
     [self.cancelButton modifyX:10];
     [self.cancelButton modifySize:CGSizeMake(50, 40)];
     [self.cancelButton modifyCenterY:self.takeButton.center.y];
@@ -684,15 +686,36 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 - (void) setClick
 {
     [self.cancelButton addTarget:self action:@selector(onControlElementClick:) forControlEvents:UIControlEventTouchUpInside];
+    [self.takeButton addTarget:self action:@selector(onControlElementClick:) forControlEvents:UIControlEventTouchUpInside];
+    [self.torchButton addTarget:self action:@selector(onControlElementClick:) forControlEvents:UIControlEventTouchUpInside];
+    [self.cameraButton addTarget:self action:@selector(onControlElementClick:) forControlEvents:UIControlEventTouchUpInside];
+    
 }
 
 - (void) onControlElementClick:(id) sender
 {
+    // 点击取消按钮
     if (sender == self.cancelButton) {
-        // 取消按钮点击
         [self dismissViewControllerAnimated:YES completion:^{
             
         }];
+    }
+    // 点击闪光灯按钮
+    if (sender == self.torchButton) {
+        [self setTorchOn:![self torchOn]];
+    }
+    // 点击相机切换按钮
+    if (sender == self.cameraButton) {
+        if ( self.camera == 0)
+        {
+            [self setCamera:1];
+        }else{
+            [self setCamera:0];
+        }
+    }
+    // 点击拍照／录制按钮
+    if (sender == self.takeButton) {
+        
     }
 }
 
@@ -759,6 +782,10 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self.videoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.photoTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
     [self.documentTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    
+    [self.takeButton setImage:[UIImage imageNamed:@"takephoto"] forState:UIControlStateNormal];
+    self.topContentView.alpha = 1.0;
+    self.bottomContentView.alpha = 1.0;
 }
 
 -(void) setVideoTabSelected
@@ -778,6 +805,10 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self.videoTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
     [self.photoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.documentTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    
+    [self.takeButton setImage:[UIImage imageNamed:@"record_idle"] forState:UIControlStateNormal];
+    self.topContentView.alpha = 0.5;
+    self.bottomContentView.alpha = 0.5;
 }
 
 -(void) setDocumentTabSelected
@@ -796,6 +827,10 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self.videoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.photoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.documentTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
+    
+    [self.takeButton setImage:[UIImage imageNamed:@"takephoto"] forState:UIControlStateNormal];
+    self.topContentView.alpha = 1.0;
+    self.bottomContentView.alpha = 1.0;
 }
 
 -(void)handleSwipeRight:(UISwipeGestureRecognizer *)gesture
