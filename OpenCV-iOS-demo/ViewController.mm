@@ -8,8 +8,6 @@
 
 #import "ViewController.h"
 #import "OpenCVWrapper.h"
-#import "CannyEdgeDetectingViewController.h"
-//#import "HoughLineEdgeDetectingViewController.h"
 
 #import "CXCameraViewController.h"
 
@@ -62,12 +60,5 @@
         
     }];
 }
-
-
-//- (IBAction)OnHoughLineEdgeDetectButtonClick:(id)sender
-//{
-//    HoughLineEdgeDetectingViewController* controller = [[HoughLineEdgeDetectingViewController alloc] init];
-//    [self presentViewController:controller animated:YES completion:nil];
-//}
 
 @end
