@@ -16,6 +16,7 @@
 		FE0083D51E2884C500299936 /* CXVideoCaptureViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CE1E2884C500299936 /* CXVideoCaptureViewController.mm */; };
 		FE0520841E52A0DC00355DA1 /* UIView+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0520831E52A0DC00355DA1 /* UIView+Ext.m */; };
 		FE0520901E5578CF00355DA1 /* CXCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE05208F1E5578CF00355DA1 /* CXCameraViewController.m */; };
+		FE05209A1E5690CC00355DA1 /* MovieRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0520991E5690CC00355DA1 /* MovieRecorder.m */; };
 		FE342FB21E30B88500F0D071 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE342FB11E30B88500F0D071 /* MobileCoreServices.framework */; };
 		FE342FB41E30B89000F0D071 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE342FB31E30B89000F0D071 /* ImageIO.framework */; };
 		FE89BC761E34B23600179706 /* MyZoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE89BC751E34B23600179706 /* MyZoomViewController.m */; };
@@ -48,6 +49,8 @@
 		FE05208E1E5578CF00355DA1 /* CXCameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CXCameraViewController.h; sourceTree = "<group>"; };
 		FE05208F1E5578CF00355DA1 /* CXCameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CXCameraViewController.m; sourceTree = "<group>"; };
 		FE0520911E557FD100355DA1 /* CameraMediaType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraMediaType.h; sourceTree = "<group>"; };
+		FE0520981E5690CC00355DA1 /* MovieRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MovieRecorder.h; sourceTree = "<group>"; };
+		FE0520991E5690CC00355DA1 /* MovieRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MovieRecorder.m; sourceTree = "<group>"; };
 		FE342FB11E30B88500F0D071 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		FE342FB31E30B89000F0D071 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		FE89BC741E34B23600179706 /* MyZoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyZoomViewController.h; sourceTree = "<group>"; };
@@ -97,6 +100,8 @@
 		FE0083C01E2884C500299936 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				FE0520981E5690CC00355DA1 /* MovieRecorder.h */,
+				FE0520991E5690CC00355DA1 /* MovieRecorder.m */,
 				FE0520821E52A0DC00355DA1 /* UIView+Ext.h */,
 				FE0520831E52A0DC00355DA1 /* UIView+Ext.m */,
 				FE05208E1E5578CF00355DA1 /* CXCameraViewController.h */,
@@ -283,6 +288,7 @@
 				FE0520841E52A0DC00355DA1 /* UIView+Ext.m in Sources */,
 				FE0083D41E2884C500299936 /* UIImage+OpenCV.mm in Sources */,
 				FEF47F8D1E2645B500AF034B /* AppDelegate.swift in Sources */,
+				FE05209A1E5690CC00355DA1 /* MovieRecorder.m in Sources */,
 				FE89BC761E34B23600179706 /* MyZoomViewController.m in Sources */,
 				FE00839D1E272D7800299936 /* OpenCVWrapper.mm in Sources */,
 				FE0083D31E2884C500299936 /* RectangleCALayer.m in Sources */,

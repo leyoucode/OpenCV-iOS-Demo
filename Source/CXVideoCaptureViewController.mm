@@ -812,7 +812,7 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     
     // Create the capture session
     _captureSession = [[AVCaptureSession alloc] init];
-    _captureSession.sessionPreset = (qualityPreset)? qualityPreset : AVCaptureSessionPresetMedium;
+    _captureSession.sessionPreset = (qualityPreset)? qualityPreset : AVCaptureSessionPresetHigh;
     
     // Create device input
     NSError *error = nil;
@@ -944,6 +944,32 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     [self.torchButton addTarget:self action:@selector(onControlElementClick:) forControlEvents:UIControlEventTouchUpInside];
     [self.cameraButton addTarget:self action:@selector(onControlElementClick:) forControlEvents:UIControlEventTouchUpInside];
     
+}
+
+- (void) reloadCameraConfiguration
+{
+    NSError *error = nil;
+   
+    BOOL locked = [_captureDevice lockForConfiguration:&error];
+   
+    if (locked) {
+        
+        switch (self.cameraMediaType) {
+            case kCameraMediaTypeVideo:// 录制视频
+                
+                break;
+            case kCameraMediaTypePhoto:// 拍照
+                _captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
+                break;
+            case kCameraMediaTypeDocument:// 拍摄文档
+                _captureSession.sessionPreset = AVCaptureSessionPresetHigh;
+                break;
+            default:
+                break;
+        }
+        
+        [_captureDevice unlockForConfiguration];
+    }
 }
 
 - (void) onControlElementClick:(id) sender
@@ -1131,25 +1157,28 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
         if (self.photoTabButton.center.x == self.bottomContentView.center.x) {
             self.cameraMediaType = kCameraMediaTypeVideo;
             [self setupTabWithAnimated:YES];
+            [self reloadCameraConfiguration];
         }else if (self.documentTabButton.center.x == self.bottomContentView.center.x) {
             self.cameraMediaType = kCameraMediaTypePhoto;
             [self setupTabWithAnimated:YES];
+            [self reloadCameraConfiguration];
         }
     }
 }
 
 -(void)handleSwipeLeft:(UISwipeGestureRecognizer *)gesture
 {
-    if (gesture.direction == UISwipeGestureRecognizerDirectionLeft) {
-        //NSLog(@"left %f, %f, %f",self.photoTabButton.center.x, self.videoTabButton.center.x, self.bottomContentView.center.x);
-        
+    if (gesture.direction == UISwipeGestureRecognizerDirectionLeft)
+    {
         if (self.videoTabButton.center.x == self.bottomContentView.center.x) {
             self.cameraMediaType = kCameraMediaTypePhoto;
             [self setupTabWithAnimated:YES];
+            [self reloadCameraConfiguration];
         }
         else if (self.photoTabButton.center.x == self.bottomContentView.center.x) {
             self.cameraMediaType = kCameraMediaTypeDocument;
             [self setupTabWithAnimated:YES];
+            [self reloadCameraConfiguration];
         }
     }
 }

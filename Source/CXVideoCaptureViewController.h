@@ -21,8 +21,14 @@
 @property (nonatomic, readonly) AVCaptureSession *captureSession;
 @property (nonatomic, readonly) AVCaptureDevice *captureDevice;
 @property (nonatomic, readonly) AVCaptureVideoDataOutput *videoOutput;
+@property (nonatomic, readonly) AVCaptureAudioDataOutput *audioDataOutput;
 @property (nonatomic, readonly) AVCaptureVideoPreviewLayer *videoPreviewLayer;
 @property (nonatomic, strong) AVCaptureStillImageOutput* stillImageOutput;
+
+@property (nonatomic, readonly) AVCaptureConnection *captureConnection;
+@property (nonatomic, readonly) AVAssetWriter *assetWriter;
+@property (nonatomic, readonly) AVAssetWriterInput *assetWriterInput;
+
 
 // -1: default, 0: back camera, 1: front camera
 @property (nonatomic, assign) int camera;
