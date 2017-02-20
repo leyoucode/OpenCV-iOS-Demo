@@ -28,6 +28,7 @@
 @interface CXVideoCaptureViewController()<AVCaptureFileOutputRecordingDelegate>
 {
     int _camera; // 当前摄像头
+    NSTimer *_calVideoDurationTimer;
 }
 
 /**
@@ -126,12 +127,12 @@ RectangleCALayer *rectangleCALayer;// = [[RectangleCALayer alloc] init];
     return moviePath;
 }
 
-- (void)startRecord {
+- (void)startVideoCapture {
     [self.movieFileOutput startRecordingToOutputFileURL:[NSURL fileURLWithPath:[self videoPath]] recordingDelegate:self];
 }
 
 
-- (void)stopRecord {
+- (void)stopVideoCapture {
     if ([self.movieFileOutput isRecording]) {
         [self.movieFileOutput stopRecording];
     }
@@ -139,11 +140,63 @@ RectangleCALayer *rectangleCALayer;// = [[RectangleCALayer alloc] init];
 
 #pragma mark - AVCaptureFileOutputRecordingDelegate
 
+- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didStartRecordingToOutputFileAtURL:(NSURL *)fileURL fromConnections:(NSArray *)connections
+{
+    NSLog(@"Recording is started ...");
+    // Hide some control elements
+    self.takeButton.tag = 1;
+    [self.takeButton setImage:[UIImage imageNamed:@"record_ing"] forState:UIControlStateNormal];
+    self.bottomContentView.hidden = YES;
+    self.cameraButton.hidden = YES;
+    self.cancelButton.hidden = YES;
+    
+    if (_calVideoDurationTimer == nil) {
+        _calVideoDurationTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(handleCalVideoDuration:) userInfo:nil repeats:YES];
+    }
+}
+
+-(NSString *)stringFromInterval:(NSTimeInterval)timeInterval
+{
+#define SECONDS_PER_MINUTE (60)
+#define MINUTES_PER_HOUR (60)
+#define SECONDS_PER_HOUR (SECONDS_PER_MINUTE * MINUTES_PER_HOUR)
+#define HOURS_PER_DAY (24)
+    
+    // convert the time to an integer, as we don't need double precision, and we do need to use the modulous operator
+    int ti = round(timeInterval);
+    
+    return [NSString stringWithFormat:@"%.2d:%.2d:%.2d", (ti / SECONDS_PER_HOUR) % HOURS_PER_DAY, (ti / SECONDS_PER_MINUTE) % MINUTES_PER_HOUR, ti % SECONDS_PER_MINUTE];
+    
+#undef SECONDS_PER_MINUTE
+#undef MINUTES_PER_HOUR
+#undef SECONDS_PER_HOUR
+#undef HOURS_PER_DAY
+}
+
+- (void)handleCalVideoDuration:(NSTimer*)timer
+{
+    float totalSeconds = CMTimeGetSeconds(self.movieFileOutput.recordedDuration);
+    self.recordDurationLabel.text = [self stringFromInterval:totalSeconds];
+}
+
 - (void)captureOutput:(AVCaptureFileOutput *)captureOutput didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL fromConnections:(NSArray *)connections error:(NSError *)error
 {
-    //NSString *path = [outputFileURL absoluteString];
-    self.cameraCaptureResult(outputFileURL);
+    NSLog(@"Recording is stoped ...");
     
+    if (_calVideoDurationTimer != nil) {
+        [_calVideoDurationTimer invalidate];
+        _calVideoDurationTimer = nil;
+    }
+    
+    // Recover control elements' state those be hiddened before
+    self.takeButton.tag = 0;
+    [self.takeButton setImage:[UIImage imageNamed:@"record_idle"] forState:UIControlStateNormal];
+    self.bottomContentView.hidden = NO;
+    self.cameraButton.hidden = NO;
+    self.cancelButton.hidden = NO;
+    
+    // Call back when finished capture
+    self.cameraCaptureResult(outputFileURL);
     [self destroyCaptureSession];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -190,7 +243,6 @@ RectangleCALayer *rectangleCALayer;// = [[RectangleCALayer alloc] init];
                 NSLog(@"摄像头无法访问:%d",camera);
                 return NO;
             }
-            
             [_captureSession beginConfiguration];
             
             [_captureSession removeInput:[[_captureSession inputs] lastObject]];
@@ -1048,17 +1100,6 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     _captureSession = [[AVCaptureSession alloc] init];
     _captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
     
-    // Create and configure device output
-    _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
-    dispatch_queue_t captureQueue = dispatch_queue_create("com.antbeta.AVCameraCaptureQueue", DISPATCH_QUEUE_SERIAL);
-    [_videoOutput setSampleBufferDelegate:self queue:captureQueue];
-    _videoOutput.alwaysDiscardsLateVideoFrames = YES;
-    _videoOutput.minFrameDuration = CMTimeMake(1, 30);
-    
-    // For color mode, BGRA format is used
-    OSType format = kCVPixelFormatType_32BGRA;
-    _videoOutput.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedInt:format]
-                                                             forKey:(id)kCVPixelBufferPixelFormatTypeKey];
     _stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
     
     // Connect up inputs and outputs
@@ -1066,18 +1107,10 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
         [_captureSession addInput:_videoInput];
     }
     
-    if ([_captureSession canAddOutput:_videoOutput]) {
-        [_captureSession addOutput:_videoOutput];
-    }
-    
     if ([_captureSession canAddOutput:_stillImageOutput]) {
         [_captureSession addOutput:_stillImageOutput];
     }
     
-//    if (_videoPreviewLayer) {
-//        [_videoPreviewLayer removeFromSuperlayer];
-//        _videoPreviewLayer = nil;
-//    }
     // Create the preview layer
     _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
     [_videoPreviewLayer setFrame:self.view.bounds];
@@ -1086,50 +1119,51 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     
 }
 
-// 配置录制视频参数
+// To configure specific video's settings
 - (void) configurationForVideo
 {
-    // 获取设备
+    // Get capture devices from current iPhone
     NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
     
     if ([devices count] == 0) {
-        NSLog(@"未找到可用的摄像头");
+        NSLog(@"ANTBETA: No any Camera be Found.");
         return;
     }
     
     if (_camera < 0 && _camera >= [devices count]) {
-        NSLog(@"未找到指定的摄像头");
+        NSLog(@"ANTBETA: The camera[%d] Can not be found from current device.", _camera);
         return;
     }
     
     _videoDevice = [devices objectAtIndex:_camera];
     
-    // 创建视频输入
+    // Create a video input with the video device.
     NSError *error = nil;
     _videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:_videoDevice error:&error];
     if (error) {
-        NSLog(@"创建视频输入报错:%@",[error description]);
+        NSLog(@"ANTBETA: An error occured when create an AVCaptureDeviceInput with '_videoDevice': %@",[error description]);
         return;
     }
     
-    // 建立会话
+    // Create a CaptureSession, It coordinates the flow of data between audio and video inputs and outputs.
     _captureSession = [[AVCaptureSession alloc] init];
     _captureSession.sessionPreset = AVCaptureSessionPresetMedium;
     
     
-    // 获取音频设备
+    // Get audio device
     _audioDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
     
-    // 创建音频输入
+    // Create an audio device with the audio device.
     _audioInput = [AVCaptureDeviceInput deviceInputWithDevice:_audioDevice error:&error];
     if (error) {
-        NSLog(@"创建音频输入报错:%@",[error description]);
+        NSLog(@"ANTBETA: An error occured when create an AVCaptureDeviceInput with '_audioDevice': %@",[error description]);
         return;
     }
     
-    // 创建视频输出
+    // The easiest option to write video to file is through an AVCaptureMovieFileOutput object. Adding it as an output to a capture session will let you write audio and video to a QuickTime file with a minimum amount of configuration:
     _movieFileOutput = [[AVCaptureMovieFileOutput alloc] init];
     _movieFileOutput.maxRecordedDuration = CMTimeMakeWithSeconds(30, 30);
+    
     
     if ([_captureSession canAddInput:_videoInput]) {
         [_captureSession addInput:_videoInput];
@@ -1140,12 +1174,6 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     if ([_captureSession canAddOutput:_movieFileOutput]) {
         [_captureSession addOutput:_movieFileOutput];
     }
-
-    
-//    if (_videoPreviewLayer) {
-//        [_videoPreviewLayer removeFromSuperlayer];
-//        _videoPreviewLayer = nil;
-//    }
     
     // Create the preview layer
     _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
@@ -1212,11 +1240,6 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
         [_captureSession addOutput:_stillImageOutput];
     }
     
-//    if (_videoPreviewLayer) {
-//        [_videoPreviewLayer removeFromSuperlayer];
-//        _videoPreviewLayer = nil;
-//    }
-    
     // Create the preview layer
     _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
     [_videoPreviewLayer setFrame:self.view.bounds];
@@ -1278,26 +1301,12 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
             case kCameraMediaTypeVideo:// 录制视频
                 
                 if (self.takeButton.tag == 0) {
-                    self.takeButton.tag = 1;
-                    [self.takeButton setImage:[UIImage imageNamed:@"record_ing"] forState:UIControlStateNormal];
-                    self.bottomContentView.hidden = YES;
-                    self.cameraButton.hidden = YES;
-                    self.cancelButton.hidden = YES;
-                    
                     // 开始录制
-                    [self startRecord];
-                    
+                    [self startVideoCapture];
                 }else{
-                    self.takeButton.tag = 0;
-                    [self.takeButton setImage:[UIImage imageNamed:@"record_idle"] forState:UIControlStateNormal];
-                    self.bottomContentView.hidden = NO;
-                    self.cameraButton.hidden = NO;
-                    self.cancelButton.hidden = NO;
-                    
                     // 结束录制
-                    [self stopRecord];
+                    [self stopVideoCapture];
                 }
-                
                 break;
             case kCameraMediaTypePhoto:// 拍照
                 

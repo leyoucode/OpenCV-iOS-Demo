@@ -15,6 +15,8 @@
 #import <AVFoundation/AVFoundation.h>
 
 #import <CommonCrypto/CommonDigest.h>
+#import "MyZoomViewController.h"
+
 
 @interface ViewController ()
 
@@ -130,23 +132,28 @@
         NSLog(@"recordVedio:%@",path);
         
         [weakSelf performSelectorInBackground:@selector(upload:) withObject:path];
-//        MPMoviePlayerViewController* playerView = [[MPMoviePlayerViewController alloc] initWithContentURL:path];
-//        [weakSelf.navigationController pushViewController:playerView animated:YES];
-        
     }];
 }
 
 - (IBAction)takeNormalPhoto:(id)sender {
+    __weak typeof(self) weakSelf = self;
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
     [controller showIn:self withType:kCameraMediaTypePhoto result:^(id responseObject) {
         NSLog(@"takeNormalPhoto:%@",responseObject);
+        MyZoomViewController *vc = [[MyZoomViewController alloc] init];
+        vc.imagePath = (NSString*)responseObject;
+        [weakSelf.navigationController pushViewController:vc animated:YES];
     }];
 }
 
 - (IBAction)takeDocumentPhoto:(id)sender {
+    __weak typeof(self) weakSelf = self;
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
     [controller showIn:self withType:kCameraMediaTypeDocument result:^(id responseObject) {
         NSLog(@"takeDocumentPhoto:%@",responseObject);
+        MyZoomViewController *vc = [[MyZoomViewController alloc] init];
+        vc.imagePath = (NSString*)responseObject;
+        [weakSelf.navigationController pushViewController:vc animated:YES];
     }];
 }
 
