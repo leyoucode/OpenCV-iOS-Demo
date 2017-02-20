@@ -19,23 +19,32 @@
 
 // AVFoundation components
 @property (nonatomic, readonly) AVCaptureSession *captureSession;
-@property (nonatomic, readonly) AVCaptureDevice *captureDevice;
+
+@property (nonatomic, readonly) AVCaptureDevice *videoDevice;
+@property (nonatomic, readonly) AVCaptureDevice *audioDevice;
+
+@property (nonatomic, strong) AVCaptureDeviceInput *videoInput;
+@property (nonatomic, strong) AVCaptureDeviceInput *audioInput;
+
 @property (nonatomic, readonly) AVCaptureVideoDataOutput *videoOutput;
 @property (nonatomic, readonly) AVCaptureAudioDataOutput *audioDataOutput;
-@property (nonatomic, readonly) AVCaptureVideoPreviewLayer *videoPreviewLayer;
+
+@property (nonatomic, strong) AVCaptureMovieFileOutput *movieFileOutput;
 @property (nonatomic, strong) AVCaptureStillImageOutput* stillImageOutput;
 
-@property (nonatomic, readonly) AVCaptureConnection *captureConnection;
-@property (nonatomic, readonly) AVAssetWriter *assetWriter;
-@property (nonatomic, readonly) AVAssetWriterInput *assetWriterInput;
+@property (nonatomic, readonly) AVCaptureVideoPreviewLayer *videoPreviewLayer;
+
+
 
 
 // -1: default, 0: back camera, 1: front camera
-@property (nonatomic, assign) int camera;
+//@property (nonatomic, assign) int camera;
 
 // These should only be modified in the initializer
-@property (nonatomic, assign) BOOL captureGrayscale;
+//@property (nonatomic, assign) BOOL captureGrayscale;
 
 - (CGAffineTransform)affineTransformForVideoFrame:(CGRect)videoFrame orientation:(AVCaptureVideoOrientation)videoOrientation;
+
+- (BOOL)setCamera:(int)camera;
 
 @end

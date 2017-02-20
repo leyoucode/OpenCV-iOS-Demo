@@ -17,17 +17,17 @@
 #import "RectangleCALayer.h"
 #import "UIImage+OpenCV.h"
 
-// Private interface
-@interface CXVideoCaptureViewController ()
-- (BOOL)createCaptureSessionForCamera:(NSInteger)camera qualityPreset:(NSString *)qualityPreset grayscale:(BOOL)grayscale;
-- (void)destroyCaptureSession;
-- (void)processFrame:(cv::Mat&)mat videoRect:(CGRect)rect videoOrientation:(AVCaptureVideoOrientation)orientation;
-@end
+//// Private interface
+//@interface CXVideoCaptureViewController ()
+//- (BOOL)createCaptureSessionForCamera:(NSInteger)camera qualityPreset:(NSString *)qualityPreset;
+//- (void)destroyCaptureSession;
+//- (void)processFrame:(cv::Mat&)mat videoRect:(CGRect)rect videoOrientation:(AVCaptureVideoOrientation)orientation;
+//@end
 
 
-@interface CXVideoCaptureViewController()
+@interface CXVideoCaptureViewController()<AVCaptureFileOutputRecordingDelegate>
 {
-    dispatch_queue_t _captureQueue;
+    int _camera; // 当前摄像头
 }
 
 /**
@@ -80,29 +80,29 @@ NSObject * queueLockObject = [[NSObject alloc] init];
 NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
 
 Rectangle * aggregateRectangle;
-RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
+RectangleCALayer *rectangleCALayer;// = [[RectangleCALayer alloc] init];
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        _camera = -1;
-        _qualityPreset = AVCaptureSessionPresetHigh;//AVCaptureSessionPresetMedium
-        _captureGrayscale = YES;
-    }
-    return self;
-}
+//- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+//{
+//    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+//    if (self) {
+//        _camera = 0;
+//        _qualityPreset = AVCaptureSessionPresetHigh;
+//    }
+//    return self;
+//}
 
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    _captureQueue = dispatch_queue_create("com.linkim.AVCameraCaptureQueue", DISPATCH_QUEUE_SERIAL);
-    [self createCaptureSessionForCamera:_camera qualityPreset:_qualityPreset grayscale:_captureGrayscale];
-    [_captureSession startRunning];
+    _camera = 0;
+    //[self createCaptureSessionForCamera:_camera qualityPreset:_qualityPreset];
     
-    [self.videoPreviewLayer addSublayer:rectangleCALayer];
+    [self reloadCameraConfiguration];
+    
+    
     
     [self setupControl];
 }
@@ -119,15 +119,40 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
     [self destroyCaptureSession];
 }
 
+- (NSString *)videoPath {
+    NSString *basePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *moviePath = [basePath stringByAppendingPathComponent:
+                           [NSString stringWithFormat:@"%f.mp4",[NSDate date].timeIntervalSince1970]];
+    return moviePath;
+}
+
+- (void)startRecord {
+    [self.movieFileOutput startRecordingToOutputFileURL:[NSURL fileURLWithPath:[self videoPath]] recordingDelegate:self];
+}
+
+
+- (void)stopRecord {
+    if ([self.movieFileOutput isRecording]) {
+        [self.movieFileOutput stopRecording];
+    }
+}
+
+#pragma mark - AVCaptureFileOutputRecordingDelegate
+
+- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL fromConnections:(NSArray *)connections error:(NSError *)error
+{
+    NSLog(@"=====> %@",[outputFileURL absoluteString]);
+}
+
 // Set torch on or off (if supported)
 - (void)setTorchOn:(BOOL)torch
 {
     NSError *error = nil;
-    if ([_captureDevice hasTorch]) {
-        BOOL locked = [_captureDevice lockForConfiguration:&error];
+    if ([_videoDevice hasTorch]) {
+        BOOL locked = [_videoDevice lockForConfiguration:&error];
         if (locked) {
-            _captureDevice.torchMode = (torch)? AVCaptureTorchModeOn : AVCaptureTorchModeOff;
-            [_captureDevice unlockForConfiguration];
+            _videoDevice.torchMode = (torch)? AVCaptureTorchModeOn : AVCaptureTorchModeOff;
+            [_videoDevice unlockForConfiguration];
         }
     }
 }
@@ -135,43 +160,51 @@ RectangleCALayer *rectangleCALayer = [[RectangleCALayer alloc] init];
 // Return YES if the torch is on
 - (BOOL)torchOn
 {
-    return (_captureDevice.torchMode == AVCaptureTorchModeOn);
+    return (_videoDevice.torchMode == AVCaptureTorchModeOn);
 }
 
+/**
+ 选择前置/后置摄像头
 
-// Switch camera 'on-the-fly'
-//
-// camera: 0 for back camera, 1 for front camera
-//
-- (void)setCamera:(int)camera
+ @param camera 0:后置 1:前置
+ @return 是否设置成功
+ */
+- (BOOL)setCamera:(int)camera
 {
+    if (camera != 0 && camera != 1)
+    {
+        return NO;
+    }
+    
     if (camera != _camera)
     {
-        _camera = camera;
-        
         if (_captureSession) {
+            
             NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+            
+            if (camera < 0 && camera >= [devices count]) {
+                NSLog(@"摄像头无法访问:%d",camera);
+                return NO;
+            }
             
             [_captureSession beginConfiguration];
             
             [_captureSession removeInput:[[_captureSession inputs] lastObject]];
 
-            if (_camera >= 0 && _camera < [devices count]) {
-                _captureDevice = [devices objectAtIndex:camera];
-            }
-            else {
-                _captureDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-            }
-         
+            _videoDevice = [devices objectAtIndex:camera];
+            _camera = camera;
+            
             // Create device input
             NSError *error = nil;
-            AVCaptureDeviceInput *input = [[AVCaptureDeviceInput alloc] initWithDevice:_captureDevice error:&error];
+            AVCaptureDeviceInput *input = [[AVCaptureDeviceInput alloc] initWithDevice:_videoDevice error:&error];
             [_captureSession addInput:input];
             
             [_captureSession commitConfiguration];
         }
     }
+    return YES;
 }
+
 
 // MARK: AVCaptureVideoDataOutputSampleBufferDelegate delegate methods
 
@@ -786,100 +819,135 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
 // qualityPreset: [AVCaptureSession sessionPreset] value
 // grayscale: YES to capture grayscale frames, NO to capture RGBA frames
 //
-- (BOOL)createCaptureSessionForCamera:(NSInteger)camera qualityPreset:(NSString *)qualityPreset grayscale:(BOOL)grayscale
-{
-    // Set up AV capture
-    NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-    
-    if ([devices count] == 0) {
-        NSLog(@"No video capture devices found");
-        return NO;
-    }
-    
-    if (camera == -1) {
-        _camera = -1;
-        _captureDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    }
-    else if (camera >= 0 && camera < [devices count]) {
-        _camera = (int)camera;
-        _captureDevice = [devices objectAtIndex:camera];
-    }
-    else {
-        _camera = -1;
-        _captureDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-        NSLog(@"Camera number out of range. Using default camera");
-    }
-    
-    // Create the capture session
-    _captureSession = [[AVCaptureSession alloc] init];
-    _captureSession.sessionPreset = (qualityPreset)? qualityPreset : AVCaptureSessionPresetHigh;
-    
-    // Create device input
-    NSError *error = nil;
-    AVCaptureDeviceInput *input = [[AVCaptureDeviceInput alloc] initWithDevice:_captureDevice error:&error];
-    
-    // Create and configure device output
-    _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
-    
-    //dispatch_queue_t queue = dispatch_queue_create("cameraQueue", NULL);
-    [_videoOutput setSampleBufferDelegate:self queue:_captureQueue];
-    
-    _videoOutput.alwaysDiscardsLateVideoFrames = YES; 
-    _videoOutput.minFrameDuration = CMTimeMake(1, 30);
-    
-    
-    // For grayscale mode, the luminance channel from the YUV fromat is used
-    // For color mode, BGRA format is used
-    OSType format = kCVPixelFormatType_32BGRA;
-
-    /*
-    // Check YUV format is available before selecting it (iPhone 3 does not support it)
-    if (NO && grayscale && [_videoOutput.availableVideoCVPixelFormatTypes containsObject:
-                      [NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarFullRange]]) {
-        format = kCVPixelFormatType_420YpCbCr8BiPlanarFullRange;
-    }
-     */
-    
-    _videoOutput.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedInt:format]
-                                                             forKey:(id)kCVPixelBufferPixelFormatTypeKey];
-    
-    _stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
-    
-    
-    // Connect up inputs and outputs
-    if ([_captureSession canAddInput:input]) {
-        [_captureSession addInput:input];
-    }
-    
-    if ([_captureSession canAddOutput:_videoOutput]) {
-        [_captureSession addOutput:_videoOutput];
-    }
-    
-    if ([_captureSession canAddOutput:_stillImageOutput]) {
-        [_captureSession addOutput:_stillImageOutput];
-    }
-    
-    
-    // Create the preview layer
-    _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
-    [_videoPreviewLayer setFrame:self.view.bounds];
-    _videoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-    [self.view.layer insertSublayer:_videoPreviewLayer atIndex:0];
-    
-    return YES;
-}
+//- (BOOL)createCaptureSessionForCamera:(NSInteger)camera qualityPreset:(NSString *)qualityPreset
+//{
+//    
+//    [self reloadCameraConfiguration];
+//    
+////    // 获取设备
+////    NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+////    
+////    if ([devices count] == 0) {
+////        NSLog(@"未找到可用的摄像头");
+////        return NO;
+////    }
+////    
+////    if (camera < 0 && camera >= [devices count]) {
+////        NSLog(@"未找到指定的摄像头");
+////        return NO;
+////    }
+////    
+////    _camera = (int)camera;
+////    _videoDevice = [devices objectAtIndex:camera];
+////    
+////    // 创建视频输入
+////    NSError *error = nil;
+////    _videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:_videoDevice error:&error];
+////    if (error) {
+////        NSLog(@"创建视频输入报错:%@",[error description]);
+////        return false;
+////    }
+////    
+////    // 建立会话
+////    _captureSession = [[AVCaptureSession alloc] init];
+////    _captureSession.sessionPreset = (qualityPreset)? qualityPreset : AVCaptureSessionPresetHigh;
+////    
+////    if (self.cameraMediaType == kCameraMediaTypeVideo) {
+////        
+////        // 获取音频设备
+////        _audioDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
+////        
+////        // 创建音频输入
+////        _audioInput = [AVCaptureDeviceInput deviceInputWithDevice:_audioDevice error:&error];
+////        if (error) {
+////            NSLog(@"创建音频输入报错:%@",[error description]);
+////            return false;
+////        }
+////        
+////        // 创建视频输出
+////        _movieFileOutput = [[AVCaptureMovieFileOutput alloc] init];
+////        _movieFileOutput.maxRecordedDuration = CMTimeMakeWithSeconds(30, 30);
+////        
+////        if ([_captureSession canAddInput:_videoInput]) {
+////            [_captureSession addInput:_videoInput];
+////        }
+////        if ([_captureSession canAddInput:_audioInput]) {
+////            [_captureSession addInput:_audioInput];
+////        }
+////        if ([_captureSession canAddOutput:_movieFileOutput]) {
+////            [_captureSession addOutput:_movieFileOutput];
+////        }
+////        
+////    }else{
+////    
+////        // Create and configure device output
+////        _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
+////        dispatch_queue_t captureQueue = dispatch_queue_create("com.antbeta.AVCameraCaptureQueue", DISPATCH_QUEUE_SERIAL);
+////        [_videoOutput setSampleBufferDelegate:self queue:captureQueue];
+////        _videoOutput.alwaysDiscardsLateVideoFrames = YES;
+////        _videoOutput.minFrameDuration = CMTimeMake(1, 30);
+////        
+////        // For color mode, BGRA format is used
+////        OSType format = kCVPixelFormatType_32BGRA;
+////        _videoOutput.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedInt:format]
+////                                                                 forKey:(id)kCVPixelBufferPixelFormatTypeKey];
+////        _stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
+////        
+////        
+////        // Connect up inputs and outputs
+////        if ([_captureSession canAddInput:_videoInput]) {
+////            [_captureSession addInput:_videoInput];
+////        }
+////        
+////        if ([_captureSession canAddOutput:_videoOutput]) {
+////            [_captureSession addOutput:_videoOutput];
+////        }
+////        
+////        if ([_captureSession canAddOutput:_stillImageOutput]) {
+////            [_captureSession addOutput:_stillImageOutput];
+////        }
+////    }
+////    
+////    // Create the preview layer
+////    _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
+////    [_videoPreviewLayer setFrame:self.view.bounds];
+////    _videoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+////    [self.view.layer insertSublayer:_videoPreviewLayer atIndex:0];
+//    
+//    return YES;
+//}
 
 // Tear down the video capture session
 - (void)destroyCaptureSession
 {
+    [_captureSession beginConfiguration];
+    for (AVCaptureInput *item in [_captureSession inputs]) {
+        [_captureSession removeInput:item];
+    }
+    [_captureSession commitConfiguration];
+    
     [_captureSession stopRunning];
     
-    [_videoPreviewLayer removeFromSuperlayer];
+//    [_videoPreviewLayer removeFromSuperlayer];
+//    
+//    _videoPreviewLayer = nil;
     
-    _videoPreviewLayer = nil;
+    _videoInput = nil;
+    _audioInput = nil;
+    
     _videoOutput = nil;
-    _captureDevice = nil;
+    _audioDataOutput = nil;
+    
+    _videoDevice = nil;
+    _audioDevice = nil;
+    
+    _movieFileOutput = nil;
+    _stillImageOutput = nil;
+    
     _captureSession = nil;
+    
+    [rectangleCALayer removeFromSuperlayer];
+    rectangleCALayer = nil;
 }
 
 #pragma mark - UI Element
@@ -946,30 +1014,239 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     
 }
 
+// 配置拍照参数
+- (void) configurationForPhoto
+{
+    // 获取设备
+    NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    
+    if ([devices count] == 0) {
+        NSLog(@"未找到可用的摄像头");
+        return;
+    }
+    
+    if (_camera < 0 && _camera >= [devices count]) {
+        NSLog(@"未找到指定的摄像头");
+        return;
+    }
+    
+    _videoDevice = [devices objectAtIndex:_camera];
+    
+    // 创建视频输入
+    NSError *error = nil;
+    _videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:_videoDevice error:&error];
+    if (error) {
+        NSLog(@"创建视频输入报错:%@",[error description]);
+        return;
+    }
+    
+    // 建立会话
+    _captureSession = [[AVCaptureSession alloc] init];
+    _captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
+    
+    // Create and configure device output
+    _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
+    dispatch_queue_t captureQueue = dispatch_queue_create("com.antbeta.AVCameraCaptureQueue", DISPATCH_QUEUE_SERIAL);
+    [_videoOutput setSampleBufferDelegate:self queue:captureQueue];
+    _videoOutput.alwaysDiscardsLateVideoFrames = YES;
+    _videoOutput.minFrameDuration = CMTimeMake(1, 30);
+    
+    // For color mode, BGRA format is used
+    OSType format = kCVPixelFormatType_32BGRA;
+    _videoOutput.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedInt:format]
+                                                             forKey:(id)kCVPixelBufferPixelFormatTypeKey];
+    _stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
+    
+    // Connect up inputs and outputs
+    if ([_captureSession canAddInput:_videoInput]) {
+        [_captureSession addInput:_videoInput];
+    }
+    
+    if ([_captureSession canAddOutput:_videoOutput]) {
+        [_captureSession addOutput:_videoOutput];
+    }
+    
+    if ([_captureSession canAddOutput:_stillImageOutput]) {
+        [_captureSession addOutput:_stillImageOutput];
+    }
+    
+//    if (_videoPreviewLayer) {
+//        [_videoPreviewLayer removeFromSuperlayer];
+//        _videoPreviewLayer = nil;
+//    }
+    // Create the preview layer
+    _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
+    [_videoPreviewLayer setFrame:self.view.bounds];
+    _videoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    [self.view.layer insertSublayer:_videoPreviewLayer atIndex:0];
+    
+}
+
+// 配置录制视频参数
+- (void) configurationForVideo
+{
+    // 获取设备
+    NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    
+    if ([devices count] == 0) {
+        NSLog(@"未找到可用的摄像头");
+        return;
+    }
+    
+    if (_camera < 0 && _camera >= [devices count]) {
+        NSLog(@"未找到指定的摄像头");
+        return;
+    }
+    
+    _videoDevice = [devices objectAtIndex:_camera];
+    
+    // 创建视频输入
+    NSError *error = nil;
+    _videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:_videoDevice error:&error];
+    if (error) {
+        NSLog(@"创建视频输入报错:%@",[error description]);
+        return;
+    }
+    
+    // 建立会话
+    _captureSession = [[AVCaptureSession alloc] init];
+    _captureSession.sessionPreset = AVCaptureSessionPresetMedium;
+    
+    
+    // Create and configure device output
+    _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
+    dispatch_queue_t captureQueue = dispatch_queue_create("com.antbeta.AVCameraCaptureQueue", DISPATCH_QUEUE_SERIAL);
+    [_videoOutput setSampleBufferDelegate:self queue:captureQueue];
+    _videoOutput.alwaysDiscardsLateVideoFrames = YES;
+    _videoOutput.minFrameDuration = CMTimeMake(1, 30);
+    
+    // For color mode, BGRA format is used
+    OSType format = kCVPixelFormatType_32BGRA;
+    _videoOutput.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedInt:format]
+                                                             forKey:(id)kCVPixelBufferPixelFormatTypeKey];
+    _stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
+    
+    
+    // Connect up inputs and outputs
+    if ([_captureSession canAddInput:_videoInput]) {
+        [_captureSession addInput:_videoInput];
+    }
+    
+    if ([_captureSession canAddOutput:_videoOutput]) {
+        [_captureSession addOutput:_videoOutput];
+    }
+    
+    if ([_captureSession canAddOutput:_stillImageOutput]) {
+        [_captureSession addOutput:_stillImageOutput];
+    }
+    
+//    if (_videoPreviewLayer) {
+//        [_videoPreviewLayer removeFromSuperlayer];
+//        _videoPreviewLayer = nil;
+//    }
+    
+    // Create the preview layer
+    _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
+    [_videoPreviewLayer setFrame:self.view.bounds];
+    _videoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    [self.view.layer insertSublayer:_videoPreviewLayer atIndex:0];
+}
+
+// 配置拍摄文档录制参数
+- (void) configurationForDocument
+{
+    // 获取设备
+    NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    
+    if ([devices count] == 0) {
+        NSLog(@"未找到可用的摄像头");
+        return;
+    }
+    
+    if (_camera < 0 && _camera >= [devices count]) {
+        NSLog(@"未找到指定的摄像头");
+        return;
+    }
+    
+    // 文档必须用后置摄像头
+    _camera = 0;
+    _videoDevice = [devices objectAtIndex:_camera];
+    
+    // 创建视频输入
+    NSError *error = nil;
+    _videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:_videoDevice error:&error];
+    if (error) {
+        NSLog(@"创建视频输入报错:%@",[error description]);
+        return;
+    }
+    
+    // 建立会话
+    _captureSession = [[AVCaptureSession alloc] init];
+    _captureSession.sessionPreset = AVCaptureSessionPresetHigh;
+    
+    // Create and configure device output
+    _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
+    dispatch_queue_t captureQueue = dispatch_queue_create("com.antbeta.AVCameraCaptureQueue", DISPATCH_QUEUE_SERIAL);
+    [_videoOutput setSampleBufferDelegate:self queue:captureQueue];
+    _videoOutput.alwaysDiscardsLateVideoFrames = YES;
+    _videoOutput.minFrameDuration = CMTimeMake(1, 30);
+    
+    // For color mode, BGRA format is used
+    OSType format = kCVPixelFormatType_32BGRA;
+    _videoOutput.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedInt:format]
+                                                             forKey:(id)kCVPixelBufferPixelFormatTypeKey];
+    _stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
+    
+    // Connect up inputs and outputs
+    if ([_captureSession canAddInput:_videoInput]) {
+        [_captureSession addInput:_videoInput];
+    }
+    
+    if ([_captureSession canAddOutput:_videoOutput]) {
+        [_captureSession addOutput:_videoOutput];
+    }
+    
+    if ([_captureSession canAddOutput:_stillImageOutput]) {
+        [_captureSession addOutput:_stillImageOutput];
+    }
+    
+//    if (_videoPreviewLayer) {
+//        [_videoPreviewLayer removeFromSuperlayer];
+//        _videoPreviewLayer = nil;
+//    }
+    
+    // Create the preview layer
+    _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
+    [_videoPreviewLayer setFrame:self.view.bounds];
+    _videoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    [self.view.layer insertSublayer:_videoPreviewLayer atIndex:0];
+    
+    if (!rectangleCALayer) {
+        rectangleCALayer = [[RectangleCALayer alloc] init];
+    }
+    
+    [self.videoPreviewLayer addSublayer:rectangleCALayer];
+}
+
 - (void) reloadCameraConfiguration
 {
-    NSError *error = nil;
-   
-    BOOL locked = [_captureDevice lockForConfiguration:&error];
-   
-    if (locked) {
-        
-        switch (self.cameraMediaType) {
-            case kCameraMediaTypeVideo:// 录制视频
-                
-                break;
-            case kCameraMediaTypePhoto:// 拍照
-                _captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
-                break;
-            case kCameraMediaTypeDocument:// 拍摄文档
-                _captureSession.sessionPreset = AVCaptureSessionPresetHigh;
-                break;
-            default:
-                break;
-        }
-        
-        [_captureDevice unlockForConfiguration];
+    [self destroyCaptureSession];
+    
+    switch (self.cameraMediaType) {
+        case kCameraMediaTypeVideo:// 录制视频
+            [self configurationForVideo];
+            break;
+        case kCameraMediaTypePhoto:// 拍照
+            [self configurationForPhoto];
+            break;
+        case kCameraMediaTypeDocument:// 拍摄文档
+            [self configurationForDocument];
+            break;
+        default:
+            break;
     }
+    
+    [_captureSession startRunning];
 }
 
 - (void) onControlElementClick:(id) sender
@@ -986,7 +1263,7 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     }
     // 点击相机切换按钮
     if (sender == self.cameraButton) {
-        if ( self.camera == 0)
+        if ( _camera == 0)
         {
             [self setCamera:1];
         }else{
@@ -1005,15 +1282,19 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
                     self.cameraButton.hidden = YES;
                     self.cancelButton.hidden = YES;
                     
+                    // 开始录制
+                    [self startRecord];
+                    
                 }else{
                     self.takeButton.tag = 0;
                     [self.takeButton setImage:[UIImage imageNamed:@"record_idle"] forState:UIControlStateNormal];
                     self.bottomContentView.hidden = NO;
                     self.cameraButton.hidden = NO;
                     self.cancelButton.hidden = NO;
+                    
+                    // 结束录制
+                    [self stopRecord];
                 }
-                
-                
                 
                 break;
             case kCameraMediaTypePhoto:// 拍照
@@ -1038,6 +1319,14 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
 
 - (void) setupTabWithAnimated:(BOOL)animated
 {
+    
+//    [UIView animateWithDuration:1 animations:^{
+//        
+//    } completion:^(BOOL finished) {
+//        [snapShot removeFromSuperview];
+//    }];
+    
+    
     switch (self.cameraMediaType) {
         case kCameraMediaTypeVideo:
             if (animated) {
@@ -1103,6 +1392,8 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     [self.takeButton setImage:[UIImage imageNamed:@"takephoto"] forState:UIControlStateNormal];
     self.topContentView.alpha = 1.0;
     self.bottomContentView.alpha = 1.0;
+    
+    self.cameraButton.hidden = false;
 }
 
 -(void) setVideoTabSelected
@@ -1126,6 +1417,8 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     [self.takeButton setImage:[UIImage imageNamed:@"record_idle"] forState:UIControlStateNormal];
     self.topContentView.alpha = 0.5;
     self.bottomContentView.alpha = 0.5;
+    
+    self.cameraButton.hidden = false;
 }
 
 -(void) setDocumentTabSelected
@@ -1148,6 +1441,8 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     [self.takeButton setImage:[UIImage imageNamed:@"takephoto"] forState:UIControlStateNormal];
     self.topContentView.alpha = 1.0;
     self.bottomContentView.alpha = 1.0;
+    
+    self.cameraButton.hidden = true;
 }
 
 -(void)handleSwipeRight:(UISwipeGestureRecognizer *)gesture

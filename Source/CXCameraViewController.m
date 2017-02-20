@@ -61,7 +61,6 @@
 -(void)showController:(UIViewController *)controller withType:(CameraMediaType)cameraMediaType result:(CXCameraResult)result
 {
     self.videoCaptureViewController.cameraMediaType = cameraMediaType;
-    self.videoCaptureViewController.camera = 0; // 0表示后置摄像头
     
     UINavigationController* navigationVC = [[UINavigationController alloc] initWithRootViewController:self.videoCaptureViewController];
     navigationVC.navigationBarHidden = YES;
