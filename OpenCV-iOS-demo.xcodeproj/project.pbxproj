@@ -55,6 +55,7 @@
 		FE342FB31E30B89000F0D071 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		FE89BC741E34B23600179706 /* MyZoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyZoomViewController.h; sourceTree = "<group>"; };
 		FE89BC751E34B23600179706 /* MyZoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyZoomViewController.m; sourceTree = "<group>"; };
+		FEDAE5781E5A9B6C003AA5FD /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		FEF47F891E2645B500AF034B /* OpenCV-iOS-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "OpenCV-iOS-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEF47F8C1E2645B500AF034B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FEF47F911E2645B500AF034B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -80,6 +81,7 @@
 		7BA92E160A3C650DB08329DF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FEDAE5781E5A9B6C003AA5FD /* MediaPlayer.framework */,
 				FE342FB31E30B89000F0D071 /* ImageIO.framework */,
 				FE342FB11E30B88500F0D071 /* MobileCoreServices.framework */,
 				FE00839E1E27724800299936 /* AssetsLibrary.framework */,

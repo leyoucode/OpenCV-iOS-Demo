@@ -12,7 +12,7 @@
 @interface CXVideoCaptureViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate>
 
 @property (nonatomic, assign) CameraMediaType cameraMediaType;
-@property (nonatomic, assign) CXCameraResult cameraCaptureResult;
+@property (nonatomic, strong) CXCameraResult cameraCaptureResult;
 
 @property (nonatomic, strong)  NSString * qualityPreset;
 

@@ -122,7 +122,7 @@ RectangleCALayer *rectangleCALayer;// = [[RectangleCALayer alloc] init];
 - (NSString *)videoPath {
     NSString *basePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
     NSString *moviePath = [basePath stringByAppendingPathComponent:
-                           [NSString stringWithFormat:@"%f.mp4",[NSDate date].timeIntervalSince1970]];
+                           [NSString stringWithFormat:@"%f.mov",[NSDate date].timeIntervalSince1970]];
     return moviePath;
 }
 
@@ -141,8 +141,8 @@ RectangleCALayer *rectangleCALayer;// = [[RectangleCALayer alloc] init];
 
 - (void)captureOutput:(AVCaptureFileOutput *)captureOutput didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL fromConnections:(NSArray *)connections error:(NSError *)error
 {
-    NSString *path = [outputFileURL absoluteString];
-    self.cameraCaptureResult(path);
+    //NSString *path = [outputFileURL absoluteString];
+    self.cameraCaptureResult(outputFileURL);
     
     [self destroyCaptureSession];
     [self dismissViewControllerAnimated:YES completion:nil];
