@@ -125,43 +125,64 @@
 - (IBAction)recordVedio:(id)sender {
     __weak typeof(self) weakSelf = self;
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
-    [controller showIn:self withType:kCameraMediaTypeVideo result:^(id responseObject) {
-        
-        NSURL* path = (NSURL*)responseObject;
-        
-        NSLog(@"recordVedio:%@",path);
-        
-        [weakSelf performSelectorInBackground:@selector(upload:) withObject:path];
+    [controller showIn:self withType:kCameraMediaTypeVideo result:^(CameraMediaType type, id responseObject) {
+        [weakSelf showResultWithType:type andObject:responseObject];
     }];
 }
 
 - (IBAction)takeNormalPhoto:(id)sender {
     __weak typeof(self) weakSelf = self;
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
-    [controller showIn:self withType:kCameraMediaTypePhoto result:^(id responseObject) {
-        NSLog(@"takeNormalPhoto:%@",responseObject);
-        MyZoomViewController *vc = [[MyZoomViewController alloc] init];
-        vc.imagePath = (NSString*)responseObject;
-        [weakSelf.navigationController pushViewController:vc animated:YES];
+    [controller showIn:self withType:kCameraMediaTypePhoto result:^(CameraMediaType type, id responseObject) {
+        [weakSelf showResultWithType:type andObject:responseObject];
     }];
 }
 
 - (IBAction)takeDocumentPhoto:(id)sender {
     __weak typeof(self) weakSelf = self;
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
-    [controller showIn:self withType:kCameraMediaTypeDocument result:^(id responseObject) {
-        NSLog(@"takeDocumentPhoto:%@",responseObject);
-        MyZoomViewController *vc = [[MyZoomViewController alloc] init];
-        vc.imagePath = (NSString*)responseObject;
-        [weakSelf.navigationController pushViewController:vc animated:YES];
+    [controller showIn:self withType:kCameraMediaTypeDocument result:^(CameraMediaType type, id responseObject) {
+        [weakSelf showResultWithType:type andObject:responseObject];
     }];
 }
 
 - (IBAction)defaultTest:(id)sender {
+    __weak typeof(self) weakSelf = self;
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
-    [controller showIn:self result:^(id responseObject) {
-        NSLog(@"defaultTest:%@",responseObject);
+    [controller showIn:self result:^(CameraMediaType type, id responseObject) {
+        [weakSelf showResultWithType:type andObject:responseObject];
     }];
+}
+
+- (void)showResultWithType:(CameraMediaType)type andObject:(id) object
+{
+    switch (type) {
+        case kCameraMediaTypeVideo:
+        {
+            NSURL* path = (NSURL*)object;
+            NSLog(@"Vedio:%@",path);
+            [self performSelectorInBackground:@selector(upload:) withObject:path];
+            break;
+        }
+        case kCameraMediaTypePhoto:
+        {
+            NSLog(@"Photo:%@",object);
+            MyZoomViewController *vc1 = [[MyZoomViewController alloc] init];
+            vc1.imagePath = (NSString*)object;
+            [self.navigationController pushViewController:vc1 animated:YES];
+            break;
+        }
+        case kCameraMediaTypeDocument:
+        {
+            NSLog(@"Document:%@",object);
+            MyZoomViewController *vc2 = [[MyZoomViewController alloc] init];
+            vc2.imagePath = (NSString*)object;
+            [self.navigationController pushViewController:vc2 animated:YES];
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 @end
