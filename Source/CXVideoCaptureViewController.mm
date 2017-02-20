@@ -297,60 +297,6 @@ RectangleCALayer *rectangleCALayer;// = [[RectangleCALayer alloc] init];
     }
 }
 
-// Create a UIImage from sample buffer data
-- (UIImage *) imageFromSampleBuffer:(CMSampleBufferRef) sampleBuffer
-{
-    // Get a CMSampleBuffer's Core Video image buffer for the media data
-    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
-    
-    // Lock the base address of the pixel buffer
-    CVPixelBufferLockBaseAddress(imageBuffer, 0);
-    
-    // Get the number of bytes per row for the pixel buffer
-    void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
-    
-    // Get the number of bytes per row for the pixel buffer
-    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
-    
-    // Get the pixel buffer width and height
-    size_t width = CVPixelBufferGetWidth(imageBuffer);
-    size_t height = CVPixelBufferGetHeight(imageBuffer);
-    
-    NSLog(@"w: %zu h: %zu bytesPerRow:%zu", width, height, bytesPerRow);
-    
-    // Create a device-dependent RGB color space
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    
-    // Create a bitmap graphics context with the sample buffer data
-    CGContextRef context = CGBitmapContextCreate(baseAddress,
-                                                 width,
-                                                 height,
-                                                 8,
-                                                 bytesPerRow,
-                                                 colorSpace,
-                                                 kCGBitmapByteOrder32Little
-                                                 | kCGImageAlphaPremultipliedFirst);
-    // Create a Quartz image from the pixel data in the bitmap graphics context
-    CGImageRef quartzImage = CGBitmapContextCreateImage(context);
-    // Unlock the pixel buffer
-    CVPixelBufferUnlockBaseAddress(imageBuffer,0);
-    
-    // Free up the context and color space
-    CGContextRelease(context);
-    CGColorSpaceRelease(colorSpace);
-    
-    // Create an image object from the Quartz image
-    //UIImage *image = [UIImage imageWithCGImage:quartzImage];
-    UIImage *image = [UIImage imageWithCGImage:quartzImage 
-                                         scale:1.0f 
-                                   orientation:UIImageOrientationRight];
-    
-    // Release the Quartz image
-    CGImageRelease(quartzImage);
-    
-    return (image);
-}
-
 - (void) processDocumentBuffer:(CMSampleBufferRef)sampleBuffer
 {
     CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
@@ -1505,16 +1451,43 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     self.cameraButton.hidden = true;
 }
 
+-(UIImage*) createImageWithColor: (UIColor*) color
+{
+    CGRect rect=CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, rect);
+    UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return theImage;
+}
+
+- (void)test
+{
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[self createImageWithColor:[UIColor grayColor]]];
+    imageView.frame = self.view.frame;
+    [self.view insertSubview:imageView belowSubview:self.topContentView];
+    
+    [UIView animateWithDuration:0.8 animations:^{
+        imageView.alpha = 0;
+    } completion:^(BOOL finished) {
+        [imageView removeFromSuperview];
+    }];
+
+}
 -(void)handleSwipeRight:(UISwipeGestureRecognizer *)gesture
 {
     if (gesture.direction == UISwipeGestureRecognizerDirectionRight) {
         //NSLog(@"right %f, %f, %f",self.photoTabButton.center.x, self.videoTabButton.center.x, self.bottomContentView.center.x);
         if (self.photoTabButton.center.x == self.bottomContentView.center.x) {
             self.cameraMediaType = kCameraMediaTypeVideo;
+            [self test];
             [self setupTabWithAnimated:YES];
             [self reloadCameraConfiguration];
         }else if (self.documentTabButton.center.x == self.bottomContentView.center.x) {
             self.cameraMediaType = kCameraMediaTypePhoto;
+            [self test];
             [self setupTabWithAnimated:YES];
             [self reloadCameraConfiguration];
         }
@@ -1527,11 +1500,13 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     {
         if (self.videoTabButton.center.x == self.bottomContentView.center.x) {
             self.cameraMediaType = kCameraMediaTypePhoto;
+            [self test];
             [self setupTabWithAnimated:YES];
             [self reloadCameraConfiguration];
         }
         else if (self.photoTabButton.center.x == self.bottomContentView.center.x) {
             self.cameraMediaType = kCameraMediaTypeDocument;
+            [self test];
             [self setupTabWithAnimated:YES];
             [self reloadCameraConfiguration];
         }
