@@ -9,8 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "CameraMediaType.h"
 
-typedef void (^CXCameraResult)(id responseObject);
-
 @interface CXCameraViewController : NSObject
 
 -(void)showIn:(UIViewController *)controller result:(CXCameraResult)result;

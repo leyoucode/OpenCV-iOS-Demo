@@ -141,7 +141,11 @@ RectangleCALayer *rectangleCALayer;// = [[RectangleCALayer alloc] init];
 
 - (void)captureOutput:(AVCaptureFileOutput *)captureOutput didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL fromConnections:(NSArray *)connections error:(NSError *)error
 {
-    NSLog(@"=====> %@",[outputFileURL absoluteString]);
+    NSString *path = [outputFileURL absoluteString];
+    self.cameraCaptureResult(path);
+    
+    [self destroyCaptureSession];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 // Set torch on or off (if supported)
@@ -877,7 +881,7 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
 ////        if ([_captureSession canAddOutput:_movieFileOutput]) {
 ////            [_captureSession addOutput:_movieFileOutput];
 ////        }
-////        
+////
 ////    }else{
 ////    
 ////        // Create and configure device output
@@ -1113,32 +1117,30 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     _captureSession.sessionPreset = AVCaptureSessionPresetMedium;
     
     
-    // Create and configure device output
-    _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
-    dispatch_queue_t captureQueue = dispatch_queue_create("com.antbeta.AVCameraCaptureQueue", DISPATCH_QUEUE_SERIAL);
-    [_videoOutput setSampleBufferDelegate:self queue:captureQueue];
-    _videoOutput.alwaysDiscardsLateVideoFrames = YES;
-    _videoOutput.minFrameDuration = CMTimeMake(1, 30);
+    // 获取音频设备
+    _audioDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
     
-    // For color mode, BGRA format is used
-    OSType format = kCVPixelFormatType_32BGRA;
-    _videoOutput.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedInt:format]
-                                                             forKey:(id)kCVPixelBufferPixelFormatTypeKey];
-    _stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
+    // 创建音频输入
+    _audioInput = [AVCaptureDeviceInput deviceInputWithDevice:_audioDevice error:&error];
+    if (error) {
+        NSLog(@"创建音频输入报错:%@",[error description]);
+        return;
+    }
     
+    // 创建视频输出
+    _movieFileOutput = [[AVCaptureMovieFileOutput alloc] init];
+    _movieFileOutput.maxRecordedDuration = CMTimeMakeWithSeconds(30, 30);
     
-    // Connect up inputs and outputs
     if ([_captureSession canAddInput:_videoInput]) {
         [_captureSession addInput:_videoInput];
     }
-    
-    if ([_captureSession canAddOutput:_videoOutput]) {
-        [_captureSession addOutput:_videoOutput];
+    if ([_captureSession canAddInput:_audioInput]) {
+        [_captureSession addInput:_audioInput];
     }
-    
-    if ([_captureSession canAddOutput:_stillImageOutput]) {
-        [_captureSession addOutput:_stillImageOutput];
+    if ([_captureSession canAddOutput:_movieFileOutput]) {
+        [_captureSession addOutput:_movieFileOutput];
     }
+
     
 //    if (_videoPreviewLayer) {
 //        [_videoPreviewLayer removeFromSuperlayer];
@@ -1299,22 +1301,38 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
                 break;
             case kCameraMediaTypePhoto:// 拍照
                 
-                [self captureImageWithCompletionHander:^(NSString *imageFilePath) {
-                    NSLog(@"imageFilePath=%@",imageFilePath);
-                }];
+                [self onCaptureImageButtonClick];
                 
                 break;
             case kCameraMediaTypeDocument:// 拍摄文档
                 
-                [self captureDocumentWithCompletionHander:^(NSString *imageFilePath) {
-                    NSLog(@"documentFilePath=%@",imageFilePath);
-                }];
+                [self onCaptureDocumentButtonClick];
                 
                 break;
             default:
                 break;
         }
     }
+}
+
+- (void) onCaptureImageButtonClick
+{
+    __weak typeof(self) weakSelf = self;
+    [self captureImageWithCompletionHander:^(NSString *imageFilePath) {
+        weakSelf.cameraCaptureResult(imageFilePath);
+        [weakSelf destroyCaptureSession];
+        [weakSelf dismissViewControllerAnimated:YES completion:nil];
+    }];
+}
+
+- (void) onCaptureDocumentButtonClick
+{
+    __weak typeof(self) weakSelf = self;
+    [self captureDocumentWithCompletionHander:^(NSString *imageFilePath) {
+        weakSelf.cameraCaptureResult(imageFilePath);
+        [weakSelf destroyCaptureSession];
+        [weakSelf dismissViewControllerAnimated:YES completion:nil];
+    }];
 }
 
 - (void) setupTabWithAnimated:(BOOL)animated

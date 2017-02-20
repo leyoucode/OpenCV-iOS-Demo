@@ -15,4 +15,6 @@ typedef enum :NSInteger {
     kCameraMediaTypeDocument // 拍文档模式
 } CameraMediaType;
 
+typedef void (^CXCameraResult)(id responseObject);
+
 #endif /* CameraMediaType_h */

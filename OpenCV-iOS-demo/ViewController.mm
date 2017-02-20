@@ -36,28 +36,28 @@
 - (IBAction)recordVedio:(id)sender {
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
     [controller showIn:self withType:kCameraMediaTypeVideo result:^(id responseObject) {
-        
+        NSLog(@"recordVedio:%@",responseObject);
     }];
 }
 
 - (IBAction)takeNormalPhoto:(id)sender {
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
     [controller showIn:self withType:kCameraMediaTypePhoto result:^(id responseObject) {
-        
+        NSLog(@"takeNormalPhoto:%@",responseObject);
     }];
 }
 
 - (IBAction)takeDocumentPhoto:(id)sender {
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
     [controller showIn:self withType:kCameraMediaTypeDocument result:^(id responseObject) {
-        
+        NSLog(@"takeDocumentPhoto:%@",responseObject);
     }];
 }
 
 - (IBAction)defaultTest:(id)sender {
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
     [controller showIn:self result:^(id responseObject) {
-        
+        NSLog(@"defaultTest:%@",responseObject);
     }];
 }
 
