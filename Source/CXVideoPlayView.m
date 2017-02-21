@@ -1,13 +1,12 @@
 //
-//  VideoView.m
+//  CXVideoPlayView.m
 //  OpenCV-iOS-demo
 //
 //  Created by 刘伟 on 2/21/17.
 //  Copyright © 2017 上海凌晋信息技术有限公司. All rights reserved.
 //
 
-#import "VideoView.h"
-#import "VideoView.h"
+#import "CXVideoPlayView.h"
 #import <AVFoundation/AVFoundation.h>
 #import <MediaPlayer/MPVolumeView.h>
 
@@ -19,7 +18,7 @@ typedef enum  {
 }Change;
 
 
-@interface VideoView ()
+@interface CXVideoPlayView ()
 
 @property (nonatomic ,readwrite) AVPlayerItem *item;
 
@@ -44,7 +43,7 @@ typedef enum  {
 @property (nonatomic ,strong) UIView *darkView;
 @end
 
-@implementation VideoView
+@implementation CXVideoPlayView
 
 - (id)initWithUrl:(NSString *)path delegate:(id<VideoSomeDelegate>)delegate {
     if (self = [super init]) {
@@ -59,7 +58,6 @@ typedef enum  {
 }
 - (void)setUpPlayer {
     NSURL *url = [NSURL fileURLWithPath:_playerUrl];//[NSURL URLWithString:_playerUrl];
-    NSLog(@"%@",url);
     _item = [[AVPlayerItem alloc] initWithURL:url];
     _player = [AVPlayer playerWithPlayerItem:_item];
     _playerLayer = [AVPlayerLayer playerLayerWithPlayer:_player];
@@ -171,16 +169,20 @@ typedef enum  {
 }
 
 - (void)movieToEnd:(NSNotification *)notic {
-    NSLog(@"%@",NSStringFromSelector(_cmd));
+    NSLog(@"movieToEnd:%@",NSStringFromSelector(_cmd));
+    
 }
 - (void)movieJumped:(NSNotification *)notic {
-    NSLog(@"%@",NSStringFromSelector(_cmd));
+    NSLog(@"movieJumped:%@",NSStringFromSelector(_cmd));
+    
 }
 - (void)movieStalle:(NSNotification *)notic {
-    NSLog(@"%@",NSStringFromSelector(_cmd));
+    NSLog(@"movieStalle:%@",NSStringFromSelector(_cmd));
+    
 }
 - (void)backGroundPauseMoive {
-    NSLog(@"%@",NSStringFromSelector(_cmd));
+    NSLog(@"backGroundPauseMoive:%@",NSStringFromSelector(_cmd));
+    
 }
 
 #pragma mark - TimerObserver
@@ -216,11 +218,11 @@ typedef enum  {
     
     if (currentTimeValue >= 3600 )
     {
-        return [NSString stringWithFormat:@"%ld:%ld:%ld",components.hour,components.minute,components.second];
+        return [NSString stringWithFormat:@"%d:%d:%d",components.hour,components.minute,components.second];
     }
     else
     {
-        return [NSString stringWithFormat:@"%ld:%ld",components.minute,components.second];
+        return [NSString stringWithFormat:@"%d:%d",components.minute,components.second];
     }
 }
 
@@ -233,11 +235,11 @@ typedef enum  {
     
     if (timeLength >= 3600 )
     {
-        return [NSString stringWithFormat:@"%ld:%ld:%ld",components.hour,components.minute,components.second];
+        return [NSString stringWithFormat:@"%d:%d:%d",components.hour,components.minute,components.second];
     }
     else
     {
-        return [NSString stringWithFormat:@"%ld:%ld",components.minute,components.second];
+        return [NSString stringWithFormat:@"%d:%d",components.minute,components.second];
     }
 }
 
@@ -256,9 +258,9 @@ typedef enum  {
 
 @end
 
-#pragma mark - VideoView (Guester)
+#pragma mark - CXVideoPlayView (Guester)
 
-@implementation VideoView (Guester)
+@implementation CXVideoPlayView (Guester)
 
 - (void)addSwipeView {
     _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(swipeAction:)];

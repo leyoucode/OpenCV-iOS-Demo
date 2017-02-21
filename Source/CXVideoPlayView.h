@@ -1,5 +1,5 @@
 //
-//  VideoView.h
+//  CXVideoPlayView.h
 //  OpenCV-iOS-demo
 //
 //  Created by 刘伟 on 2/21/17.
@@ -19,7 +19,7 @@
 
 @end
 
-@interface VideoView : UIView
+@interface CXVideoPlayView : UIView
 
 @property (nonatomic ,strong) NSString *playerUrl;
 
@@ -39,7 +39,7 @@
 
 @end
 
-@interface VideoView  (Guester)
+@interface CXVideoPlayView  (Guester)
 
 - (void)addSwipeView;
 
