@@ -79,20 +79,20 @@
     return ret;
 }
 
-- (void)upload:(NSURL*) path
+- (void)upload:(NSString*) path
 {
-    if (![[NSFileManager defaultManager] fileExistsAtPath:path.path])
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path])
     {
         NSLog(@"文件不存在");
         return;
     }
     
-    NSString* objectKey = [self getOSSObjectKey:path.path];
+    NSString* objectKey = [self getOSSObjectKey:path];
     
     OSSPutObjectRequest * put = [OSSPutObjectRequest new];
     put.bucketName = @"bly-video-in";
     put.objectKey = objectKey;
-    put.uploadingFileURL = path;
+    put.uploadingFileURL = [NSURL fileURLWithPath:path];
     put.uploadProgress = ^(int64_t bytesSent, int64_t totalByteSent, int64_t totalBytesExpectedToSend) {
         NSLog(@"%lld, %lld, %lld", bytesSent, totalByteSent, totalBytesExpectedToSend);
     };
@@ -159,7 +159,7 @@
     switch (type) {
         case kCameraMediaTypeVideo:
         {
-            NSURL* path = (NSURL*)object;
+            NSString* path = (NSString*)object;
             NSLog(@"Vedio:%@",path);
             [self performSelectorInBackground:@selector(upload:) withObject:path];
             break;

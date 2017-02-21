@@ -9,43 +9,36 @@
 #import <AVFoundation/AVFoundation.h>
 #import "CameraMediaType.h"
 
+#import "Rectangle.h"
+#import "RectangleCALayer.h"
+
+
 @interface CXVideoCaptureViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate>
 
+@property (nonatomic, assign) int camera; // 当前摄像头
 @property (nonatomic, assign) CameraMediaType cameraMediaType;
 @property (nonatomic, strong) CXCameraResult cameraCaptureResult;
 
-@property (nonatomic, strong)  NSString * qualityPreset;
+@property(nonatomic, strong) Rectangle * aggregateRectangle;
+@property(nonatomic, strong) RectangleCALayer *rectangleCALayer;
 
 @property (nonatomic, assign) BOOL torchOn;
 
 // AVFoundation components
-@property (nonatomic, readonly) AVCaptureSession *captureSession;
+@property (nonatomic, strong, readonly) AVCaptureSession *captureSession;
 
-@property (nonatomic, readonly) AVCaptureDevice *videoDevice;
-@property (nonatomic, readonly) AVCaptureDevice *audioDevice;
+@property (nonatomic, strong) AVCaptureDevice *videoDevice;
+@property (nonatomic, strong) AVCaptureDevice *audioDevice;
 
 @property (nonatomic, strong) AVCaptureDeviceInput *videoInput;
 @property (nonatomic, strong) AVCaptureDeviceInput *audioInput;
 
-@property (nonatomic, readonly) AVCaptureVideoDataOutput *videoOutput;
-@property (nonatomic, readonly) AVCaptureAudioDataOutput *audioDataOutput;
+@property (nonatomic, strong) AVCaptureVideoDataOutput *videoOutput;
+@property (nonatomic, strong) AVCaptureAudioDataOutput *audioDataOutput;
 
 @property (nonatomic, strong) AVCaptureMovieFileOutput *movieFileOutput;
 @property (nonatomic, strong) AVCaptureStillImageOutput* stillImageOutput;
 
-@property (nonatomic, readonly) AVCaptureVideoPreviewLayer *videoPreviewLayer;
-
-
-
-
-// -1: default, 0: back camera, 1: front camera
-//@property (nonatomic, assign) int camera;
-
-// These should only be modified in the initializer
-//@property (nonatomic, assign) BOOL captureGrayscale;
-
-- (CGAffineTransform)affineTransformForVideoFrame:(CGRect)videoFrame orientation:(AVCaptureVideoOrientation)videoOrientation;
-
-- (BOOL)setCamera:(int)camera;
+@property (nonatomic, strong) AVCaptureVideoPreviewLayer *videoPreviewLayer;
 
 @end
