@@ -1,32 +1,21 @@
 //
-//  UIImage+OpenCV.mm
-//  OpenCVClient
+//  ImageUtils.m
+//  OpenCV-iOS-demo
 //
-//  Created by Robin Summerhill on 02/09/2011.
-//  Copyright 2011 Aptogo Limited. All rights reserved.
-//
-//  Permission is given to use this source code file without charge in any
-//  project, commercial or otherwise, entirely at your risk, with the condition
-//  that any redistribution (in part or whole) of source code must retain
-//  this copyright and permission notice. Attribution in compiled projects is
-//  appreciated but not required.
+//  Created by 刘伟 on 2/21/17.
+//  Copyright © 2017 上海凌晋信息技术有限公司. All rights reserved.
 //
 
-#import "UIImage+utils.h"
+#import "ImageUtils.h"
 
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <iostream>
+@implementation ImageUtils
 
-
-@implementation UIImage (utils)
-
--(cv::Mat)CVMat
++(cv::Mat)getCVMatFrom:(UIImage*)image
 {
     
-    CGColorSpaceRef colorSpace = CGImageGetColorSpace(self.CGImage);
-    CGFloat cols = self.size.width;
-    CGFloat rows = self.size.height;
+    CGColorSpaceRef colorSpace = CGImageGetColorSpace(image.CGImage);
+    CGFloat cols = image.size.width;
+    CGFloat rows = image.size.height;
     
     cv::Mat cvMat(rows, cols, CV_8UC4); // 8 bits per component, 4 channels
     
@@ -39,39 +28,39 @@
                                                     kCGImageAlphaNoneSkipLast |
                                                     kCGBitmapByteOrderDefault); // Bitmap info flags
     
-    CGContextDrawImage(contextRef, CGRectMake(0, 0, cols, rows), self.CGImage);
+    CGContextDrawImage(contextRef, CGRectMake(0, 0, cols, rows), image.CGImage);
     CGContextRelease(contextRef);
     
     return cvMat;
 }
 
 /*
--(cv::Mat)CVGrayscaleMat
-{
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
-    CGFloat cols = self.size.width;
-    CGFloat rows = self.size.height;
-    
-    cv::Mat cvMat = cv::Mat(rows, cols, CV_8UC1); // 8 bits per component, 1 channel
-    
-    CGContextRef contextRef = CGBitmapContextCreate(cvMat.data,                 // Pointer to backing data
-                                                    cols,                      // Width of bitmap
-                                                    rows,                     // Height of bitmap
-                                                    8,                          // Bits per component
-                                                    cvMat.step[0],              // Bytes per row
-                                                    colorSpace,                 // Colorspace
-                                                    kCGImageAlphaNone |
-                                                    kCGBitmapByteOrderDefault); // Bitmap info flags
-    
-    CGContextDrawImage(contextRef, CGRectMake(0, 0, cols, rows), self.CGImage);
-    CGContextRelease(contextRef);
-    CGColorSpaceRelease(colorSpace);
-    
-    return cvMat;
-}
-*/
+ -(cv::Mat)CVGrayscaleMat
+ {
+ CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
+ CGFloat cols = self.size.width;
+ CGFloat rows = self.size.height;
+ 
+ cv::Mat cvMat = cv::Mat(rows, cols, CV_8UC1); // 8 bits per component, 1 channel
+ 
+ CGContextRef contextRef = CGBitmapContextCreate(cvMat.data,                 // Pointer to backing data
+ cols,                      // Width of bitmap
+ rows,                     // Height of bitmap
+ 8,                          // Bits per component
+ cvMat.step[0],              // Bytes per row
+ colorSpace,                 // Colorspace
+ kCGImageAlphaNone |
+ kCGBitmapByteOrderDefault); // Bitmap info flags
+ 
+ CGContextDrawImage(contextRef, CGRectMake(0, 0, cols, rows), self.CGImage);
+ CGContextRelease(contextRef);
+ CGColorSpaceRelease(colorSpace);
+ 
+ return cvMat;
+ }
+ */
 
-- (id)initWithCVMat:(const cv::Mat&)cvMat
++ (UIImage*)getImageWithCVMat:(const cv::Mat&)cvMat
 {
     NSData *data = [NSData dataWithBytes:cvMat.data length:cvMat.elemSize() * cvMat.total()];
     
@@ -100,20 +89,17 @@
                                         false,                                          // Should interpolate
                                         kCGRenderingIntentDefault);                     // Intent
     
-    self = [self initWithCGImage:imageRef];
+    UIImage *image = [[UIImage alloc] initWithCGImage:imageRef];
     CGImageRelease(imageRef);
     CGDataProviderRelease(provider);
     CGColorSpaceRelease(colorSpace);
     
-    return self;
+    return image;
 }
 
-+ (UIImage *)imageWithCVMat:(const cv::Mat&)cvMat
-{
-    return [[UIImage alloc] initWithCVMat:cvMat];
-}
 
-- (UIImage *)fixOrientation:(UIImage *)aImage {
+
++(UIImage *)fixOrientation:(UIImage *)aImage {
     
     // No-op if the orientation is already correct
     if (aImage.imageOrientation == UIImageOrientationUp)

@@ -15,7 +15,7 @@
 #import <AVFoundation/AVFoundation.h>
 
 #import <CommonCrypto/CommonDigest.h>
-#import "MyZoomViewController.h"
+#import "CXImagePreviewViewController.h"
 
 
 @interface ViewController ()
@@ -167,17 +167,11 @@
         case kCameraMediaTypePhoto:
         {
             NSLog(@"Photo:%@",object);
-            MyZoomViewController *vc1 = [[MyZoomViewController alloc] init];
-            vc1.imagePath = (NSString*)object;
-            [self.navigationController pushViewController:vc1 animated:YES];
             break;
         }
         case kCameraMediaTypeDocument:
         {
             NSLog(@"Document:%@",object);
-            MyZoomViewController *vc2 = [[MyZoomViewController alloc] init];
-            vc2.imagePath = (NSString*)object;
-            [self.navigationController pushViewController:vc2 animated:YES];
             break;
         }
         default:

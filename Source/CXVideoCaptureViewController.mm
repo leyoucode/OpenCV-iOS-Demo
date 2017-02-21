@@ -15,6 +15,11 @@
 #import "CXVideoCaptureViewController+CaptureDocument.h"
 #import "CXVideoCaptureViewController+Configuration.h"
 
+#import "CXImagePreviewViewController.h"
+#import "CXVideoPreviewViewController.h"
+
+#import "UIView+Ext.h"
+
 @interface CXVideoCaptureViewController()<CXVideoCaptureViewDelegate>
 {
     NSTimer *_calVideoDurationTimer;
@@ -30,27 +35,24 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [UIApplication sharedApplication].statusBarHidden = YES;
     
     _camera = 0;
-    
-    [self setupAVCapture];
-    
-    [self reloadCameraConfiguration];
     
     rootView = [[CXVideoCaptureView alloc] initWithFrame:self.view.frame andCameraMediaType:self.cameraMediaType];
     rootView.delegate = self;
     [self.view addSubview:rootView];
 }
 
-- (void) viewWillAppear:(BOOL)animated{
+- (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    _aggregateRectangle = nil;
-    
+    [self setupAVCapture];
+    [self reloadCameraConfiguration];
 }
 
-- (void)viewDidDisappear:(BOOL)animated
+- (void)viewWillDisappear:(BOOL)animated
 {
-    [super viewDidDisappear:animated];
+    [super viewWillDisappear:animated];
     [self tearDownAVCapture];
 }
 
@@ -193,7 +195,7 @@
     
     // Create a CaptureSession, It coordinates the flow of data between audio and video inputs and outputs.
     _captureSession = [[AVCaptureSession alloc] init];
-    _captureSession.sessionPreset = AVCaptureSessionPresetMedium;
+    _captureSession.sessionPreset = AVCaptureSessionPresetHigh;
     
     // Connect up inputs and outputs
     if ([_captureSession canAddInput:_videoInput]) {
@@ -203,7 +205,11 @@
     // Create the preview layer
     _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
     [_videoPreviewLayer setFrame:self.view.bounds];
-    _videoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    
+    NSLog(@"%@",NSStringFromCGRect(self.view.bounds));
+    
+    _videoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspect;
+    
     [self.view.layer insertSublayer:_videoPreviewLayer atIndex:0];
     
     [_captureSession startRunning];
@@ -283,16 +289,22 @@
 {
     __weak typeof(self) weakSelf = self;
     [self captureImageWithCompletionHander:^(NSString *imageFilePath) {
-        weakSelf.cameraCaptureResult(self.cameraMediaType, imageFilePath);
-        [weakSelf dismissViewControllerAnimated:YES completion:nil];
+        CXImagePreviewViewController *previewController = [[CXImagePreviewViewController alloc] init];
+        previewController.imagePath = imageFilePath;
+        previewController.cameraMediaType = self.cameraMediaType;
+        previewController.cameraCaptureResult = weakSelf.cameraCaptureResult;
+        [weakSelf.navigationController pushViewController:previewController animated:NO];
     }];
 }
 -(void) onCaptureDocumentButtonCick
 {
     __weak typeof(self) weakSelf = self;
     [self captureDocumentWithCompletionHander:^(NSString *imageFilePath) {
-        weakSelf.cameraCaptureResult(self.cameraMediaType, imageFilePath);
-        [weakSelf dismissViewControllerAnimated:YES completion:nil];
+        CXImagePreviewViewController *previewController = [[CXImagePreviewViewController alloc] init];
+        previewController.imagePath = imageFilePath;
+        previewController.cameraMediaType = self.cameraMediaType;
+        previewController.cameraCaptureResult = weakSelf.cameraCaptureResult;
+        [weakSelf.navigationController pushViewController:previewController animated:NO];
     }];
 }
 -(void) didStartVideoRecording
@@ -309,9 +321,15 @@
         _calVideoDurationTimer = nil;
     }
     
-    // Call back when finished capture
-    self.cameraCaptureResult(self.cameraMediaType, videoPath);
-    [self dismissViewControllerAnimated:YES completion:nil];
+    CXVideoPreviewViewController *previewController = [[CXVideoPreviewViewController alloc] init];
+    previewController.videoPath = videoPath;
+    previewController.cameraMediaType = self.cameraMediaType;
+    previewController.cameraCaptureResult = self.cameraCaptureResult;
+    [self.navigationController pushViewController:previewController animated:NO];
+    
+//    // Call back when finished capture
+//    self.cameraCaptureResult(self.cameraMediaType, videoPath);
+//    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Private

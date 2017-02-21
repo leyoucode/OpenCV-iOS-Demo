@@ -12,18 +12,20 @@
 		FE0083A21E2784D900299936 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083A11E2784D900299936 /* ViewController.mm */; };
 		FE0083D21E2884C500299936 /* Rectangle.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0083C81E2884C500299936 /* Rectangle.m */; };
 		FE0083D31E2884C500299936 /* RectangleCALayer.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CA1E2884C500299936 /* RectangleCALayer.m */; };
-		FE0083D41E2884C500299936 /* UIImage+utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CC1E2884C500299936 /* UIImage+utils.mm */; };
 		FE0083D51E2884C500299936 /* CXVideoCaptureViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CE1E2884C500299936 /* CXVideoCaptureViewController.mm */; };
 		FE0520841E52A0DC00355DA1 /* UIView+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0520831E52A0DC00355DA1 /* UIView+Ext.m */; };
 		FE0520901E5578CF00355DA1 /* CXCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE05208F1E5578CF00355DA1 /* CXCameraViewController.m */; };
 		FE342FB21E30B88500F0D071 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE342FB11E30B88500F0D071 /* MobileCoreServices.framework */; };
 		FE342FB41E30B89000F0D071 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE342FB31E30B89000F0D071 /* ImageIO.framework */; };
-		FE89BC761E34B23600179706 /* MyZoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE89BC751E34B23600179706 /* MyZoomViewController.m */; };
 		FEDAE57C1E5BCC92003AA5FD /* CXVideoCaptureView.mm in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE57B1E5BCC92003AA5FD /* CXVideoCaptureView.mm */; };
 		FEDAE57F1E5BDD83003AA5FD /* StringUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE57E1E5BDD83003AA5FD /* StringUtils.m */; };
-		FEDAE5821E5BE29F003AA5FD /* CXVideoCaptureViewController+CaptureImage.m in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE5811E5BE29F003AA5FD /* CXVideoCaptureViewController+CaptureImage.m */; };
+		FEDAE5821E5BE29F003AA5FD /* CXVideoCaptureViewController+CaptureImage.mm in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE5811E5BE29F003AA5FD /* CXVideoCaptureViewController+CaptureImage.mm */; };
 		FEDAE5851E5BE316003AA5FD /* CXVideoCaptureViewController+CaptureDocument.mm in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE5841E5BE316003AA5FD /* CXVideoCaptureViewController+CaptureDocument.mm */; };
 		FEDAE5881E5BE52B003AA5FD /* CXVideoCaptureViewController+Configuration.m in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE5871E5BE52B003AA5FD /* CXVideoCaptureViewController+Configuration.m */; };
+		FEDAE58B1E5BF1A9003AA5FD /* CXImagePreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE58A1E5BF1A9003AA5FD /* CXImagePreviewViewController.m */; };
+		FEDAE58F1E5C2A67003AA5FD /* ImageUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE58E1E5C2A67003AA5FD /* ImageUtils.mm */; };
+		FEDAE5921E5C3C40003AA5FD /* CXVideoPreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE5911E5C3C40003AA5FD /* CXVideoPreviewViewController.m */; };
+		FEDAE5951E5C3EDA003AA5FD /* VideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE5941E5C3EDA003AA5FD /* VideoView.m */; };
 		FEF47F8D1E2645B500AF034B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF47F8C1E2645B500AF034B /* AppDelegate.swift */; };
 		FEF47F921E2645B500AF034B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FEF47F901E2645B500AF034B /* Main.storyboard */; };
 		FEF47F941E2645B500AF034B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FEF47F931E2645B500AF034B /* Assets.xcassets */; };
@@ -44,8 +46,6 @@
 		FE0083C81E2884C500299936 /* Rectangle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Rectangle.m; sourceTree = "<group>"; };
 		FE0083C91E2884C500299936 /* RectangleCALayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RectangleCALayer.h; sourceTree = "<group>"; };
 		FE0083CA1E2884C500299936 /* RectangleCALayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RectangleCALayer.m; sourceTree = "<group>"; };
-		FE0083CB1E2884C500299936 /* UIImage+utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+utils.h"; sourceTree = "<group>"; };
-		FE0083CC1E2884C500299936 /* UIImage+utils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+utils.mm"; sourceTree = "<group>"; };
 		FE0083CD1E2884C500299936 /* CXVideoCaptureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CXVideoCaptureViewController.h; sourceTree = "<group>"; };
 		FE0083CE1E2884C500299936 /* CXVideoCaptureViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CXVideoCaptureViewController.mm; sourceTree = "<group>"; };
 		FE0520821E52A0DC00355DA1 /* UIView+Ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Ext.h"; sourceTree = "<group>"; };
@@ -55,19 +55,26 @@
 		FE0520911E557FD100355DA1 /* CameraMediaType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraMediaType.h; sourceTree = "<group>"; };
 		FE342FB11E30B88500F0D071 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		FE342FB31E30B89000F0D071 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
-		FE89BC741E34B23600179706 /* MyZoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyZoomViewController.h; sourceTree = "<group>"; };
-		FE89BC751E34B23600179706 /* MyZoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyZoomViewController.m; sourceTree = "<group>"; };
 		FEDAE5781E5A9B6C003AA5FD /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		FEDAE57A1E5BCC92003AA5FD /* CXVideoCaptureView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CXVideoCaptureView.h; sourceTree = "<group>"; };
 		FEDAE57B1E5BCC92003AA5FD /* CXVideoCaptureView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CXVideoCaptureView.mm; sourceTree = "<group>"; };
 		FEDAE57D1E5BDD83003AA5FD /* StringUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringUtils.h; sourceTree = "<group>"; };
 		FEDAE57E1E5BDD83003AA5FD /* StringUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StringUtils.m; sourceTree = "<group>"; };
 		FEDAE5801E5BE29F003AA5FD /* CXVideoCaptureViewController+CaptureImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CXVideoCaptureViewController+CaptureImage.h"; sourceTree = "<group>"; };
-		FEDAE5811E5BE29F003AA5FD /* CXVideoCaptureViewController+CaptureImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CXVideoCaptureViewController+CaptureImage.m"; sourceTree = "<group>"; };
+		FEDAE5811E5BE29F003AA5FD /* CXVideoCaptureViewController+CaptureImage.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "CXVideoCaptureViewController+CaptureImage.mm"; sourceTree = "<group>"; };
 		FEDAE5831E5BE316003AA5FD /* CXVideoCaptureViewController+CaptureDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CXVideoCaptureViewController+CaptureDocument.h"; sourceTree = "<group>"; };
 		FEDAE5841E5BE316003AA5FD /* CXVideoCaptureViewController+CaptureDocument.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "CXVideoCaptureViewController+CaptureDocument.mm"; sourceTree = "<group>"; };
 		FEDAE5861E5BE52B003AA5FD /* CXVideoCaptureViewController+Configuration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CXVideoCaptureViewController+Configuration.h"; sourceTree = "<group>"; };
 		FEDAE5871E5BE52B003AA5FD /* CXVideoCaptureViewController+Configuration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CXVideoCaptureViewController+Configuration.m"; sourceTree = "<group>"; };
+		FEDAE5891E5BF1A9003AA5FD /* CXImagePreviewViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CXImagePreviewViewController.h; sourceTree = "<group>"; };
+		FEDAE58A1E5BF1A9003AA5FD /* CXImagePreviewViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CXImagePreviewViewController.m; sourceTree = "<group>"; };
+		FEDAE58C1E5C256F003AA5FD /* CXMarcos.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CXMarcos.h; sourceTree = "<group>"; };
+		FEDAE58D1E5C2A67003AA5FD /* ImageUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUtils.h; sourceTree = "<group>"; };
+		FEDAE58E1E5C2A67003AA5FD /* ImageUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImageUtils.mm; sourceTree = "<group>"; };
+		FEDAE5901E5C3C40003AA5FD /* CXVideoPreviewViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CXVideoPreviewViewController.h; sourceTree = "<group>"; };
+		FEDAE5911E5C3C40003AA5FD /* CXVideoPreviewViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CXVideoPreviewViewController.m; sourceTree = "<group>"; };
+		FEDAE5931E5C3EDA003AA5FD /* VideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoView.h; sourceTree = "<group>"; };
+		FEDAE5941E5C3EDA003AA5FD /* VideoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoView.m; sourceTree = "<group>"; };
 		FEF47F891E2645B500AF034B /* OpenCV-iOS-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "OpenCV-iOS-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEF47F8C1E2645B500AF034B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FEF47F911E2645B500AF034B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -123,20 +130,27 @@
 				FE0083CD1E2884C500299936 /* CXVideoCaptureViewController.h */,
 				FE0083CE1E2884C500299936 /* CXVideoCaptureViewController.mm */,
 				FEDAE5801E5BE29F003AA5FD /* CXVideoCaptureViewController+CaptureImage.h */,
-				FEDAE5811E5BE29F003AA5FD /* CXVideoCaptureViewController+CaptureImage.m */,
+				FEDAE5811E5BE29F003AA5FD /* CXVideoCaptureViewController+CaptureImage.mm */,
 				FEDAE5831E5BE316003AA5FD /* CXVideoCaptureViewController+CaptureDocument.h */,
 				FEDAE5841E5BE316003AA5FD /* CXVideoCaptureViewController+CaptureDocument.mm */,
 				FEDAE5861E5BE52B003AA5FD /* CXVideoCaptureViewController+Configuration.h */,
 				FEDAE5871E5BE52B003AA5FD /* CXVideoCaptureViewController+Configuration.m */,
+				FEDAE5891E5BF1A9003AA5FD /* CXImagePreviewViewController.h */,
+				FEDAE58A1E5BF1A9003AA5FD /* CXImagePreviewViewController.m */,
+				FEDAE5901E5C3C40003AA5FD /* CXVideoPreviewViewController.h */,
+				FEDAE5911E5C3C40003AA5FD /* CXVideoPreviewViewController.m */,
 				FE0083C71E2884C500299936 /* Rectangle.h */,
 				FE0083C81E2884C500299936 /* Rectangle.m */,
 				FE0083C91E2884C500299936 /* RectangleCALayer.h */,
 				FE0083CA1E2884C500299936 /* RectangleCALayer.m */,
-				FE0083CB1E2884C500299936 /* UIImage+utils.h */,
-				FE0083CC1E2884C500299936 /* UIImage+utils.mm */,
 				FE0520911E557FD100355DA1 /* CameraMediaType.h */,
 				FEDAE57D1E5BDD83003AA5FD /* StringUtils.h */,
 				FEDAE57E1E5BDD83003AA5FD /* StringUtils.m */,
+				FEDAE58D1E5C2A67003AA5FD /* ImageUtils.h */,
+				FEDAE58E1E5C2A67003AA5FD /* ImageUtils.mm */,
+				FEDAE58C1E5C256F003AA5FD /* CXMarcos.h */,
+				FEDAE5931E5C3EDA003AA5FD /* VideoView.h */,
+				FEDAE5941E5C3EDA003AA5FD /* VideoView.m */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -173,8 +187,6 @@
 				FE00839A1E272D7700299936 /* OpenCV-iOS-demo-Bridging-Header.h */,
 				FE0083A01E2784D900299936 /* ViewController.h */,
 				FE0083A11E2784D900299936 /* ViewController.mm */,
-				FE89BC741E34B23600179706 /* MyZoomViewController.h */,
-				FE89BC751E34B23600179706 /* MyZoomViewController.m */,
 			);
 			path = "OpenCV-iOS-demo";
 			sourceTree = "<group>";
@@ -304,18 +316,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FEDAE5951E5C3EDA003AA5FD /* VideoView.m in Sources */,
 				FE0083A21E2784D900299936 /* ViewController.mm in Sources */,
 				FE0520901E5578CF00355DA1 /* CXCameraViewController.m in Sources */,
 				FEDAE57F1E5BDD83003AA5FD /* StringUtils.m in Sources */,
 				FE0083D21E2884C500299936 /* Rectangle.m in Sources */,
 				FE0520841E52A0DC00355DA1 /* UIView+Ext.m in Sources */,
-				FE0083D41E2884C500299936 /* UIImage+utils.mm in Sources */,
 				FEDAE5851E5BE316003AA5FD /* CXVideoCaptureViewController+CaptureDocument.mm in Sources */,
 				FEF47F8D1E2645B500AF034B /* AppDelegate.swift in Sources */,
-				FE89BC761E34B23600179706 /* MyZoomViewController.m in Sources */,
-				FEDAE5821E5BE29F003AA5FD /* CXVideoCaptureViewController+CaptureImage.m in Sources */,
+				FEDAE58B1E5BF1A9003AA5FD /* CXImagePreviewViewController.m in Sources */,
+				FEDAE5821E5BE29F003AA5FD /* CXVideoCaptureViewController+CaptureImage.mm in Sources */,
 				FEDAE57C1E5BCC92003AA5FD /* CXVideoCaptureView.mm in Sources */,
+				FEDAE58F1E5C2A67003AA5FD /* ImageUtils.mm in Sources */,
 				FE00839D1E272D7800299936 /* OpenCVWrapper.mm in Sources */,
+				FEDAE5921E5C3C40003AA5FD /* CXVideoPreviewViewController.m in Sources */,
 				FE0083D31E2884C500299936 /* RectangleCALayer.m in Sources */,
 				FE0083D51E2884C500299936 /* CXVideoCaptureViewController.mm in Sources */,
 				FEDAE5881E5BE52B003AA5FD /* CXVideoCaptureViewController+Configuration.m in Sources */,

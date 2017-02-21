@@ -8,7 +8,8 @@
 
 #import "CXVideoCaptureView.h"
 #import "UIView+Ext.h"
-#import "UIImage+utils.h"
+#import "CXMarcos.h"
+#import "ImageUtils.h"
 
 @implementation CXVideoCaptureView
 
@@ -312,7 +313,7 @@
     [self.takeButton setImage:[UIImage imageNamed:@"takephoto"] forState:UIControlStateNormal];
     self.topContentView.alpha = 1.0;
     self.bottomContentView.alpha = 1.0;
-    
+
     self.cameraButton.hidden = true;
 }
 
@@ -377,7 +378,8 @@
 
 - (void)makeAnimation
 {
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage createImageWithColor:[UIColor grayColor]]];
+    
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[ImageUtils createImageWithColor:[UIColor grayColor]]];
     imageView.frame = self.frame;
     [self insertSubview:imageView belowSubview:self.topContentView];
     

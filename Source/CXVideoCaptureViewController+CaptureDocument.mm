@@ -15,7 +15,7 @@
 
 #import "Rectangle.h"
 #import "RectangleCALayer.h"
-#import "UIImage+utils.h"
+#import "ImageUtils.h"
 
 @implementation CXVideoCaptureViewController (CaptureDocument)
 
@@ -62,7 +62,7 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
              NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
              UIImage* image = [[UIImage alloc] initWithData:imageData];
              
-             image = [image fixOrientation:image];
+             image = [ImageUtils fixOrientation:image];
              
              Rectangle *newRectangle = [self rotationRectangle:rectangle];
              
@@ -93,7 +93,8 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
     float b = imageSize.height / screenSize.height;
     //float c = MAX(a, b);
     
-    cv::Mat img = [sourceImage CVMat];
+    
+    cv::Mat img = [ImageUtils getCVMatFrom:sourceImage];
     
     std::vector<cv::Point2f> corners(4);
     corners[0] = cv::Point2f(rectangle.topLeftX * a, rectangle.topLeftY * b );
@@ -138,7 +139,7 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
     //cv::warpPerspective(img, quad, warpMatrix, quad.size());
     //warpPerspective(img, rotated, warpMatrix, rotated.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT);
     
-    return [UIImage imageWithCVMat:outt];
+    return [ImageUtils getImageWithCVMat:outt];
     
     /*
      

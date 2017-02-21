@@ -74,7 +74,7 @@
             self.stillImageOutput = nil;
         }
         
-        self.captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
+        self.captureSession.sessionPreset = AVCaptureSessionPresetHigh;//AVCaptureSessionPresetPhoto;
         
         self.stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
         
@@ -120,7 +120,7 @@
             self.stillImageOutput = nil;
         }
         
-        self.captureSession.sessionPreset = AVCaptureSessionPresetMedium;
+        self.captureSession.sessionPreset = AVCaptureSessionPresetHigh;//AVCaptureSessionPresetMedium;
         
         // Get audio device
         self.audioDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
