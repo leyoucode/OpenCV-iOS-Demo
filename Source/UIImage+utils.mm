@@ -12,21 +12,14 @@
 //  appreciated but not required.
 //
 
-#import "UIImage+OpenCV.h"
+#import "UIImage+utils.h"
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 
-static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
-{
-    // Do not release memory
-    return;
-}
 
-
-
-@implementation UIImage (UIImage_OpenCV)
+@implementation UIImage (utils)
 
 -(cv::Mat)CVMat
 {
@@ -52,6 +45,7 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
     return cvMat;
 }
 
+/*
 -(cv::Mat)CVGrayscaleMat
 {
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
@@ -75,11 +69,7 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
     
     return cvMat;
 }
-
-+ (UIImage *)imageWithCVMat:(const cv::Mat&)cvMat
-{
-    return [[UIImage alloc] initWithCVMat:cvMat];
-}
+*/
 
 - (id)initWithCVMat:(const cv::Mat&)cvMat
 {
@@ -116,6 +106,11 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
     CGColorSpaceRelease(colorSpace);
     
     return self;
+}
+
++ (UIImage *)imageWithCVMat:(const cv::Mat&)cvMat
+{
+    return [[UIImage alloc] initWithCVMat:cvMat];
 }
 
 - (UIImage *)fixOrientation:(UIImage *)aImage {
@@ -194,5 +189,18 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
     CGImageRelease(cgimg);
     return img;
 }
+
++(UIImage*) createImageWithColor: (UIColor*) color
+{
+    CGRect rect = CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, rect);
+    UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return theImage;
+}
+
 
 @end

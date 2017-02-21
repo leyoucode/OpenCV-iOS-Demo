@@ -12,7 +12,7 @@
 		FE0083A21E2784D900299936 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083A11E2784D900299936 /* ViewController.mm */; };
 		FE0083D21E2884C500299936 /* Rectangle.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0083C81E2884C500299936 /* Rectangle.m */; };
 		FE0083D31E2884C500299936 /* RectangleCALayer.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CA1E2884C500299936 /* RectangleCALayer.m */; };
-		FE0083D41E2884C500299936 /* UIImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CC1E2884C500299936 /* UIImage+OpenCV.mm */; };
+		FE0083D41E2884C500299936 /* UIImage+utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CC1E2884C500299936 /* UIImage+utils.mm */; };
 		FE0083D51E2884C500299936 /* CXVideoCaptureViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE0083CE1E2884C500299936 /* CXVideoCaptureViewController.mm */; };
 		FE0520841E52A0DC00355DA1 /* UIView+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0520831E52A0DC00355DA1 /* UIView+Ext.m */; };
 		FE0520901E5578CF00355DA1 /* CXCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE05208F1E5578CF00355DA1 /* CXCameraViewController.m */; };
@@ -40,8 +40,8 @@
 		FE0083C81E2884C500299936 /* Rectangle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Rectangle.m; sourceTree = "<group>"; };
 		FE0083C91E2884C500299936 /* RectangleCALayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RectangleCALayer.h; sourceTree = "<group>"; };
 		FE0083CA1E2884C500299936 /* RectangleCALayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RectangleCALayer.m; sourceTree = "<group>"; };
-		FE0083CB1E2884C500299936 /* UIImage+OpenCV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+OpenCV.h"; sourceTree = "<group>"; };
-		FE0083CC1E2884C500299936 /* UIImage+OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+OpenCV.mm"; sourceTree = "<group>"; };
+		FE0083CB1E2884C500299936 /* UIImage+utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+utils.h"; sourceTree = "<group>"; };
+		FE0083CC1E2884C500299936 /* UIImage+utils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+utils.mm"; sourceTree = "<group>"; };
 		FE0083CD1E2884C500299936 /* CXVideoCaptureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CXVideoCaptureViewController.h; sourceTree = "<group>"; };
 		FE0083CE1E2884C500299936 /* CXVideoCaptureViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CXVideoCaptureViewController.mm; sourceTree = "<group>"; };
 		FE0520821E52A0DC00355DA1 /* UIView+Ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Ext.h"; sourceTree = "<group>"; };
@@ -114,8 +114,8 @@
 				FE0083C81E2884C500299936 /* Rectangle.m */,
 				FE0083C91E2884C500299936 /* RectangleCALayer.h */,
 				FE0083CA1E2884C500299936 /* RectangleCALayer.m */,
-				FE0083CB1E2884C500299936 /* UIImage+OpenCV.h */,
-				FE0083CC1E2884C500299936 /* UIImage+OpenCV.mm */,
+				FE0083CB1E2884C500299936 /* UIImage+utils.h */,
+				FE0083CC1E2884C500299936 /* UIImage+utils.mm */,
 				FE0520911E557FD100355DA1 /* CameraMediaType.h */,
 			);
 			path = Source;
@@ -288,7 +288,7 @@
 				FE0520901E5578CF00355DA1 /* CXCameraViewController.m in Sources */,
 				FE0083D21E2884C500299936 /* Rectangle.m in Sources */,
 				FE0520841E52A0DC00355DA1 /* UIView+Ext.m in Sources */,
-				FE0083D41E2884C500299936 /* UIImage+OpenCV.mm in Sources */,
+				FE0083D41E2884C500299936 /* UIImage+utils.mm in Sources */,
 				FEF47F8D1E2645B500AF034B /* AppDelegate.swift in Sources */,
 				FE05209A1E5690CC00355DA1 /* MovieRecorder.m in Sources */,
 				FE89BC761E34B23600179706 /* MyZoomViewController.m in Sources */,

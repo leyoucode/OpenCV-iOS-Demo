@@ -17,14 +17,26 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-@interface UIImage (UIImage_OpenCV)
-
-+(UIImage *)imageWithCVMat:(const cv::Mat&)cvMat;
--(id)initWithCVMat:(const cv::Mat&)cvMat;
+@interface UIImage (utils)
 
 @property(nonatomic, readonly) cv::Mat CVMat;
+
+#pragma mark - OpenCV
+
+-(id)initWithCVMat:(const cv::Mat&)cvMat;
+
++(UIImage *)imageWithCVMat:(const cv::Mat&)cvMat;
+
+
+
+/*
 @property(nonatomic, readonly) cv::Mat CVGrayscaleMat;
+*/
+
+#pragma mark - Extension
 
 - (UIImage *)fixOrientation:(UIImage *)aImage;
+
++(UIImage*) createImageWithColor: (UIColor*) color;
 
 @end

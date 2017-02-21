@@ -15,7 +15,7 @@
 
 #import "Rectangle.h"
 #import "RectangleCALayer.h"
-#import "UIImage+OpenCV.h"
+#import "UIImage+utils.h"
 
 //// Private interface
 //@interface CXVideoCaptureViewController ()
@@ -1451,21 +1451,11 @@ void find_largest_square(const std::vector<std::vector<cv::Point> >& squares, st
     self.cameraButton.hidden = true;
 }
 
--(UIImage*) createImageWithColor: (UIColor*) color
-{
-    CGRect rect=CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
-    UIGraphicsBeginImageContext(rect.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetFillColorWithColor(context, [color CGColor]);
-    CGContextFillRect(context, rect);
-    UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return theImage;
-}
+
 
 - (void)test
 {
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[self createImageWithColor:[UIColor grayColor]]];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage createImageWithColor:[UIColor grayColor]]];
     imageView.frame = self.view.frame;
     [self.view insertSubview:imageView belowSubview:self.topContentView];
     
