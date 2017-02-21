@@ -25,7 +25,7 @@
 		FEDAE58B1E5BF1A9003AA5FD /* CXImagePreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE58A1E5BF1A9003AA5FD /* CXImagePreviewViewController.m */; };
 		FEDAE58F1E5C2A67003AA5FD /* ImageUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE58E1E5C2A67003AA5FD /* ImageUtils.mm */; };
 		FEDAE5921E5C3C40003AA5FD /* CXVideoPreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE5911E5C3C40003AA5FD /* CXVideoPreviewViewController.m */; };
-		FEDAE5951E5C3EDA003AA5FD /* VideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE5941E5C3EDA003AA5FD /* VideoView.m */; };
+		FEDAE5951E5C3EDA003AA5FD /* CXVideoPlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = FEDAE5941E5C3EDA003AA5FD /* CXVideoPlayView.m */; };
 		FEF47F8D1E2645B500AF034B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF47F8C1E2645B500AF034B /* AppDelegate.swift */; };
 		FEF47F921E2645B500AF034B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FEF47F901E2645B500AF034B /* Main.storyboard */; };
 		FEF47F941E2645B500AF034B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FEF47F931E2645B500AF034B /* Assets.xcassets */; };
@@ -73,8 +73,8 @@
 		FEDAE58E1E5C2A67003AA5FD /* ImageUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImageUtils.mm; sourceTree = "<group>"; };
 		FEDAE5901E5C3C40003AA5FD /* CXVideoPreviewViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CXVideoPreviewViewController.h; sourceTree = "<group>"; };
 		FEDAE5911E5C3C40003AA5FD /* CXVideoPreviewViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CXVideoPreviewViewController.m; sourceTree = "<group>"; };
-		FEDAE5931E5C3EDA003AA5FD /* VideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoView.h; sourceTree = "<group>"; };
-		FEDAE5941E5C3EDA003AA5FD /* VideoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoView.m; sourceTree = "<group>"; };
+		FEDAE5931E5C3EDA003AA5FD /* CXVideoPlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CXVideoPlayView.h; sourceTree = "<group>"; };
+		FEDAE5941E5C3EDA003AA5FD /* CXVideoPlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CXVideoPlayView.m; sourceTree = "<group>"; };
 		FEF47F891E2645B500AF034B /* OpenCV-iOS-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "OpenCV-iOS-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEF47F8C1E2645B500AF034B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FEF47F911E2645B500AF034B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -149,8 +149,8 @@
 				FEDAE58D1E5C2A67003AA5FD /* ImageUtils.h */,
 				FEDAE58E1E5C2A67003AA5FD /* ImageUtils.mm */,
 				FEDAE58C1E5C256F003AA5FD /* CXMarcos.h */,
-				FEDAE5931E5C3EDA003AA5FD /* VideoView.h */,
-				FEDAE5941E5C3EDA003AA5FD /* VideoView.m */,
+				FEDAE5931E5C3EDA003AA5FD /* CXVideoPlayView.h */,
+				FEDAE5941E5C3EDA003AA5FD /* CXVideoPlayView.m */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -316,7 +316,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FEDAE5951E5C3EDA003AA5FD /* VideoView.m in Sources */,
+				FEDAE5951E5C3EDA003AA5FD /* CXVideoPlayView.m in Sources */,
 				FE0083A21E2784D900299936 /* ViewController.mm in Sources */,
 				FE0520901E5578CF00355DA1 /* CXCameraViewController.m in Sources */,
 				FEDAE57F1E5BDD83003AA5FD /* StringUtils.m in Sources */,
