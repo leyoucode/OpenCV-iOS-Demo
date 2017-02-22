@@ -12,9 +12,7 @@
 
 typedef enum  {
     ChangeNone,
-    ChangeVoice,
-    ChangeLigth,
-    ChangeCMTime
+    ChangeVoice
 }Change;
 
 @interface CXVideoPlayView ()
@@ -39,7 +37,7 @@ typedef enum  {
 @property (nonatomic ,strong) UIPanGestureRecognizer *panGesture;
 @property (nonatomic ,strong) MPVolumeView *volumeView;
 @property (nonatomic ,weak) UISlider *volumeSlider;
-@property (nonatomic ,strong) UIView *darkView;
+
 @end
 
 @implementation CXVideoPlayView
@@ -49,13 +47,13 @@ typedef enum  {
         _playerUrl = url;
         _someDelegate = delegate;
         [self setBackgroundColor:[UIColor blackColor]];
-        [self setUpPlayer];
-        [self addSwipeView];
-        
+        [self setUpAVPlayer];
+        [self addSwipeGesture];
     }
     return self;
 }
-- (void)setUpPlayer {
+
+- (void)setUpAVPlayer {
     _item = [[AVPlayerItem alloc] initWithURL:_playerUrl];
     _player = [AVPlayer playerWithPlayerItem:_item];
     _playerLayer = [AVPlayerLayer playerLayerWithPlayer:_player];
@@ -66,6 +64,21 @@ typedef enum  {
     [self addVideoTimerObserver];
     [self addVideoNotic];
 }
+
+- (void)tearDownAVPlayer
+{
+    [self removeVideoTimerObserver];
+    [self removeVideoNotic];
+    [self removeVideoKVO];
+
+    [_player pause];
+    [_playerLayer removeFromSuperlayer];
+    _playerLayer = nil;
+    [_player replaceCurrentItemWithPlayerItem:nil];
+    _player = nil;
+    _item = nil;
+}
+
 - (void)seekValue:(float)value {
     
     _shouldFlushSlider = NO;
@@ -79,41 +92,21 @@ typedef enum  {
         _shouldFlushSlider = finished;
         
     }];
-    
 }
-- (void)stop {
-    
-    [self removeVideoTimerObserver];
-    
-    [self removeVideoNotic];
-    
-    [self removeVideoKVO];
-    
-    [_player pause];
-    
-    [_playerLayer removeFromSuperlayer];
-    
-    _playerLayer = nil;
-    
-    [_player replaceCurrentItemWithPlayerItem:nil];
-    
-    _player = nil;
-    
-    _item = nil;
-}
+
 #pragma mark - KVO
 - (void)addVideoKVO
 {
     //KVO
     [_item addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
-    [_item addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
-    [_item addObserver:self forKeyPath:@"playbackBufferEmpty" options:NSKeyValueObservingOptionNew context:nil];
+    [_player addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew context:nil];
 }
+
 - (void)removeVideoKVO {
     [_item removeObserver:self forKeyPath:@"status"];
-    [_item removeObserver:self forKeyPath:@"loadedTimeRanges"];
-    [_item removeObserver:self forKeyPath:@"playbackBufferEmpty"];
+    [_player removeObserver:self forKeyPath:@"rate"];
 }
+
 - (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary<NSString*, id> *)change context:(nullable void *)context {
     
     if ([keyPath isEqualToString:@"status"]) {
@@ -122,6 +115,11 @@ typedef enum  {
             case AVPlayerItemStatusReadyToPlay:
             {
                 NSLog(@"AVPlayerItemStatusReadyToPlay");
+                
+                if ([self.someDelegate respondsToSelector:@selector(videoDidPlaying)]) {
+                    [self.someDelegate videoDidPlaying];
+                }
+                
                 [_player play];
                 _shouldFlushSlider = YES;
                 _videoLength = floor(_item.asset.duration.value * 1.0/ _item.asset.duration.timescale);
@@ -136,62 +134,67 @@ typedef enum  {
             {
                 NSLog(@"AVPlayerItemStatusFailed");
                 NSLog(@"%@",_item.error);
+                
+                if ([self.someDelegate respondsToSelector:@selector(videoDidError:)]) {
+                    [self.someDelegate videoDidError:_item.error];
+                }
             }
                 break;
                 
             default:
                 break;
         }
-    } else if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
-        
-    } else if ([keyPath isEqualToString:@"playbackBufferEmpty"]) {
-        
+    }
+    else if ([keyPath isEqualToString:@"rate"])
+    {
+        float rate = [change[NSKeyValueChangeNewKey] floatValue];
+        if (rate == 0.0) {
+            //
+            NSLog(@"Playback stopped");
+            
+            if ([self.someDelegate respondsToSelector:@selector(videoDidPause)]) {
+                [self.someDelegate videoDidPause];
+            }
+            
+        } else if (rate == 1.0) {
+            //
+            NSLog(@"Normal playback");
+            if ([self.someDelegate respondsToSelector:@selector(videoDidPlaying)]) {
+                [self.someDelegate videoDidPlaying];
+            }
+        } else if (rate == -1.0) {
+            //
+            NSLog(@"Reverse playback");
+            
+        }
     }
 }
 #pragma mark - Notic
-- (void)addVideoNotic {
-    
-    //Notification
+- (void)addVideoNotic
+{
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieToEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieJumped:) name:AVPlayerItemTimeJumpedNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieStalle:) name:AVPlayerItemPlaybackStalledNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backGroundPauseMoive) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    
 }
 - (void)removeVideoNotic {
-    //
     [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemPlaybackStalledNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemTimeJumpedNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)movieToEnd:(NSNotification *)notic {
     NSLog(@"movieToEnd:%@",NSStringFromSelector(_cmd));
-    
-}
-- (void)movieJumped:(NSNotification *)notic {
-    NSLog(@"movieJumped:%@",NSStringFromSelector(_cmd));
-    
-}
-- (void)movieStalle:(NSNotification *)notic {
-    NSLog(@"movieStalle:%@",NSStringFromSelector(_cmd));
-    
-}
-- (void)backGroundPauseMoive {
-    NSLog(@"backGroundPauseMoive:%@",NSStringFromSelector(_cmd));
-    
+    if ([self.someDelegate respondsToSelector:@selector(videoDidEnd)]) {
+        [self.someDelegate videoDidEnd];
+    }
 }
 
 #pragma mark - TimerObserver
 - (void)addVideoTimerObserver {
-    __weak typeof (self)self_ = self;
+    __weak typeof (self)weakSelf = self;
     _timeObser = [_player addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:NULL usingBlock:^(CMTime time) {
-        float currentTimeValue = time.value*1.0/time.timescale/self_.videoLength;
-        NSString *currentString = [self_ getStringFromCMTime:time];
+        float currentTimeValue = time.value*1.0/time.timescale/weakSelf.videoLength;
+        NSString *currentString = [weakSelf getStringFromCMTime:time];
         
-        if ([self_.someDelegate respondsToSelector:@selector(flushCurrentTime:sliderValue:)] && _shouldFlushSlider) {
-            [self_.someDelegate flushCurrentTime:currentString sliderValue:currentTimeValue];
+        if ([weakSelf.someDelegate respondsToSelector:@selector(flushCurrentTime:sliderValue:)] && _shouldFlushSlider) {
+            [weakSelf.someDelegate flushCurrentTime:currentString sliderValue:currentTimeValue];
         } else {
             NSLog(@"no response");
         }
@@ -216,11 +219,11 @@ typedef enum  {
     
     if (currentTimeValue >= 3600 )
     {
-        return [NSString stringWithFormat:@"%d:%d:%d",components.hour,components.minute,components.second];
+        return [NSString stringWithFormat:@"%.2d:%.2d:%.2d",components.hour,components.minute,components.second];
     }
     else
     {
-        return [NSString stringWithFormat:@"%d:%d",components.minute,components.second];
+        return [NSString stringWithFormat:@"%.2d:%.2d",components.minute,components.second];
     }
 }
 
@@ -260,22 +263,10 @@ typedef enum  {
 
 @implementation CXVideoPlayView (Guester)
 
-- (void)addSwipeView {
+- (void)addSwipeGesture
+{
     _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(swipeAction:)];
     [self addGestureRecognizer:_panGesture];
-    [self setUpDarkView];
-}
-- (void)setUpDarkView {
-    _darkView = [[UIView alloc] init];
-    [_darkView setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [_darkView setBackgroundColor:[UIColor blackColor]];
-    _darkView.alpha = 0.0;
-    [self addSubview:_darkView];
-    
-    NSMutableArray *darkArray = [NSMutableArray array];
-    [darkArray addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_darkView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(_darkView)]];
-    [darkArray addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_darkView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(_darkView)]];
-    [self addConstraints:darkArray];
 }
 
 - (void)swipeAction:(UISwipeGestureRecognizer *)gesture {
@@ -295,9 +286,6 @@ typedef enum  {
             break;
         case UIGestureRecognizerStateEnded:
         {
-            if (_changeKind == ChangeCMTime) {
-                [self changeEndForCMTime:[gesture locationInView:self]];
-            }
             _changeKind = ChangeNone;
             _lastPoint = CGPointZero;
         }
@@ -315,16 +303,6 @@ typedef enum  {
             [self changeForNone:pointNow];
         }
             break;
-        case ChangeCMTime:
-        {
-            [self changeForCMTime:pointNow];
-        }
-            break;
-        case ChangeLigth:
-        {
-            [self changeForLigth:pointNow];
-        }
-            break;
         case ChangeVoice:
         {
             [self changeForVoice:pointNow];
@@ -336,41 +314,24 @@ typedef enum  {
     }
 }
 - (void)changeForNone:(CGPoint) pointNow {
+    
     if (fabs(pointNow.x - _lastPoint.x) > fabs(pointNow.y - _lastPoint.y)) {
-        _changeKind = ChangeCMTime;
+        
     } else {
         float halfWight = self.bounds.size.width / 2;
         if (_lastPoint.x < halfWight) {
-            _changeKind =  ChangeLigth;
+            
         } else {
             _changeKind =   ChangeVoice;
         }
         _lastPoint = pointNow;
     }
 }
-- (void)changeForCMTime:(CGPoint) pointNow {
-    float number = fabs(pointNow.x - _lastPoint.x);
-    if (pointNow.x > _lastPoint.x && number > 10) {
-        float currentTime = _player.currentTime.value / _player.currentTime.timescale;
-        float tobeTime = currentTime + number*0.5;
-        NSLog(@"forwart to  changeTo  time:%f",tobeTime);
-    } else if (pointNow.x < _lastPoint.x && number > 10) {
-        float currentTime = _player.currentTime.value / _player.currentTime.timescale;
-        float tobeTime = currentTime - number*0.5;
-        NSLog(@"back to  time:%f",tobeTime);
-    }
-}
-- (void)changeForLigth:(CGPoint) pointNow {
-    float number = fabs(pointNow.y - _lastPoint.y);
-    if (pointNow.y > _lastPoint.y && number > 10) {
-        _lastPoint = pointNow;
-        [self minLigth];
-        
-    } else if (pointNow.y < _lastPoint.y && number > 10) {
-        _lastPoint = pointNow;
-        [self upperLigth];
-    }
-}
+
+
+
+#pragma mark - increase or reduce volume of the video
+
 - (void)changeForVoice:(CGPoint)pointNow {
     float number = fabs(pointNow.y - _lastPoint.y);
     if (pointNow.y > _lastPoint.y && number > 10) {
@@ -379,29 +340,6 @@ typedef enum  {
     } else if (pointNow.y < _lastPoint.y && number > 10) {
         _lastPoint = pointNow;
         [self upperVolume];
-    }
-}
-- (void)changeEndForCMTime:(CGPoint)pointNow {
-    if (pointNow.x > _lastPoint.x ) {
-        NSLog(@"end for CMTime Upper");
-        float length = fabs(pointNow.x - _lastPoint.x);
-        [self upperCMTime:length];
-    } else {
-        NSLog(@"end for CMTime min");
-        float length = fabs(pointNow.x - _lastPoint.x);
-        [self mineCMTime:length];
-    }
-}
-- (void)upperLigth {
-    
-    if (_darkView.alpha >= 0.1) {
-        _darkView.alpha =  _darkView.alpha - 0.1;
-    }
-    
-}
-- (void)minLigth {
-    if (_darkView.alpha <= 1.0) {
-        _darkView.alpha =  _darkView.alpha + 0.1;
     }
 }
 
@@ -414,27 +352,6 @@ typedef enum  {
 - (void)minVolume {
     if (self.volumeSlider.value >= 0.0) {
         self.volumeSlider.value =  self.volumeSlider.value - 0.1 ;
-    }
-}
-#pragma mark -CMTIME
-- (void)upperCMTime:(float)length {
-    
-    float currentTime = _player.currentTime.value / _player.currentTime.timescale;
-    float tobeTime = currentTime + length*0.5;
-    if (tobeTime > _videoLength) {
-        [_player seekToTime:_item.asset.duration];
-    } else {
-        [_player seekToTime:CMTimeMake(tobeTime, 1)];
-    }
-}
-- (void)mineCMTime:(float)length {
-    
-    float currentTime = _player.currentTime.value / _player.currentTime.timescale;
-    float tobeTime = currentTime - length*0.5;
-    if (tobeTime <= 0) {
-        [_player seekToTime:kCMTimeZero];
-    } else {
-        [_player seekToTime:CMTimeMake(tobeTime, 1)];
     }
 }
 

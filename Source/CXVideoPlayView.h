@@ -13,9 +13,15 @@
 
 @required
 
-- (void)flushCurrentTime:(NSString *)timeString sliderValue:(float)sliderValue;
+-(void) flushCurrentTime:(NSString *)timeString sliderValue:(float)sliderValue;
 
-//- (void)flushVideoLength:(float)videoLength;
+-(void) videoDidPlaying;
+
+-(void) videoDidPause;
+
+-(void) videoDidEnd;
+
+-(void) videoDidError:(NSError*) error;
 
 @end
 
@@ -35,12 +41,12 @@
 
 - (void)seekValue:(float)value;
 
-- (void)stop;
+- (void)tearDownAVPlayer;
 
 @end
 
 @interface CXVideoPlayView  (Guester)
 
-- (void)addSwipeView;
+- (void)addSwipeGesture;
 
 @end

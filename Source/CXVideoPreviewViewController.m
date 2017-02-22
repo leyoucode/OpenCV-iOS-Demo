@@ -181,10 +181,11 @@
     }
     else if (self.playOrPauseButton == sender)
     {
-        if ([self.videoView.player rate] == 0) {
-            
+        if ([self.videoView.player rate] == 0)
+        {
             [self.videoView.player play];
-        }else{
+        }else
+        {
             [self.videoView.player pause];
         }
     }
@@ -209,22 +210,42 @@
     } completion:nil];
     
 }
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-}
+
 - (void)sliderValueChange:(UISlider *)slider {
-    
-    [_videoView seekValue:slider.value];
-    
+    [self.videoView seekValue:slider.value];
 }
 - (void)dealloc {
-    [_videoView stop];
+    [_videoView tearDownAVPlayer];
     _videoView = nil;
-    NSLog(@"dealloc of VC");
 }
+
 #pragma mark -
+
 - (void)flushCurrentTime:(NSString *)timeString sliderValue:(float)sliderValue {
-    _videoSlider.value = sliderValue;
+    self.videoSlider.value = sliderValue;
+    NSLog(@"timeString:%@",timeString);
+}
+
+- (void)videoDidPlaying
+{
+    [self.playOrPauseButton setTitle:@"暂停" forState:UIControlStateNormal];
+}
+
+- (void)videoDidPause
+{
+    [self.playOrPauseButton setTitle:@"播放" forState:UIControlStateNormal];
+}
+
+- (void)videoDidEnd
+{
+    [self.playOrPauseButton setTitle:@"播放" forState:UIControlStateNormal];
+    [self.videoView seekValue:0];
+    self.videoSlider.value = 0;
+}
+
+- (void)videoDidError:(NSError *)error
+{
+    [self.playOrPauseButton setTitle:@"播放" forState:UIControlStateNormal];
 }
 
 @end
