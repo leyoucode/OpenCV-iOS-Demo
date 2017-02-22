@@ -21,7 +21,7 @@
 
 @interface CXVideoPlayView : UIView
 
-@property (nonatomic ,strong) NSString *playerUrl;
+@property (nonatomic ,strong) NSURL *playerUrl;
 
 @property (nonatomic ,readonly) AVPlayerItem *item;
 
@@ -31,7 +31,7 @@
 
 @property (nonatomic ,weak) id <VideoSomeDelegate> someDelegate;
 
-- (id)initWithUrl:(NSString *)path delegate:(id<VideoSomeDelegate>)delegate;
+- (id)initWithUrl:(NSURL *)url delegate:(id<VideoSomeDelegate>)delegate;
 
 - (void)seekValue:(float)value;
 

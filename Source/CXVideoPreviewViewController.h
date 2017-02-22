@@ -11,7 +11,7 @@
 
 @interface CXVideoPreviewViewController : UIViewController
 
-@property(nonatomic, strong) NSString* videoPath;
+@property(nonatomic, strong) NSURL* videoUrl;
 
 @property (nonatomic, assign) CameraMediaType cameraMediaType;
 @property (nonatomic,strong) CXCameraResult cameraCaptureResult;

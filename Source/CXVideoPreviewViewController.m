@@ -41,8 +41,12 @@
 - (void)initVideoView {
     
     //NSString *path = @"http://static.tripbe.com/videofiles/20121214/9533522808.f4v.mp4";
-    @autoreleasepool {
-        _videoView = [[CXVideoPlayView alloc] initWithUrl:self.videoPath delegate:self];
+    //self.videoPath = @"http://bly-video-in.oss-cn-hangzhou.aliyuncs.com/test/2017/02/1c58e5e94048e8de7f110b62056e9339.mov?Expires=1487760713&OSSAccessKeyId=TMP.AQHbN_CDZS4VlQFHUkp0pqwgC5t-5sT7sKdL8NNjEk81nb1gcKWnTl1lEb_KMC4CFQCvnB6KC5tNQnsyCCRxYVc3GnH7YAIVAKRl3tpQZMszNzERtlfd1cICYz-q&Signature=NWFGmoVDNIGKMbD29NQWPqBWMJY%3D";
+    //self.videoPath = [self.videoPath stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    
+    @autoreleasepool
+    {
+        _videoView = [[CXVideoPlayView alloc] initWithUrl:self.videoUrl delegate:self];
         _videoView.someDelegate = self;
         [_videoView setTranslatesAutoresizingMaskIntoConstraints:NO];
         [self.view addSubview:_videoView];
@@ -186,7 +190,7 @@
     }
     else if (self.confirmButton == sender)
     {
-        self.cameraCaptureResult(self.cameraMediaType, self.videoPath);
+        self.cameraCaptureResult(self.cameraMediaType, [self.videoUrl path]);
         [self dismissViewControllerAnimated:YES completion:nil];
     }
 }

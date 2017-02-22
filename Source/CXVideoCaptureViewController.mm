@@ -322,7 +322,7 @@
     }
     
     CXVideoPreviewViewController *previewController = [[CXVideoPreviewViewController alloc] init];
-    previewController.videoPath = videoPath;
+    previewController.videoUrl = [NSURL fileURLWithPath:videoPath];
     previewController.cameraMediaType = self.cameraMediaType;
     previewController.cameraCaptureResult = self.cameraCaptureResult;
     [self.navigationController pushViewController:previewController animated:NO];

@@ -137,6 +137,8 @@
 				FEDAE5871E5BE52B003AA5FD /* CXVideoCaptureViewController+Configuration.m */,
 				FEDAE5891E5BF1A9003AA5FD /* CXImagePreviewViewController.h */,
 				FEDAE58A1E5BF1A9003AA5FD /* CXImagePreviewViewController.m */,
+				FEDAE5931E5C3EDA003AA5FD /* CXVideoPlayView.h */,
+				FEDAE5941E5C3EDA003AA5FD /* CXVideoPlayView.m */,
 				FEDAE5901E5C3C40003AA5FD /* CXVideoPreviewViewController.h */,
 				FEDAE5911E5C3C40003AA5FD /* CXVideoPreviewViewController.m */,
 				FE0083C71E2884C500299936 /* Rectangle.h */,
@@ -149,8 +151,6 @@
 				FEDAE58D1E5C2A67003AA5FD /* ImageUtils.h */,
 				FEDAE58E1E5C2A67003AA5FD /* ImageUtils.mm */,
 				FEDAE58C1E5C256F003AA5FD /* CXMarcos.h */,
-				FEDAE5931E5C3EDA003AA5FD /* CXVideoPlayView.h */,
-				FEDAE5941E5C3EDA003AA5FD /* CXVideoPlayView.m */,
 			);
 			path = Source;
 			sourceTree = "<group>";

@@ -17,7 +17,6 @@ typedef enum  {
     ChangeCMTime
 }Change;
 
-
 @interface CXVideoPlayView ()
 
 @property (nonatomic ,readwrite) AVPlayerItem *item;
@@ -45,9 +44,9 @@ typedef enum  {
 
 @implementation CXVideoPlayView
 
-- (id)initWithUrl:(NSString *)path delegate:(id<VideoSomeDelegate>)delegate {
+- (id)initWithUrl:(NSURL *)url delegate:(id<VideoSomeDelegate>)delegate {
     if (self = [super init]) {
-        _playerUrl = path;
+        _playerUrl = url;
         _someDelegate = delegate;
         [self setBackgroundColor:[UIColor blackColor]];
         [self setUpPlayer];
@@ -57,8 +56,7 @@ typedef enum  {
     return self;
 }
 - (void)setUpPlayer {
-    NSURL *url = [NSURL fileURLWithPath:_playerUrl];//[NSURL URLWithString:_playerUrl];
-    _item = [[AVPlayerItem alloc] initWithURL:url];
+    _item = [[AVPlayerItem alloc] initWithURL:_playerUrl];
     _player = [AVPlayer playerWithPlayerItem:_item];
     _playerLayer = [AVPlayerLayer playerLayerWithPlayer:_player];
     _playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
