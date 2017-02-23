@@ -27,6 +27,8 @@
 {
     NSTimer *_calVideoDurationTimer;
     CXVideoCaptureView *rootView;
+    BOOL statusBarHidden;
+    UIStatusBarStyle statusBarStyle;
 }
 
 @end
@@ -39,7 +41,8 @@
 {
     [super viewDidLoad];
     
-    [UIApplication sharedApplication].statusBarHidden = YES;
+    statusBarHidden = [UIApplication sharedApplication].statusBarHidden;
+    statusBarStyle = [UIApplication sharedApplication].statusBarStyle;
     
     rootView = [[CXVideoCaptureView alloc] initWithFrame:self.view.frame andCameraMediaType:self.cameraMediaType];
     rootView.delegate = self;
@@ -56,6 +59,17 @@
 {
     [super viewWillDisappear:animated];
     [self tearDownAVCapture];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+}
+
+- (void)dealloc
+{
+    [UIApplication sharedApplication].statusBarHidden = statusBarHidden;
+    [UIApplication sharedApplication].statusBarStyle = statusBarStyle;
 }
 
 - (NSString *)videoPath {
