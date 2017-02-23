@@ -86,6 +86,12 @@
             [_videoDevice unlockForConfiguration];
         }
     }
+    
+    if ([self torchOn]) {
+        [rootView.torchButton setImage:[UIImage imageNamed:@"record_flash_on"] forState:UIControlStateNormal];
+    }else{
+        [rootView.torchButton setImage:[UIImage imageNamed:@"record_flash_off"] forState:UIControlStateNormal];
+    }
 }
 
 // Return YES if the torch is on

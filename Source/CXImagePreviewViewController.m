@@ -32,8 +32,8 @@
     self.mainScrollView.delegate = self;
     
     self.mainScrollView.userInteractionEnabled = YES;
-    self.mainScrollView.showsHorizontalScrollIndicator = YES;//是否显示侧边的滚动栏
-    self.mainScrollView.showsVerticalScrollIndicator = YES;
+    self.mainScrollView.showsHorizontalScrollIndicator = NO;
+    self.mainScrollView.showsVerticalScrollIndicator = NO;
     self.mainScrollView.scrollsToTop = NO;
     self.mainScrollView.scrollEnabled = YES;
     self.mainScrollView.alwaysBounceHorizontal = YES;
