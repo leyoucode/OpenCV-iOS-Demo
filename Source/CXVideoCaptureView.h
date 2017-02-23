@@ -35,6 +35,8 @@
 
 @property (nonatomic, assign) id<CXVideoCaptureViewDelegate> delegate;
 
+@property (strong, nonatomic) UIVisualEffectView *visualEffectView;
+
 #pragma mark - View Elements
 /**
  顶部容器视图
@@ -79,5 +81,8 @@
 
 #pragma maek - Initialization
 - (id)initWithFrame:(CGRect)frame andCameraMediaType:(CameraMediaType)type;
+
+- (void)showBlurEffectView;
+- (void)hideBlurEffectView;
 
 @end

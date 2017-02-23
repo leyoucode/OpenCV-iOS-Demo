@@ -156,21 +156,22 @@
     {
         [self.captureSession beginConfiguration];
         
-        if (self.camera == 1)
-        { // 1是前置摄像头，需要换成后置摄像头
-            NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-            if ([devices count] == 0) {
-                NSLog(@"ANTBETA: No any Camera be Found.");
+        if ([self currentCameraPosition] != AVCaptureDevicePositionBack)
+        {
+            //必须是后置摄像头
+            AVCaptureDevice *cameraDevice = [self cameraWithPosition:AVCaptureDevicePositionBack];
+            
+            if (cameraDevice == nil) {
+                NSLog(@"ANTBETA: No back camera is working");
                 [self.captureSession commitConfiguration];
                 return;
             }
+            
             // Remove current camera
             [self.captureSession removeInput:self.videoInput];
             self.videoInput = nil;
             
-            self.videoDevice = [devices objectAtIndex:0];
-            self.camera = 0;
-            
+            self.videoDevice = cameraDevice;
             // Create device input
             NSError *error = nil;
             self.videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:self.videoDevice error:&error];

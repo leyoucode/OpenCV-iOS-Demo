@@ -35,9 +35,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [UIApplication sharedApplication].statusBarHidden = YES;
     
-    _camera = 0;
+    [UIApplication sharedApplication].statusBarHidden = YES;
     
     rootView = [[CXVideoCaptureView alloc] initWithFrame:self.view.frame andCameraMediaType:self.cameraMediaType];
     rootView.delegate = self;
@@ -97,55 +96,78 @@
 
 /**
   Choose front/back Camera
- 
- @param camera 0:Back 1:Front
  */
-- (void)setCamera:(int)camera
+- (void)setCamera:(AVCaptureDevicePosition)position
 {
-    if (camera != 0 && camera != 1)
+    if ([self currentCameraPosition] == position)
     {
         return;
     }
     
-    if (camera != _camera)
+    if (_captureSession)
     {
-        if (_captureSession) {
-            
-            NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-            
-            if (camera < 0 && camera >= [devices count]) {
-                NSLog(@"摄像头无法访问:%d",camera);
-                return;
-            }
-            [_captureSession beginConfiguration];
-            
-            /*
-            NSArray *inputs = _captureSession.inputs;
-            for (AVCaptureDeviceInput *input in inputs ) {
-                AVCaptureDevice *device = input.device;
-                if ( [device hasMediaType:AVMediaTypeVideo] ) {
-                    //AVCaptureDevicePosition position = device.position;
-                    [_captureSession removeInput:input];
-                    break;
-                }
-            }
-             */
-            
-            // Remove current camera
+        AVCaptureDevice *cameraDevice = [self cameraWithPosition:position];
+        
+        if (cameraDevice == nil) {
+            NSLog(@"ANTBETA:No any camera is working");
+            return;
+        }
+        
+        [_captureSession beginConfiguration];
+        
+        // Remove current camera
+        if (_videoInput)
+        {
             [_captureSession removeInput:_videoInput];
             _videoInput = nil;
+        }
+        
+        _videoDevice = cameraDevice;
+        
+        // Create device input
+        NSError *error = nil;
+        _videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:_videoDevice error:&error];
+        [_captureSession addInput:_videoInput];
+        
+        [_captureSession commitConfiguration];
+    }
+}
 
-            _videoDevice = [devices objectAtIndex:camera];
-            _camera = camera;
-            
-            // Create device input
-            NSError *error = nil;
-            _videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:_videoDevice error:&error];
-            [_captureSession addInput:_videoInput];
-            
-            [_captureSession commitConfiguration];
+#pragma mark - Private
+
+- (AVCaptureDevicePosition)currentCameraPosition
+{
+    if (!_captureSession) {
+        return AVCaptureDevicePositionUnspecified;
+    }
+    
+    NSArray *inputs = _captureSession.inputs;
+    
+    AVCaptureDevicePosition position = AVCaptureDevicePositionUnspecified;
+    
+    for (AVCaptureDeviceInput *input in inputs )
+    {
+        AVCaptureDevice *device = input.device;
+        
+        if ([device hasMediaType:AVMediaTypeVideo])
+        {
+            position = device.position;
+            break;
         }
     }
+    return position;
+}
+
+- (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position
+{
+    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    
+    for (AVCaptureDevice *device in devices)
+    {
+        if ([device position] == position)
+            return device;
+    }
+    return nil;
 }
 
 #pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate
@@ -171,23 +193,18 @@
 - (BOOL)setupAVCapture
 {
     // Get capture devices from current iPhone
-    NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    AVCaptureDevice *cameraDevice = [self cameraWithPosition:AVCaptureDevicePositionBack];
     
-    if ([devices count] == 0) {
-        NSLog(@"ANTBETA: No any Camera be Found.");
+    if (cameraDevice == nil) {
+        NSLog(@"ANTBETA:No any camera is working");
         return NO;
     }
     
-    if (_camera < 0 && _camera >= [devices count]) {
-        NSLog(@"ANTBETA: The camera[%d] Can not be found from current device.", _camera);
-        return NO;
-    }
-    
-    _videoDevice = [devices objectAtIndex:_camera];
+    self.videoDevice = cameraDevice;
     
     // Create a video input with the video device.
     NSError *error = nil;
-    _videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:_videoDevice error:&error];
+    self.videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:self.videoDevice error:&error];
     if (error) {
         NSLog(@"ANTBETA: An error occured when create an AVCaptureDeviceInput with '_videoDevice': %@",[error description]);
         return NO;
@@ -198,21 +215,22 @@
     _captureSession.sessionPreset = AVCaptureSessionPresetHigh;
     
     // Connect up inputs and outputs
-    if ([_captureSession canAddInput:_videoInput]) {
-        [_captureSession addInput:_videoInput];
+    if ([self.captureSession canAddInput:self.videoInput]) {
+        [self.captureSession addInput:self.videoInput];
     }
     
     // Create the preview layer
-    _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
-    [_videoPreviewLayer setFrame:self.view.bounds];
+    self.videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.captureSession];
+    [self.videoPreviewLayer setFrame:self.view.bounds];
     
     NSLog(@"%@",NSStringFromCGRect(self.view.bounds));
     
-    _videoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspect;
+    self.videoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspect;
     
-    [self.view.layer insertSublayer:_videoPreviewLayer atIndex:0];
+    self.view.backgroundColor = [UIColor blackColor];
+    [self.view.layer insertSublayer:self.videoPreviewLayer atIndex:0];
     
-    [_captureSession startRunning];
+    [self.captureSession startRunning];
     
     return YES;
 }
@@ -270,11 +288,13 @@
 }
 -(void) onCameraButtonClick
 {
-    if ( _camera == 0)
+    AVCaptureDevicePosition position = [self currentCameraPosition];
+    
+    if ( position == AVCaptureDevicePositionBack)
     {
-        [self setCamera:1];
+        [self setCamera:AVCaptureDevicePositionFront];
     }else{
-        [self setCamera:0];
+        [self setCamera:AVCaptureDevicePositionBack];
     }
 }
 -(void) onVideoCaptureStartButtonClick

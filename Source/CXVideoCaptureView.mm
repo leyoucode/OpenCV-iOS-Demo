@@ -15,6 +15,16 @@
 
 #pragma mark - Views
 
+- (UIVisualEffectView*) visualEffectView
+{
+    if (!_visualEffectView) {
+        UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+        _visualEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+        _visualEffectView.alpha = 0;
+    }
+    return _visualEffectView;
+}
+
 /**
  顶部容器视图
  */
@@ -143,6 +153,9 @@
     //self.translatesAutoresizingMaskIntoConstraints = NO;
     self.userInteractionEnabled = YES;
     
+    [self addSubview:self.visualEffectView];
+    self.visualEffectView.frame = self.frame;
+    
     [self addSubview:self.topContentView];
     self.topContentView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
     
@@ -174,7 +187,6 @@
     [self.bottomContentView addSubview:self.videoTabButton];
     [self.bottomContentView addSubview:self.photoTabButton];
     [self.bottomContentView addSubview:self.documentTabButton];
-    
 }
 
 #pragma mark ---------------------System---------------------
@@ -262,8 +274,13 @@
     [self.documentTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     
     [self.takeButton setImage:[UIImage imageNamed:@"takephoto"] forState:UIControlStateNormal];
-    self.topContentView.alpha = 1.0;
-    self.bottomContentView.alpha = 1.0;
+ 
+    [UIView animateWithDuration:1 delay:0.3 usingSpringWithDamping:1.0 initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        self.topContentView.alpha = 1.0;
+        self.bottomContentView.alpha = 1.0;
+    } completion:^(BOOL finished) {
+        
+    }];
     
     self.cameraButton.hidden = false;
 }
@@ -287,9 +304,12 @@
     [self.documentTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     
     [self.takeButton setImage:[UIImage imageNamed:@"record_idle"] forState:UIControlStateNormal];
-    self.topContentView.alpha = 0.5;
-    self.bottomContentView.alpha = 0.5;
-    
+    [UIView animateWithDuration:1 delay:0.3 usingSpringWithDamping:1.0 initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+        self.topContentView.alpha = 0.5;
+        self.bottomContentView.alpha = 0.5;
+    } completion:^(BOOL finished) {
+        
+    }];
     self.cameraButton.hidden = false;
 }
 
@@ -311,9 +331,13 @@
     [self.documentTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
     
     [self.takeButton setImage:[UIImage imageNamed:@"takephoto"] forState:UIControlStateNormal];
-    self.topContentView.alpha = 1.0;
-    self.bottomContentView.alpha = 1.0;
 
+    [UIView animateWithDuration:1 delay:0.3 usingSpringWithDamping:1.0 initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        self.topContentView.alpha = 1.0;
+        self.bottomContentView.alpha = 1.0;
+    } completion:^(BOOL finished) {
+        
+    }];
     self.cameraButton.hidden = true;
 }
 
@@ -334,22 +358,22 @@
 -(void)handleSwipeRight:(UISwipeGestureRecognizer *)gesture
 {
     if (gesture.direction == UISwipeGestureRecognizerDirectionRight) {
+        [self showBlurEffectView];
         //NSLog(@"right %f, %f, %f",self.photoTabButton.center.x, self.videoTabButton.center.x, self.bottomContentView.center.x);
         if (self.photoTabButton.center.x == self.bottomContentView.center.x) {
             _cameraMediaType = kCameraMediaTypeVideo;
-            [self makeAnimation];
             [self setupTabWithAnimated:YES];
             if (_delegate && [_delegate respondsToSelector:@selector(onViewChanged:)]) {
                 [_delegate onViewChanged:_cameraMediaType];
             }
         }else if (self.documentTabButton.center.x == self.bottomContentView.center.x) {
             _cameraMediaType = kCameraMediaTypePhoto;
-            [self makeAnimation];
             [self setupTabWithAnimated:YES];
             if (_delegate && [_delegate respondsToSelector:@selector(onViewChanged:)]) {
                 [_delegate onViewChanged:_cameraMediaType];
             }
         }
+        [self hideBlurEffectView];
     }
 }
 
@@ -357,9 +381,10 @@
 {
     if (gesture.direction == UISwipeGestureRecognizerDirectionLeft)
     {
+        [self showBlurEffectView];
+        
         if (self.videoTabButton.center.x == self.bottomContentView.center.x) {
             _cameraMediaType = kCameraMediaTypePhoto;
-            [self makeAnimation];
             [self setupTabWithAnimated:YES];
             if (_delegate && [_delegate respondsToSelector:@selector(onViewChanged:)]) {
                 [_delegate onViewChanged:_cameraMediaType];
@@ -367,26 +392,26 @@
         }
         else if (self.photoTabButton.center.x == self.bottomContentView.center.x) {
             _cameraMediaType = kCameraMediaTypeDocument;
-            [self makeAnimation];
             [self setupTabWithAnimated:YES];
             if (_delegate && [_delegate respondsToSelector:@selector(onViewChanged:)]) {
                 [_delegate onViewChanged:_cameraMediaType];
             }
         }
+        [self hideBlurEffectView];
     }
 }
 
-- (void)makeAnimation
+- (void)showBlurEffectView
 {
-    
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[ImageUtils createImageWithColor:[UIColor grayColor]]];
-    imageView.frame = self.frame;
-    [self insertSubview:imageView belowSubview:self.topContentView];
-    
-    [UIView animateWithDuration:0.8 animations:^{
-        imageView.alpha = 0;
+    self.visualEffectView.alpha = 1;
+}
+
+- (void)hideBlurEffectView
+{
+    [UIView animateWithDuration:0.7 delay:0.2 usingSpringWithDamping:1.0 initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+        self.visualEffectView.alpha = 0;
     } completion:^(BOOL finished) {
-        [imageView removeFromSuperview];
+        
     }];
 }
 

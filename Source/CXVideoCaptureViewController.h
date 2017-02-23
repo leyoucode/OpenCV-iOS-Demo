@@ -12,10 +12,18 @@
 #import "Rectangle.h"
 #import "RectangleCALayer.h"
 
+//typedef enum :NSInteger {
+//    kNone,
+//    kFront,
+//    kBack
+//} CameraPosition;
+
 
 @interface CXVideoCaptureViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate>
 
-@property (nonatomic, assign) int camera; // 当前摄像头
+//@property (nonatomic, assign) int camera; // 当前摄像头
+//@property (nonatomic, assign) CameraPosition cameraPosition;
+
 @property (nonatomic, assign) CameraMediaType cameraMediaType;
 @property (nonatomic, strong) CXCameraResult cameraCaptureResult;
 
@@ -41,4 +49,6 @@
 
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *videoPreviewLayer;
 
+- (AVCaptureDevicePosition)currentCameraPosition;
+- (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position;
 @end
