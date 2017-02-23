@@ -9,6 +9,8 @@
 #import "CXVideoPreviewViewController.h"
 #import "CXVideoPlayView.h"
 #import "CXMarcos.h"
+#import "CXImageUtils.h"
+#import "CXFileUtils.h"
 
 @interface CXVideoPreviewViewController ()<VideoSomeDelegate>
 
@@ -117,7 +119,7 @@
     
     _videoSlider = [[UISlider alloc] init];
     [_videoSlider setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [_videoSlider setThumbImage:[UIImage imageNamed:@"sliderButton"] forState:UIControlStateNormal];
+    [_videoSlider setThumbImage:[CXImageUtils imageNamed:@"sliderButton"] forState:UIControlStateNormal];
     _videoSlider.minimumTrackTintColor = [UIColor orangeColor];
     _videoSlider.maximumTrackTintColor = [UIColor grayColor];
     [_videoSlider addTarget:self action:@selector(sliderValueChange:) forControlEvents:UIControlEventValueChanged];
@@ -177,6 +179,7 @@
 {
     if (self.cancelButton == sender)
     {
+        [CXFileUtils deleteFileWithFilePath:[self.videoUrl path]];
         [self.navigationController popViewControllerAnimated:YES];
     }
     else if (self.playOrPauseButton == sender)

@@ -1,5 +1,5 @@
 //
-//  ImageUtils.h
+//  CXImageUtils.h
 //  OpenCV-iOS-demo
 //
 //  Created by 刘伟 on 2/21/17.
@@ -12,7 +12,7 @@
 #import <opencv2/imgproc/imgproc.hpp>
 #import <opencv2/highgui/highgui.hpp>
 
-@interface ImageUtils : NSObject
+@interface CXImageUtils : NSObject
 
 +(cv::Mat)getCVMatFrom:(UIImage*)image;
 
@@ -26,9 +26,10 @@
 
 #pragma mark - Extension
 
-+(UIImage *)fixOrientation:(UIImage *)aImage;
++(UIImage*)fixOrientation:(UIImage *)aImage;
 
-+(UIImage*) createImageWithColor: (UIColor*) color;
++(UIImage*)createImageWithColor: (UIColor*) color;
 
++(UIImage*)imageNamed:(NSString*)name;
 
 @end

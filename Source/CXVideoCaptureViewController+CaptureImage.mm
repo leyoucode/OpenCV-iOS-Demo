@@ -7,7 +7,8 @@
 //
 
 #import "CXVideoCaptureViewController+CaptureImage.h"
-#import "ImageUtils.h"
+#import "CXImageUtils.h"
+#import "CXFileUtils.h"
 #import "CXMarcos.h"
 
 @implementation CXVideoCaptureViewController (CaptureImage)
@@ -39,7 +40,7 @@
              return;
          }
          
-         __block NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"CX_IMAGE_%i.jpeg",(int)[NSDate date].timeIntervalSince1970]];
+         __block NSString *filePath = [CXFileUtils getMediaObjectPathWithType:self.cameraMediaType];
          
          @autoreleasepool
          {
@@ -47,7 +48,7 @@
              
              UIImage * image = [UIImage imageWithData:imageData];
              
-             image = [ImageUtils fixOrientation:image];
+             image = [CXImageUtils fixOrientation:image];
              
              image = [self cropImage:image];
              

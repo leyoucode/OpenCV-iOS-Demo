@@ -1,14 +1,14 @@
 //
-//  Rectangle.m
+//  CXRectangle.m
 //  DocBox
 //
 //  Created by Dan Bucholtz on 4/19/14.
 //  Copyright (c) 2014 Mod618. All rights reserved.
 //
 
-#import "Rectangle.h"
+#import "CXRectangle.h"
 
-@implementation Rectangle
+@implementation CXRectangle
 
 @synthesize topLeftX;
 @synthesize topRightX;

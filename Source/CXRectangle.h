@@ -1,5 +1,5 @@
 //
-//  Rectangle.h
+//  CXRectangle.h
 //  DocBox
 //
 //  Created by Dan Bucholtz on 4/19/14.
@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Rectangle : NSObject{
+@interface CXRectangle : NSObject{
     int topLeftX;
     int topLeftY;
     int topRightX;

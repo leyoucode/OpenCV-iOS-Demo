@@ -31,7 +31,7 @@
         case kCameraMediaTypeDocument:// 拍摄文档
             [self configurationForDocument];
             if (!self.rectangleCALayer) {
-                self.rectangleCALayer = [[RectangleCALayer alloc] init];
+                self.rectangleCALayer = [[CXRectangleCALayer alloc] init];
             }
             [self.videoPreviewLayer addSublayer:self.rectangleCALayer];
             break;

@@ -7,9 +7,9 @@
 //
 
 #import "CXVideoCaptureView.h"
-#import "UIView+Ext.h"
+#import "UIView+CXExt.h"
 #import "CXMarcos.h"
-#import "ImageUtils.h"
+#import "CXImageUtils.h"
 
 @implementation CXVideoCaptureView
 
@@ -45,7 +45,7 @@
 {
     if (!_torchButton) {
         _torchButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_torchButton setImage:[UIImage imageNamed:@"record_flash_off"] forState:UIControlStateNormal];
+        [_torchButton setImage:[CXImageUtils imageNamed:@"record_flash_off"] forState:UIControlStateNormal];
     }
     return _torchButton;
 }
@@ -56,7 +56,7 @@
 {
     if (!_cameraButton) {
         _cameraButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_cameraButton setImage:[UIImage imageNamed:@"record_camera"] forState:UIControlStateNormal];
+        [_cameraButton setImage:[CXImageUtils imageNamed:@"record_camera"] forState:UIControlStateNormal];
     }
     return _cameraButton;
 }
@@ -91,7 +91,7 @@
 {
     if (!_takeButton) {
         _takeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_takeButton setImage:[UIImage imageNamed:@"record_idle"] forState:UIControlStateNormal];
+        [_takeButton setImage:[CXImageUtils imageNamed:@"record_idle"] forState:UIControlStateNormal];
     }
     return _takeButton;
 }
@@ -191,7 +191,7 @@
 
 #pragma mark ---------------------System---------------------
 #pragma mark 初始化
-- (id)initWithFrame:(CGRect)frame andCameraMediaType:(CameraMediaType)type
+- (id)initWithFrame:(CGRect)frame andCameraMediaType:(CXCameraMediaType)type
 {
     self = [super initWithFrame:frame];
     if (self)
@@ -273,7 +273,7 @@
     [self.photoTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
     [self.documentTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     
-    [self.takeButton setImage:[UIImage imageNamed:@"takephoto"] forState:UIControlStateNormal];
+    [self.takeButton setImage:[CXImageUtils imageNamed:@"takephoto"] forState:UIControlStateNormal];
  
     [UIView animateWithDuration:1 delay:0.3 usingSpringWithDamping:1.0 initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
         self.topContentView.alpha = 1.0;
@@ -303,7 +303,7 @@
     [self.photoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.documentTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     
-    [self.takeButton setImage:[UIImage imageNamed:@"record_idle"] forState:UIControlStateNormal];
+    [self.takeButton setImage:[CXImageUtils imageNamed:@"record_idle"] forState:UIControlStateNormal];
     [UIView animateWithDuration:1 delay:0.3 usingSpringWithDamping:1.0 initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
         self.topContentView.alpha = 0.5;
         self.bottomContentView.alpha = 0.5;
@@ -330,7 +330,7 @@
     [self.photoTabButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.documentTabButton setTitleColor:[UIColor yellowColor] forState:UIControlStateNormal];
     
-    [self.takeButton setImage:[UIImage imageNamed:@"takephoto"] forState:UIControlStateNormal];
+    [self.takeButton setImage:[CXImageUtils imageNamed:@"takephoto"] forState:UIControlStateNormal];
 
     [UIView animateWithDuration:1 delay:0.3 usingSpringWithDamping:1.0 initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
         self.topContentView.alpha = 1.0;
@@ -463,15 +463,30 @@
                 }
                 break;
             case kCameraMediaTypePhoto:// 拍照
+            {
+                self.takeButton.enabled = NO;
                 if (_delegate && [_delegate respondsToSelector:@selector(onCaptureImageButtonCick)]) {
                     [_delegate onCaptureImageButtonCick];
                 }
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    self.takeButton.enabled = YES;
+                });
+                
                 break;
+            }
             case kCameraMediaTypeDocument:// 拍摄文档
+            {
+                self.takeButton.enabled = NO;
+                
                 if (_delegate && [_delegate respondsToSelector:@selector(onCaptureDocumentButtonCick)]) {
                     [_delegate onCaptureDocumentButtonCick];
                 }
+                
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    self.takeButton.enabled = YES;
+                });
                 break;
+            }
             default:
                 break;
         }
@@ -485,7 +500,7 @@
     NSLog(@"Recording is started ...");
     // Hide some control elements
     self.takeButton.tag = 1;
-    [self.takeButton setImage:[UIImage imageNamed:@"record_ing"] forState:UIControlStateNormal];
+    [self.takeButton setImage:[CXImageUtils imageNamed:@"record_ing"] forState:UIControlStateNormal];
     self.bottomContentView.hidden = YES;
     self.cameraButton.hidden = YES;
     self.cancelButton.hidden = YES;
@@ -501,7 +516,7 @@
     NSLog(@"Recording is stoped ...");
     // Recover control elements' state those be hiddened before
     self.takeButton.tag = 0;
-    [self.takeButton setImage:[UIImage imageNamed:@"record_idle"] forState:UIControlStateNormal];
+    [self.takeButton setImage:[CXImageUtils imageNamed:@"record_idle"] forState:UIControlStateNormal];
     self.bottomContentView.hidden = NO;
     self.cameraButton.hidden = NO;
     self.cancelButton.hidden = NO;

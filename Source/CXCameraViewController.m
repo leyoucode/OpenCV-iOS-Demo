@@ -18,7 +18,7 @@
 
 @implementation CXCameraViewController
 
--(void)showIn:(UIViewController *)controller withType:(CameraMediaType)cameraMediaType result:(CXCameraResult)result
+-(void)showIn:(UIViewController *)controller withType:(CXCameraMediaType)cameraMediaType result:(CXCameraResult)result
 {
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_7_1) {
         AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
@@ -58,7 +58,7 @@
     [self showIn:controller withType:kCameraMediaTypePhoto result:result];
 }
 
--(void)showController:(UIViewController *)controller withType:(CameraMediaType)cameraMediaType result:(CXCameraResult)result
+-(void)showController:(UIViewController *)controller withType:(CXCameraMediaType)cameraMediaType result:(CXCameraResult)result
 {
     self.videoCaptureViewController.cameraMediaType = cameraMediaType;
     self.videoCaptureViewController.cameraCaptureResult = result;

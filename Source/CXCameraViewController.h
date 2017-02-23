@@ -7,12 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "CameraMediaType.h"
+#import "CXCameraMediaType.h"
 
 @interface CXCameraViewController : NSObject
 
--(void)showIn:(UIViewController *)controller result:(CXCameraResult)result;
 
--(void)showIn:(UIViewController *)controller withType:(CameraMediaType)cameraMediaType result:(CXCameraResult)result;
+/**
+ You should delete the file with `filePath` in callback `CXCameraResult`,
+ or the file will exists all the time.
+ */
+-(void)showIn:(UIViewController *)controller result:(CXCameraResult)result;
+-(void)showIn:(UIViewController *)controller withType:(CXCameraMediaType)cameraMediaType result:(CXCameraResult)result;
 
 @end

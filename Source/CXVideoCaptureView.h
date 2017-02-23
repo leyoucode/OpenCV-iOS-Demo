@@ -7,13 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "CameraMediaType.h"
+#import "CXCameraMediaType.h"
 #import <AVFoundation/AVFoundation.h>
 
 @protocol CXVideoCaptureViewDelegate<NSObject>
 
 // It will be triggered when you switch the Tabs by swipe view to right or left with your finger
--(void) onViewChanged:(CameraMediaType)type;
+-(void) onViewChanged:(CXCameraMediaType)type;
 
 /* The follow events will be triggered when you click relative Buttons */
 -(void) onCancelButtonClick;
@@ -31,7 +31,7 @@
 
 @interface CXVideoCaptureView : UIView<AVCaptureFileOutputRecordingDelegate>
 
-@property (nonatomic, assign, readonly) CameraMediaType cameraMediaType;
+@property (nonatomic, assign, readonly) CXCameraMediaType cameraMediaType;
 
 @property (nonatomic, assign) id<CXVideoCaptureViewDelegate> delegate;
 
@@ -80,7 +80,7 @@
 @property (strong, nonatomic) UIButton *cancelButton;
 
 #pragma maek - Initialization
-- (id)initWithFrame:(CGRect)frame andCameraMediaType:(CameraMediaType)type;
+- (id)initWithFrame:(CGRect)frame andCameraMediaType:(CXCameraMediaType)type;
 
 - (void)showBlurEffectView;
 - (void)hideBlurEffectView;

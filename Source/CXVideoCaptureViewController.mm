@@ -9,7 +9,6 @@
 #import "CXVideoCaptureViewController.h"
 
 #import "CXVideoCaptureView.h"
-#import "StringUtils.h"
 
 #import "CXVideoCaptureViewController+CaptureImage.h"
 #import "CXVideoCaptureViewController+CaptureDocument.h"
@@ -18,7 +17,11 @@
 #import "CXImagePreviewViewController.h"
 #import "CXVideoPreviewViewController.h"
 
-#import "UIView+Ext.h"
+#import "UIView+CXExt.h"
+#import "CXStringUtils.h"
+#import "CXImageUtils.h"
+#import "CXFileUtils.h"
+
 
 @interface CXVideoCaptureViewController()<CXVideoCaptureViewDelegate>
 {
@@ -56,16 +59,19 @@
 }
 
 - (NSString *)videoPath {
-    NSString *basePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
-    NSString *moviePath = [basePath stringByAppendingPathComponent:
-                           [NSString stringWithFormat:@"%f.mov",[NSDate date].timeIntervalSince1970]];
-    return moviePath;
+//    NSString *basePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+//    
+//    NSString *path = [[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"]
+//                      stringByAppendingPathComponent:directory];
+//    
+//    NSString *moviePath = [basePath stringByAppendingPathComponent:
+//                           [NSString stringWithFormat:@"CX_VIDEO%i.mov",(int)[NSDate date].timeIntervalSince1970]];
+    return [CXFileUtils getMediaObjectPathWithType:self.cameraMediaType];
 }
 
 - (void)startVideoCapture {
     [self.movieFileOutput startRecordingToOutputFileURL:[NSURL fileURLWithPath:[self videoPath]] recordingDelegate:rootView];
 }
-
 
 - (void)stopVideoCapture {
     if ([self.movieFileOutput isRecording]) {
@@ -88,9 +94,9 @@
     }
     
     if ([self torchOn]) {
-        [rootView.torchButton setImage:[UIImage imageNamed:@"record_flash_on"] forState:UIControlStateNormal];
+        [rootView.torchButton setImage:[CXImageUtils imageNamed:@"record_flash_on"] forState:UIControlStateNormal];
     }else{
-        [rootView.torchButton setImage:[UIImage imageNamed:@"record_flash_off"] forState:UIControlStateNormal];
+        [rootView.torchButton setImage:[CXImageUtils imageNamed:@"record_flash_off"] forState:UIControlStateNormal];
     }
 }
 
@@ -184,6 +190,7 @@
     {
         [self processDocumentBuffer:sampleBuffer];
     }
+    /*
     else if(self.cameraMediaType == kCameraMediaTypePhoto)
     {
         NSLog(@"kCameraMediaTypePhoto");
@@ -192,6 +199,7 @@
     {
         NSLog(@"kCameraMediaTypeVideo");
     }
+     */
 }
 
 #pragma mark - AVCapture initilization and destroy
@@ -276,7 +284,7 @@
 #pragma mark - CXVideoCaptureViewDelegate
 
 // It will be triggered when you switch the Tabs by swipe view to right or left with your finger
-- (void) onViewChanged:(CameraMediaType)type
+- (void) onViewChanged:(CXCameraMediaType)type
 {
     NSLog(@"onViewChanged");
     self.cameraMediaType = type;
@@ -347,15 +355,28 @@
         _calVideoDurationTimer = nil;
     }
     
+    float totalSeconds = CMTimeGetSeconds(self.movieFileOutput.recordedDuration);
+    
+    if (totalSeconds < 5) {
+        // Video's recorded duration must greater than 5 seconds.
+        [CXFileUtils deleteFileWithFilePath:videoPath];
+        
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示" message:@"录制时间需要大于5秒" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action){
+            rootView.recordDurationLabel.text = @"00:00:00";
+        }];
+        [alert addAction:action1];
+        [self presentViewController:alert animated:YES completion:nil];
+        
+        return;
+    }
+    
+    
     CXVideoPreviewViewController *previewController = [[CXVideoPreviewViewController alloc] init];
     previewController.videoUrl = [NSURL fileURLWithPath:videoPath];
     previewController.cameraMediaType = self.cameraMediaType;
     previewController.cameraCaptureResult = self.cameraCaptureResult;
     [self.navigationController pushViewController:previewController animated:NO];
-    
-//    // Call back when finished capture
-//    self.cameraCaptureResult(self.cameraMediaType, videoPath);
-//    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Private
@@ -363,7 +384,7 @@
 - (void)handleCalVideoDuration:(NSTimer*)timer
 {
     float totalSeconds = CMTimeGetSeconds(self.movieFileOutput.recordedDuration);
-    rootView.recordDurationLabel.text = [StringUtils stringFromInterval:totalSeconds];
+    rootView.recordDurationLabel.text = [CXStringUtils stringFromInterval:totalSeconds];
 }
 
 

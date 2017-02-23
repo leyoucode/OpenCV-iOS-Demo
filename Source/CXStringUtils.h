@@ -1,5 +1,5 @@
 //
-//  StringUtils.h
+//  CXStringUtils.h
 //  OpenCV-iOS-demo
 //
 //  Created by 刘伟 on 2/21/17.
@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface StringUtils: NSObject
+@interface CXStringUtils: NSObject
 
 + (NSString *)stringFromInterval:(NSTimeInterval)timeInterval;
 

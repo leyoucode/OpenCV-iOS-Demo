@@ -7,10 +7,10 @@
 //
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
-#import "CameraMediaType.h"
+#import "CXCameraMediaType.h"
 
-#import "Rectangle.h"
-#import "RectangleCALayer.h"
+#import "CXRectangle.h"
+#import "CXRectangleCALayer.h"
 
 //typedef enum :NSInteger {
 //    kNone,
@@ -24,11 +24,11 @@
 //@property (nonatomic, assign) int camera; // 当前摄像头
 //@property (nonatomic, assign) CameraPosition cameraPosition;
 
-@property (nonatomic, assign) CameraMediaType cameraMediaType;
+@property (nonatomic, assign) CXCameraMediaType cameraMediaType;
 @property (nonatomic, strong) CXCameraResult cameraCaptureResult;
 
-@property(nonatomic, strong) Rectangle * aggregateRectangle;
-@property(nonatomic, strong) RectangleCALayer *rectangleCALayer;
+@property(nonatomic, strong) CXRectangle * aggregateRectangle;
+@property(nonatomic, strong) CXRectangleCALayer *rectangleCALayer;
 
 @property (nonatomic, assign) BOOL torchOn;
 

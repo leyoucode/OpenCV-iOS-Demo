@@ -7,13 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "CameraMediaType.h"
+#import "CXCameraMediaType.h"
 
 @interface CXImagePreviewViewController : UIViewController
 
 @property(nonatomic,strong) NSString* imagePath;
 
-@property (nonatomic, assign) CameraMediaType cameraMediaType;
+@property (nonatomic, assign) CXCameraMediaType cameraMediaType;
 @property (nonatomic,strong) CXCameraResult cameraCaptureResult;
 
 @end

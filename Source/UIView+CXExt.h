@@ -16,7 +16,7 @@
 #define VIEW_WIDTH(V)  V.frame.size.width
 #define VIEW_HEIGHT(V) V.frame.size.height
 
-@interface UIView(Ext)
+@interface UIView(CXExt)
 
 -(CGFloat)getViewLeft;
 

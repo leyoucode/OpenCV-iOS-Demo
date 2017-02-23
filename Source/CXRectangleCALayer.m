@@ -1,19 +1,19 @@
 //
-//  RectangleCALayer.m
+//  CXRectangleCALayer.m
 //  DocBox
 //
 //  Created by Dan Bucholtz on 8/26/14.
 //  Copyright (c) 2014 Mod618. All rights reserved.
 //
 
-#import "RectangleCALayer.h"
+#import "CXRectangleCALayer.h"
 #import "UIKit/UIKit.h"
-#import "Rectangle.h"
+#import "CXRectangle.h"
 
-@interface RectangleCALayer() <CALayerDelegate>
+@interface CXRectangleCALayer() <CALayerDelegate>
 {
     // 当前找到的矩形区域
-    Rectangle * _rectangle;
+    CXRectangle * _rectangle;
     
     // 是否在执行动画中
     BOOL _isAnimating;
@@ -21,7 +21,7 @@
 
 @end
 
-@implementation RectangleCALayer
+@implementation CXRectangleCALayer
 
 - (instancetype)init
 {
@@ -35,12 +35,12 @@
     return self;
 }
 
--(Rectangle *)getCurrentRectangle
+-(CXRectangle *)getCurrentRectangle
 {
     return _rectangle;
 }
 
--(void)updateDetect:(Rectangle *)rectangle
+-(void)updateDetect:(CXRectangle *)rectangle
 {
     if (_isAnimating)
     {

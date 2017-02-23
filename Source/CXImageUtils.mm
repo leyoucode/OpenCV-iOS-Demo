@@ -1,14 +1,14 @@
 //
-//  ImageUtils.m
+//  CXImageUtils.m
 //  OpenCV-iOS-demo
 //
 //  Created by 刘伟 on 2/21/17.
 //  Copyright © 2017 上海凌晋信息技术有限公司. All rights reserved.
 //
 
-#import "ImageUtils.h"
+#import "CXImageUtils.h"
 
-@implementation ImageUtils
+@implementation CXImageUtils
 
 +(cv::Mat)getCVMatFrom:(UIImage*)image
 {
@@ -188,5 +188,50 @@
     return theImage;
 }
 
++(UIImage*)imageNamed:(NSString*)name
+{
+//    // 获取NSBundle文件的Path
+//    NSString * imgBundlePath = [[NSBundle mainBundle] pathForResource:@"CameraImages" ofType:@"bundle"];
+//    // 使用Path地址新建一个NSBundle对象
+//    NSBundle *imgBundle = [NSBundle bundleWithPath:imgBundlePath];
+//    
+//    NSString *filePath = [imgBundle pathForResource:name ofType:@"png"];
+//    NSData *imageData = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:filePath]];
+//    return [UIImage imageWithData:imageData];
+    
+    //此处Scale是判断图片是@2x还是@3x
+    NSInteger scale = (NSInteger)[[UIScreen mainScreen] scale];
+    for (NSInteger i = scale; i >= 1; i--) {
+        NSString *filepath = [self getImagePath:name scale:i];
+        UIImage *tempImage = [UIImage imageWithContentsOfFile:filepath];
+        if (tempImage) {
+            return tempImage;
+        }
+    }
+    return nil;
+}
+
++ (NSString *)getImagePath:(NSString *)name scale:(NSInteger)scale{
+    
+    NSURL *bundleUrl = [[NSBundle mainBundle] URLForResource:@"CameraImages" withExtension:@"bundle"];
+    NSBundle *customBundle = [NSBundle bundleWithURL:bundleUrl];
+    NSString *bundlePath = [customBundle bundlePath];
+    NSString *imgPath = [bundlePath stringByAppendingPathComponent:name];
+    NSString *pathExtension = [imgPath pathExtension];
+    //没有后缀加上PNG后缀
+    if (!pathExtension || pathExtension.length == 0) {
+        pathExtension = @"png";
+    }
+    //Scale是根据屏幕不同选择使用@2x还是@3x的图片
+    NSString *imageName = nil;
+    if (scale == 1) {
+        imageName = [NSString stringWithFormat:@"%@.%@", [[imgPath lastPathComponent] stringByDeletingPathExtension], pathExtension];
+    }
+    else {
+        imageName = [NSString stringWithFormat:@"%@@%ldx.%@", [[imgPath lastPathComponent] stringByDeletingPathExtension], (long)scale, pathExtension];
+    }
+    //返回删掉旧名称加上新名称的路径
+    return [[imgPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:imageName];
+}
 
 @end

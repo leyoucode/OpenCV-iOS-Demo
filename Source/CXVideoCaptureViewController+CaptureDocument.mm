@@ -13,9 +13,10 @@
 #import <opencv2/highgui/highgui.hpp>
 #import <iostream>
 
-#import "Rectangle.h"
-#import "RectangleCALayer.h"
-#import "ImageUtils.h"
+#import "CXRectangle.h"
+#import "CXRectangleCALayer.h"
+#import "CXImageUtils.h"
+#import "CXFileUtils.h"
 
 @implementation CXVideoCaptureViewController (CaptureDocument)
 
@@ -44,7 +45,7 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
     
     __weak typeof(self) weakSelf = self;
     
-    Rectangle* rectangle = [self.rectangleCALayer getCurrentRectangle];
+    CXRectangle* rectangle = [self.rectangleCALayer getCurrentRectangle];
     
     [self.stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler: ^(CMSampleBufferRef imageSampleBuffer, NSError *error)
      {
@@ -55,16 +56,16 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
              return;
          }
          
-         __block NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"CX_PDF_%i.jpeg",(int)[NSDate date].timeIntervalSince1970]];
+         __block NSString *filePath = [CXFileUtils getMediaObjectPathWithType:self.cameraMediaType];
          
          @autoreleasepool
          {
              NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
              UIImage* image = [[UIImage alloc] initWithData:imageData];
              
-             image = [ImageUtils fixOrientation:image];
+             image = [CXImageUtils fixOrientation:image];
              
-             Rectangle *newRectangle = [self rotationRectangle:rectangle];
+             CXRectangle *newRectangle = [self rotationRectangle:rectangle];
              
              image = [weakSelf correctPerspectiveForImage:image withFeatures:newRectangle];
              
@@ -83,7 +84,7 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
      }];
 }
 
-- (UIImage *)confirmedImage:(UIImage*)sourceImage withFeatures:(Rectangle *)rectangle
+- (UIImage *)confirmedImage:(UIImage*)sourceImage withFeatures:(CXRectangle *)rectangle
 {
     
     CGSize imageSize = sourceImage.size;
@@ -94,7 +95,7 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
     //float c = MAX(a, b);
     
     
-    cv::Mat img = [ImageUtils getCVMatFrom:sourceImage];
+    cv::Mat img = [CXImageUtils getCVMatFrom:sourceImage];
     
     std::vector<cv::Point2f> corners(4);
     corners[0] = cv::Point2f(rectangle.topLeftX * a, rectangle.topLeftY * b );
@@ -139,7 +140,7 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
     //cv::warpPerspective(img, quad, warpMatrix, quad.size());
     //warpPerspective(img, rotated, warpMatrix, rotated.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT);
     
-    return [ImageUtils getImageWithCVMat:outt];
+    return [CXImageUtils getImageWithCVMat:outt];
     
     /*
      
@@ -179,7 +180,7 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     return screenWidth - pointX;
 }
 
--(Rectangle *)rotationRectangle:(Rectangle *)rectangle
+-(CXRectangle *)rotationRectangle:(CXRectangle *)rectangle
 {
     CGSize screenSize = [[UIScreen mainScreen] bounds].size;
     CGFloat screenWidth = screenSize.width;
@@ -192,7 +193,7 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     cv::Point2f bottomLeft = RotatePoint(center, cv::Point2f(rectangle.bottomLeftX, rectangle.bottomLeftY), M_PI);
     cv::Point2f bottomRight = RotatePoint(center, cv::Point2f(rectangle.bottomRightX, rectangle.bottomRightY), M_PI);
     
-    Rectangle *newRectangle = [[Rectangle alloc] init];
+    CXRectangle *newRectangle = [[CXRectangle alloc] init];
     newRectangle.topLeftX = flipHorizontalPointX(topLeft.x, screenWidth);
     newRectangle.topLeftY = topLeft.y;
     newRectangle.topRightX = flipHorizontalPointX(topRight.x, screenWidth);
@@ -204,7 +205,7 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     return newRectangle;
 }
 
-- (UIImage *)correctPerspectiveForImage:(UIImage *)image withFeatures:(Rectangle *)rectangle
+- (UIImage *)correctPerspectiveForImage:(UIImage *)image withFeatures:(CXRectangle *)rectangle
 {
     // 定义左上角，右上角，左下角，右下角
     CGPoint tlp, trp, blp, brp;
@@ -336,7 +337,7 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     
     long start = [[NSDate date] timeIntervalSince1970 ] * 1000;
     
-    Rectangle * rectangle = [self getLargestRectangleInFrame:mat];
+    CXRectangle * rectangle = [self getLargestRectangleInFrame:mat];
     
     [self processRectangleFromFrame:rectangle]; //inFrame:frameNumber];
     
@@ -379,7 +380,7 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     }
 }
 
-- (void) processRectangleFromFrame:(Rectangle *)rectangle// inFrame:(long)frame
+- (void) processRectangleFromFrame:(CXRectangle *)rectangle// inFrame:(long)frame
 {
     if ( !rectangle ){
         // the rectangle is null, so remove the oldest frame from the queue
@@ -398,13 +399,13 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
             [self removeOldestFrameFromRectangleQueue];
             // then add the new frame, and average the 5 to build an aggregate rectangle
             [self addRectangleToQueue:rectangle];
-            Rectangle * aggregate = [self buildAggregateRectangleFromQueue];
+            CXRectangle * aggregate = [self buildAggregateRectangleFromQueue];
             [self updateAggregateRectangle:aggregate];
         }
     }
 }
 
-- (Rectangle *) buildAggregateRectangleFromQueue{
+- (CXRectangle *) buildAggregateRectangleFromQueue{
     @synchronized(queueLockObject){
         double topLeftX = 0;
         double topLeftY = 0;
@@ -420,7 +421,7 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
         }
         
         for ( int i = 0; i < [queue count]; i++ ){
-            Rectangle * temp = [queue objectAtIndex:i];
+            CXRectangle * temp = [queue objectAtIndex:i];
             topLeftX = topLeftX + temp.topLeftX;
             topLeftY = topLeftY + temp.topLeftY;
             topRightX = topRightX + temp.topRightX;
@@ -431,7 +432,7 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
             bottomRightY = bottomRightY + temp.bottomRightY;
         }
         
-        Rectangle * aggregate = [[Rectangle alloc] init];
+        CXRectangle * aggregate = [[CXRectangle alloc] init];
         aggregate.topLeftX = round(topLeftX/[queue count]);
         aggregate.topLeftY = round(topLeftY/[queue count]);
         aggregate.topRightX = round(topRightX/[queue count]);
@@ -445,7 +446,7 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     }
 }
 
-- (void) updateAggregateRectangle:(Rectangle *)rectangle{
+- (void) updateAggregateRectangle:(CXRectangle *)rectangle{
     @synchronized(aggregateRectangleLockObject){
         self.aggregateRectangle = rectangle;
     }
@@ -459,7 +460,7 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     }
 }
 
-- (BOOL) checkForSignificantChange:(Rectangle *)rectangle withAggregate:(Rectangle *)aggregate {
+- (BOOL) checkForSignificantChange:(CXRectangle *)rectangle withAggregate:(CXRectangle *)aggregate {
     @synchronized(aggregateRectangleLockObject){
         if ( !aggregate ){
             return YES;
@@ -499,7 +500,7 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     }
 }
 
-- (void) addRectangleToQueue:(Rectangle *)rectangle{
+- (void) addRectangleToQueue:(CXRectangle *)rectangle{
     @synchronized(queueLockObject){
         if ( queue ){
             // per apple docs, If index is already occupied, the objects at index and beyond are shifted by adding 1 to their indices to make room.
@@ -509,13 +510,13 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     }
 }
 
-- (Rectangle *) getLargestRectangleInFrame:(cv::Mat)mat{
+- (CXRectangle *) getLargestRectangleInFrame:(cv::Mat)mat{
     std::vector<std::vector<cv::Point>>squares;
     std::vector<cv::Point> largest_square;
     
     find_squares(mat, squares);
     find_largest_square(squares, largest_square);
-    Rectangle * rectangle;
+    CXRectangle * rectangle;
     if (largest_square.size() == 4 ){
         NSMutableArray * points = [[NSMutableArray alloc] initWithCapacity:4];
         [points addObject:[NSValue valueWithCGPoint:CGPointMake(largest_square[0].x, largest_square[0].y)]];
@@ -578,7 +579,7 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
         
         CGPoint bottomRightOriginal = [[sortedRight objectAtIndex:1] CGPointValue];
         
-        rectangle = [[Rectangle alloc] init];
+        rectangle = [[CXRectangle alloc] init];
         
         
         rectangle.bottomLeftX = bottomLeftOriginal.x;

@@ -6,9 +6,9 @@
 //  Copyright © 2015年 慧富汇. All rights reserved.
 //
 
-#import "UIView+Ext.h"
+#import "UIView+CXExt.h"
 
-@implementation UIView(Ext)
+@implementation UIView(CXExt)
 
 
 +(void)modifyViewWidth:(CGFloat)width view:(UIView*)view

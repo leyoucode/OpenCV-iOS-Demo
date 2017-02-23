@@ -8,6 +8,7 @@
 
 #import "CXImagePreviewViewController.h"
 #import "CXMarcos.h"
+#import "CXFileUtils.h"
 
 @interface CXImagePreviewViewController ()<UIScrollViewDelegate>
 
@@ -127,8 +128,7 @@
 {
     if (self.cancelButton == sender)
     {
-        //self.cameraCaptureResult(self.cameraMediaType, self.imagePath);
-        //[self dismissViewControllerAnimated:YES completion:nil];
+        [CXFileUtils deleteFileWithFilePath:self.imagePath];
         [self.navigationController popViewControllerAnimated:YES];
     }
     else if (self.confirmButton == sender)

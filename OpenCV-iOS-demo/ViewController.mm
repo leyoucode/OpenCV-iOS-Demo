@@ -125,53 +125,52 @@
 - (IBAction)recordVedio:(id)sender {
     __weak typeof(self) weakSelf = self;
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
-    [controller showIn:self withType:kCameraMediaTypeVideo result:^(CameraMediaType type, id responseObject) {
-        [weakSelf showResultWithType:type andObject:responseObject];
+    [controller showIn:self withType:kCameraMediaTypeVideo result:^(CXCameraMediaType type, NSString* filePath) {
+        [weakSelf showResultWithType:type andObject:filePath];
     }];
 }
 
 - (IBAction)takeNormalPhoto:(id)sender {
     __weak typeof(self) weakSelf = self;
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
-    [controller showIn:self withType:kCameraMediaTypePhoto result:^(CameraMediaType type, id responseObject) {
-        [weakSelf showResultWithType:type andObject:responseObject];
+    [controller showIn:self withType:kCameraMediaTypePhoto result:^(CXCameraMediaType type, NSString* filePath) {
+        [weakSelf showResultWithType:type andObject:filePath];
     }];
 }
 
 - (IBAction)takeDocumentPhoto:(id)sender {
     __weak typeof(self) weakSelf = self;
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
-    [controller showIn:self withType:kCameraMediaTypeDocument result:^(CameraMediaType type, id responseObject) {
-        [weakSelf showResultWithType:type andObject:responseObject];
+    [controller showIn:self withType:kCameraMediaTypeDocument result:^(CXCameraMediaType type, NSString* filePath) {
+        [weakSelf showResultWithType:type andObject:filePath];
     }];
 }
 
 - (IBAction)defaultTest:(id)sender {
     __weak typeof(self) weakSelf = self;
     CXCameraViewController *controller = [[CXCameraViewController alloc] init];
-    [controller showIn:self result:^(CameraMediaType type, id responseObject) {
-        [weakSelf showResultWithType:type andObject:responseObject];
+    [controller showIn:self result:^(CXCameraMediaType type, NSString* filePath) {
+        [weakSelf showResultWithType:type andObject:filePath];
     }];
 }
 
-- (void)showResultWithType:(CameraMediaType)type andObject:(id) object
+- (void)showResultWithType:(CXCameraMediaType)type andObject:(NSString*) filePath
 {
     switch (type) {
         case kCameraMediaTypeVideo:
         {
-            NSString* path = (NSString*)object;
-            NSLog(@"Vedio:%@",path);
-            [self performSelectorInBackground:@selector(upload:) withObject:path];
+            NSLog(@"Vedio:%@",filePath);
+            [self performSelectorInBackground:@selector(upload:) withObject:filePath];
             break;
         }
         case kCameraMediaTypePhoto:
         {
-            NSLog(@"Photo:%@",object);
+            NSLog(@"Photo:%@",filePath);
             break;
         }
         case kCameraMediaTypeDocument:
         {
-            NSLog(@"Document:%@",object);
+            NSLog(@"Document:%@",filePath);
             break;
         }
         default:
