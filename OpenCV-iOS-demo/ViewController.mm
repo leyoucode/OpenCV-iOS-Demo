@@ -17,7 +17,6 @@
 #import <CommonCrypto/CommonDigest.h>
 #import "CXImagePreviewViewController.h"
 
-
 @interface ViewController ()
 
 {
@@ -87,6 +86,14 @@
         return;
     }
     
+    /*
+    AVURLAsset* asset = [AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:path] options:nil];
+    AVAssetImageGenerator* imageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:asset];
+    UIImage* image = [UIImage imageWithCGImage:[imageGenerator copyCGImageAtTime:CMTimeMake(0, 1) actualTime:nil error:nil]];
+    return;
+     */
+    
+    /*
     NSString* objectKey = [self getOSSObjectKey:path];
     
     OSSPutObjectRequest * put = [OSSPutObjectRequest new];
@@ -105,6 +112,7 @@
         }
         return nil;
     }];
+     */
 }
 
 - (void)compressVideo:(NSURL*)inputURL
