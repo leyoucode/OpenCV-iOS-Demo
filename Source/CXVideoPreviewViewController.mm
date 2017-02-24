@@ -141,8 +141,9 @@
     [self.cancelButton setTitle:@"取消" forState:UIControlStateNormal];
     [self.cancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     
-    self.playOrPauseButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [self.playOrPauseButton setTitle:@"播放" forState:UIControlStateNormal];
+    self.playOrPauseButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    //[self.playOrPauseButton setTitle:@"播放" forState:UIControlStateNormal];
+    [self.playOrPauseButton setImage:[CXImageUtils imageNamed:@"video_preview_play"] forState:UIControlStateNormal];
     [self.playOrPauseButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     
     self.confirmButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -194,6 +195,8 @@
     }
     else if (self.confirmButton == sender)
     {
+        [UIApplication sharedApplication].statusBarHidden = self.statusBarHidden;
+        [UIApplication sharedApplication].statusBarStyle = self.statusBarStyle;
         self.cameraCaptureResult(self.cameraMediaType, [self.videoUrl path]);
         [self dismissViewControllerAnimated:YES completion:nil];
     }
@@ -231,24 +234,28 @@
 
 - (void)videoDidPlaying
 {
-    [self.playOrPauseButton setTitle:@"暂停" forState:UIControlStateNormal];
+    //[self.playOrPauseButton setTitle:@"暂停" forState:UIControlStateNormal];
+    [self.playOrPauseButton setImage:[CXImageUtils imageNamed:@"video_preview_pause"] forState:UIControlStateNormal];
 }
 
 - (void)videoDidPause
 {
-    [self.playOrPauseButton setTitle:@"播放" forState:UIControlStateNormal];
+    //[self.playOrPauseButton setTitle:@"播放" forState:UIControlStateNormal];
+    [self.playOrPauseButton setImage:[CXImageUtils imageNamed:@"video_preview_play"] forState:UIControlStateNormal];
 }
 
 - (void)videoDidEnd
 {
-    [self.playOrPauseButton setTitle:@"播放" forState:UIControlStateNormal];
+//    [self.playOrPauseButton setTitle:@"播放" forState:UIControlStateNormal];
+    [self.playOrPauseButton setImage:[CXImageUtils imageNamed:@"video_preview_play"] forState:UIControlStateNormal];
     [self.videoView seekValue:0];
     self.videoSlider.value = 0;
 }
 
 - (void)videoDidError:(NSError *)error
 {
-    [self.playOrPauseButton setTitle:@"播放" forState:UIControlStateNormal];
+//    [self.playOrPauseButton setTitle:@"播放" forState:UIControlStateNormal];
+    [self.playOrPauseButton setImage:[CXImageUtils imageNamed:@"video_preview_play"] forState:UIControlStateNormal];
 }
 
 @end

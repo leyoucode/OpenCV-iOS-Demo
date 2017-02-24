@@ -55,6 +55,12 @@
     [self reloadCameraConfiguration];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [UIApplication sharedApplication].statusBarHidden = YES;
+}
+
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
@@ -64,12 +70,6 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-}
-
-- (void)dealloc
-{
-    [UIApplication sharedApplication].statusBarHidden = statusBarHidden;
-    [UIApplication sharedApplication].statusBarStyle = statusBarStyle;
 }
 
 - (NSString *)videoPath {
@@ -308,6 +308,8 @@
 /* The follow events will be triggered when you click relative Buttons */
 -(void) onCancelButtonClick
 {
+    [UIApplication sharedApplication].statusBarHidden = statusBarHidden;
+    [UIApplication sharedApplication].statusBarStyle = statusBarStyle;
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 -(void) onTorchButtonClick
@@ -341,6 +343,8 @@
         previewController.imagePath = imageFilePath;
         previewController.cameraMediaType = self.cameraMediaType;
         previewController.cameraCaptureResult = weakSelf.cameraCaptureResult;
+        previewController.statusBarStyle = statusBarStyle;
+        previewController.statusBarHidden = statusBarHidden;
         [weakSelf.navigationController pushViewController:previewController animated:NO];
     }];
 }
@@ -352,6 +356,8 @@
         previewController.imagePath = imageFilePath;
         previewController.cameraMediaType = self.cameraMediaType;
         previewController.cameraCaptureResult = weakSelf.cameraCaptureResult;
+        previewController.statusBarStyle = statusBarStyle;
+        previewController.statusBarHidden = statusBarHidden;
         [weakSelf.navigationController pushViewController:previewController animated:NO];
     }];
 }
@@ -390,6 +396,8 @@
     previewController.videoUrl = [NSURL fileURLWithPath:videoPath];
     previewController.cameraMediaType = self.cameraMediaType;
     previewController.cameraCaptureResult = self.cameraCaptureResult;
+    previewController.statusBarStyle = statusBarStyle;
+    previewController.statusBarHidden = statusBarHidden;
     [self.navigationController pushViewController:previewController animated:NO];
 }
 

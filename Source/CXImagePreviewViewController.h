@@ -16,4 +16,6 @@
 @property (nonatomic, assign) CXCameraMediaType cameraMediaType;
 @property (nonatomic,strong) CXCameraResult cameraCaptureResult;
 
+@property (nonatomic, assign) BOOL statusBarHidden;
+@property (nonatomic, assign) UIStatusBarStyle statusBarStyle;
 @end

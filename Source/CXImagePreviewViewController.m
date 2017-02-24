@@ -133,6 +133,8 @@
     }
     else if (self.confirmButton == sender)
     {
+        [UIApplication sharedApplication].statusBarHidden = self.statusBarHidden;
+        [UIApplication sharedApplication].statusBarStyle = self.statusBarStyle;
         self.cameraCaptureResult(self.cameraMediaType, self.imagePath);
         [self dismissViewControllerAnimated:YES completion:nil];
     }

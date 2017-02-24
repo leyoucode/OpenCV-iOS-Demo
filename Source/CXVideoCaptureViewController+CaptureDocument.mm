@@ -69,7 +69,7 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
              
              image = [weakSelf correctPerspectiveForImage:image withFeatures:newRectangle];
              
-             //image = [weakSelf confirmedImage:image withFeatures:rectangle];
+             image = [weakSelf confirmedImage:image withFeatures:rectangle];
              
              NSData *jpgData = UIImageJPEGRepresentation(image, 1.0f);
              [jpgData writeToFile:filePath atomically:NO];
@@ -97,11 +97,25 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
     
     cv::Mat img = [CXImageUtils getCVMatFrom:sourceImage];
     
+    
+    
+    //
     std::vector<cv::Point2f> corners(4);
     corners[0] = cv::Point2f(rectangle.topLeftX * a, rectangle.topLeftY * b );
     corners[1] = cv::Point2f(rectangle.topRightX * a, rectangle.topRightY * b );
     corners[2] = cv::Point2f(rectangle.bottomLeftX * a, rectangle.bottomLeftY * b );
     corners[3] = cv::Point2f(rectangle.bottomRightX * a, rectangle.bottomRightY * b );
+    
+    // 这里顺利打印出了四个点
+    cv::Mat draw = img.clone();
+    
+    // draw the polygon
+    cv::circle(draw,corners[0],5,cv::Scalar(0,0,255),2.5);
+    cv::circle(draw,corners[1],5,cv::Scalar(0,0,255),2.5);
+    cv::circle(draw,corners[2],5,cv::Scalar(0,0,255),2.5);
+    cv::circle(draw,corners[3],5,cv::Scalar(0,0,255),2.5);
+    
+    return [CXImageUtils getImageWithCVMat:draw];
     
     float leftX = MIN(rectangle.topLeftX, rectangle.bottomLeftX);
     float topY = MIN(rectangle.topLeftY, rectangle.topRightY);
@@ -139,6 +153,7 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
     
     //cv::warpPerspective(img, quad, warpMatrix, quad.size());
     //warpPerspective(img, rotated, warpMatrix, rotated.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT);
+    
     
     return [CXImageUtils getImageWithCVMat:outt];
     
