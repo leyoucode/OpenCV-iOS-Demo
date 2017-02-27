@@ -32,4 +32,9 @@
 
 +(UIImage*)imageNamed:(NSString*)name;
 
+
++ (UIImage *)UIImageFromCVMat:(cv::Mat)cvMat;
+
++ (cv::Mat)cvMatFromUIImage:(UIImage *)image;
+
 @end

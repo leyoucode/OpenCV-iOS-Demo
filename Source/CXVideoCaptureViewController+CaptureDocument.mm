@@ -11,12 +11,152 @@
 
 #import <opencv2/imgproc/imgproc.hpp>
 #import <opencv2/highgui/highgui.hpp>
+#import <opencv2/imgcodecs/ios.h>
 #import <iostream>
 
 #import "CXRectangle.h"
 #import "CXRectangleCALayer.h"
 #import "CXImageUtils.h"
 #import "CXFileUtils.h"
+
+// http://stackoverflow.com/questions/13098073/adjust-corners-and-crop-the-image-opencv
+// Helper
+cv::Point2f getCenter( std::vector<cv::Point2f> points ) {
+    
+    cv::Point2f center = cv::Point2f( 0.0, 0.0 );
+    
+    for( size_t i = 0; i < points.size(); i++ ) {
+        center.x += points[ i ].x;
+        center.y += points[ i ].y;
+    }
+    
+    center.x = center.x / points.size();
+    center.y = center.y / points.size();
+    
+    return center;
+    
+}
+
+// Helper;
+// 0----1
+// |    |
+// |    |
+// 3----2
+std::vector<cv::Point2f> sortSquarePointsClockwise( std::vector<cv::Point2f> square ) {
+    
+    cv::Point2f center = getCenter( square );
+    
+    std::vector<cv::Point2f> sorted_square;
+    for( size_t i = 0; i < square.size(); i++ ) {
+        if ( (square[i].x - center.x) < 0 && (square[i].y - center.y) < 0 ) {
+            switch( i ) {
+                case 0:
+                    sorted_square = square;
+                    break;
+                case 1:
+                    sorted_square.push_back( square[1] );
+                    sorted_square.push_back( square[2] );
+                    sorted_square.push_back( square[3] );
+                    sorted_square.push_back( square[0] );
+                    break;
+                case 2:
+                    sorted_square.push_back( square[2] );
+                    sorted_square.push_back( square[3] );
+                    sorted_square.push_back( square[0] );
+                    sorted_square.push_back( square[1] );
+                    break;
+                case 3:
+                    sorted_square.push_back( square[3] );
+                    sorted_square.push_back( square[0] );
+                    sorted_square.push_back( square[1] );
+                    sorted_square.push_back( square[2] );
+                    break;
+            }
+            break;
+        }
+    }
+    
+    return sorted_square;
+    
+}
+
+// Helper
+float distanceBetweenPoints( cv::Point2f p1, cv::Point2f p2 ) {
+    
+    if( p1.x == p2.x ) {
+        return std::abs( p2.y - p1.y );
+    }
+    else if( p1.y == p2.y ) {
+        return std::abs( p2.x - p1.x );
+    }
+    else {
+        float dx = p2.x - p1.x;
+        float dy = p2.y - p1.y;
+        return std::sqrt( (dx*dx)+(dy*dy) );
+    }
+}
+
+
+
+cv::Mat getPaperAreaFromImage(int paperWidth, int paperHeight, cv::Mat image, std::vector<cv::Point2f> square )
+{
+    std::cout << "paperWidth:" << paperWidth << " paperHeight:" << paperHeight << std::endl;
+    
+    cv::Point2f imageVertices[4];
+    float distanceP1P2;
+    float distanceP1P3;
+    BOOL isLandscape = true;
+    int scaleFactor;
+    cv::Mat paperImage;
+    cv::Mat paperImageCorrected;
+    cv::Point2f paperVertices[4];
+    
+    // sort square corners for further operations
+    square = sortSquarePointsClockwise( square );
+    
+    // rearrange to get proper order for getPerspectiveTransform()
+    imageVertices[0] = square[0];
+    imageVertices[1] = square[1];
+    imageVertices[2] = square[2];
+    imageVertices[3] = square[3];
+    
+    // get distance between corner points for further operations
+    distanceP1P2 = distanceBetweenPoints( imageVertices[0], imageVertices[1] );
+    distanceP1P3 = distanceBetweenPoints( imageVertices[0], imageVertices[2] );
+    
+    // calc paper, paperVertices; take orientation into account
+    if ( distanceP1P2 > distanceP1P3 ) {
+        scaleFactor =  ceil( lroundf(distanceP1P2/paperHeight) ); // we always want to scale the image down to maintain the best quality possible
+        paperImage = cv::Mat( paperWidth*scaleFactor, paperHeight*scaleFactor, CV_8UC4 );
+        paperVertices[0] = cv::Point( 0, 0 );
+        paperVertices[1] = cv::Point( paperHeight*scaleFactor, 0 );
+        paperVertices[2] = cv::Point( 0, paperWidth*scaleFactor );
+        paperVertices[3] = cv::Point( paperHeight*scaleFactor, paperWidth*scaleFactor );
+    }
+    else {
+        isLandscape = false;
+        scaleFactor =  ceil( lroundf(distanceP1P3/paperHeight) ); // we always want to scale the image down to maintain the best quality possible
+        paperImage = cv::Mat( paperHeight*scaleFactor, paperWidth*scaleFactor, CV_8UC4 );
+        paperVertices[0] = cv::Point( 0, 0 );
+        paperVertices[1] = cv::Point( paperWidth*scaleFactor, 0 );
+        paperVertices[2] = cv::Point( 0, paperHeight*scaleFactor );
+        paperVertices[3] = cv::Point( paperWidth*scaleFactor, paperHeight*scaleFactor );
+    }
+    
+    // 求解变换公式的函数
+    cv::Mat warpMatrix = getPerspectiveTransform( imageVertices, paperVertices );
+    cv::warpPerspective(image, paperImage, warpMatrix, paperImage.size(), 1, 0, 0);
+    
+    // we want portrait output
+    if ( isLandscape ) {
+        cv::transpose(paperImage, paperImageCorrected);
+        cv::flip(paperImageCorrected, paperImageCorrected, 1);
+        return paperImageCorrected;
+    }
+    
+    return paperImage;
+    
+}
 
 @implementation CXVideoCaptureViewController (CaptureDocument)
 
@@ -61,17 +201,19 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
          @autoreleasepool
          {
              NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
+             
              UIImage* image = [[UIImage alloc] initWithData:imageData];
              
              image = [CXImageUtils fixOrientation:image];
              
-             CXRectangle *newRectangle = [self rotationRectangle:rectangle];
+             //CXRectangle *newRectangle = [self rotationRectangle:rectangle];
              
-             image = [weakSelf correctPerspectiveForImage:image withFeatures:newRectangle];
+             if (rectangle) {
+                 image = [weakSelf getPaperImageFromImage:image withFeatures:rectangle];
+             }
              
-             image = [weakSelf confirmedImage:image withFeatures:rectangle];
              
-             NSData *jpgData = UIImageJPEGRepresentation(image, 1.0f);
+             NSData *jpgData = UIImagePNGRepresentation(image);
              [jpgData writeToFile:filePath atomically:NO];
              
              NSLog(@"=== OK");
@@ -84,7 +226,7 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
      }];
 }
 
-- (UIImage *)confirmedImage:(UIImage*)sourceImage withFeatures:(CXRectangle *)rectangle
+- (UIImage *)getPaperImageFromImage:(UIImage*)sourceImage withFeatures:(CXRectangle *)rectangle
 {
     
     CGSize imageSize = sourceImage.size;
@@ -94,85 +236,70 @@ NSObject * aggregateRectangleLockObject = [[NSObject alloc] init];
     float b = imageSize.height / screenSize.height;
     //float c = MAX(a, b);
     
-    
-    cv::Mat img = [CXImageUtils getCVMatFrom:sourceImage];
-    
-    
-    
-    //
     std::vector<cv::Point2f> corners(4);
     corners[0] = cv::Point2f(rectangle.topLeftX * a, rectangle.topLeftY * b );
     corners[1] = cv::Point2f(rectangle.topRightX * a, rectangle.topRightY * b );
     corners[2] = cv::Point2f(rectangle.bottomLeftX * a, rectangle.bottomLeftY * b );
     corners[3] = cv::Point2f(rectangle.bottomRightX * a, rectangle.bottomRightY * b );
     
-    // 这里顺利打印出了四个点
-    cv::Mat draw = img.clone();
+    // sort square corners for further operations
+    corners = sortSquarePointsClockwise( corners );
+    
+    cv::Mat src = [CXImageUtils cvMatFromUIImage:sourceImage];
     
     // draw the polygon
-    cv::circle(draw,corners[0],5,cv::Scalar(0,0,255),2.5);
-    cv::circle(draw,corners[1],5,cv::Scalar(0,0,255),2.5);
-    cv::circle(draw,corners[2],5,cv::Scalar(0,0,255),2.5);
-    cv::circle(draw,corners[3],5,cv::Scalar(0,0,255),2.5);
-    
-    return [CXImageUtils getImageWithCVMat:draw];
-    
-    float leftX = MIN(rectangle.topLeftX, rectangle.bottomLeftX);
-    float topY = MIN(rectangle.topLeftY, rectangle.topRightY);
-    float rightX = MAX(rectangle.topRightX, rectangle.bottomRightX);
-    float bottomY = MAX(rectangle.bottomLeftY, rectangle.bottomRightY);
-    
+    cv::circle(src,corners[0],5,cv::Scalar(0,0,255),5);
+    cv::circle(src,corners[1],5,cv::Scalar(0,0,255),5);
+    cv::circle(src,corners[2],5,cv::Scalar(0,0,255),5);
+    cv::circle(src,corners[3],5,cv::Scalar(0,0,255),5);
+
+    // Assemble a rotated rectangle out of that info
+    cv::RotatedRect box = minAreaRect(cv::Mat(corners));
+    std::cout << "Rotated box set to (" << box.boundingRect().x << "," << box.boundingRect().y << ") " << box.size.width << "x" << box.size.height << std::endl;
+
     std::vector<cv::Point2f> corners_trans(4);
-    corners_trans[0] = cv::Point2f(leftX,topY);
-    corners_trans[1] = cv::Point2f(rightX,topY);
-    corners_trans[2] = cv::Point2f(leftX,bottomY);
-    corners_trans[3] = cv::Point2f(rightX,bottomY);
     
-    //    // Assemble a rotated rectangle out of that info
-    //    cv::RotatedRect box = minAreaRect(cv::Mat(corners));
-    //    std::cout << "Rotated box set to (" << box.boundingRect().x << "," << box.boundingRect().y << ") " << box.size.width << "x" << box.size.height << std::endl;
-    //
-    ////    cv::Point2f pts[4];
-    ////    box.points(pts);
-    //
-    //    corners_trans[0] = cv::Point(0, 0);
-    //    corners_trans[1] = cv::Point(box.boundingRect().width - 1, 0);
-    //    corners_trans[2] = cv::Point(0, box.boundingRect().height - 1);
-    //    corners_trans[3] = cv::Point(box.boundingRect().width - 1, box.boundingRect().height - 1);
+    // get distance between corner points for further operations
+    float distanceP1P2 = distanceBetweenPoints( corners[0], corners[1] );
+    float distanceP1P3 = distanceBetweenPoints( corners[0], corners[2] );
     
-    //自由变换 透视变换矩阵3*3
-    cv::Mat warp_matrix( 3, 3, CV_32FC1 );
+    cv::Size size = cv::Size(box.boundingRect().width, box.boundingRect().height);
+    
+    if ( distanceP1P2 > distanceP1P3 )
+    {
+        corners_trans[0] = cv::Point( 0, 0 );
+        corners_trans[1] = cv::Point( box.boundingRect().width, 0 );
+        corners_trans[2] = cv::Point( 0, box.boundingRect().height );
+        corners_trans[3] = cv::Point( box.boundingRect().width, box.boundingRect().height );
+    }
+    else
+    {
+        corners_trans[0] = cv::Point( 0, 0 );
+        corners_trans[1] = cv::Point( box.boundingRect().width, 0 );
+        corners_trans[2] = cv::Point( 0, box.boundingRect().height );
+        corners_trans[3] = cv::Point( box.boundingRect().width, box.boundingRect().height );
+    }
+    
+    cv::Mat paperImage;
+    cv::Mat paperImageCorrected;
+    
     // 求解变换公式的函数
     cv::Mat warpMatrix = getPerspectiveTransform(corners, corners_trans);
-    //cv::Mat rotated;
+    warpPerspective(src, paperImage, warpMatrix,size, 1, 0, 0);
     
-    //cv::RotatedRect box = minAreaRect(cv::Mat(corners_trans));
-    cv::Mat outt;
-    cv::Size size(std::abs(rightX - leftX), std::abs(bottomY - topY));
-    warpPerspective(img, outt, warpMatrix,size, 1, 0, 0);
+    // we want portrait output
+//    if ( isLandscape ) {
+//        cv::transpose(paperImage, paperImageCorrected);
+//        cv::flip(paperImageCorrected, paperImageCorrected, 1);
+//        UIImage *newImage = [CXImageUtils UIImageFromCVMat:paperImageCorrected];
+//        return newImage;
+//    }
     
-    //cv::warpPerspective(img, quad, warpMatrix, quad.size());
-    //warpPerspective(img, rotated, warpMatrix, rotated.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT);
-    
-    
-    return [CXImageUtils getImageWithCVMat:outt];
-    
-    /*
-     
-     // 这里顺利打印出了四个点
-     cv::Mat draw = img.clone();
-     
-     // draw the polygon
-     cv::circle(draw,corners[0],5,cv::Scalar(0,0,255),2.5);
-     cv::circle(draw,corners[1],5,cv::Scalar(0,0,255),2.5);
-     cv::circle(draw,corners[2],5,cv::Scalar(0,0,255),2.5);
-     cv::circle(draw,corners[3],5,cv::Scalar(0,0,255),2.5);
-     
-     return [UIImage imageWithCVMat:draw];
-     */
-    
+    UIImage *newImage = [CXImageUtils UIImageFromCVMat:paperImage];
+    return newImage;
 }
 
+/*
 cv::Point2f RotatePoint(const cv::Point2f& p, float rad)
 {
     const float x = std::cos(rad) * p.x - std::sin(rad) * p.y;
@@ -220,66 +347,21 @@ CGFloat flipHorizontalPointX(float pointX, CGFloat screenWidth) {
     return newRectangle;
 }
 
-- (UIImage *)correctPerspectiveForImage:(UIImage *)image withFeatures:(CXRectangle *)rectangle
-{
-    // 定义左上角，右上角，左下角，右下角
-    CGPoint tlp, trp, blp, brp;
-    
-    CGSize imageSize = image.size;
-    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-    float screenRatio = screenSize.width / screenSize.height;
-    imageSize.height = imageSize.width / screenRatio;
-    
-    float a = imageSize.width / screenSize.width;
-    float b = imageSize.height / screenSize.height;
-    //float c = MAX(a, b);
-    
-    tlp = CGPointMake(rectangle.topLeftX * a, rectangle.topLeftY * b);
-    trp = CGPointMake(rectangle.topRightX * a, rectangle.topRightY * b);
-    blp = CGPointMake(rectangle.bottomLeftX * a, rectangle.bottomLeftY * b);
-    brp = CGPointMake(rectangle.bottomRightX * a, rectangle.bottomRightY * b);
-    
-    NSLog(@"LT:%@ RT:%@ LB:%@ RB:%@", NSStringFromCGPoint(tlp),NSStringFromCGPoint(trp),NSStringFromCGPoint(blp),NSStringFromCGPoint(brp));
-    
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef context = CGBitmapContextCreate(NULL, image.size.width, image.size.height, 8, 4 * image.size.width, colorSpace, kCGImageAlphaPremultipliedLast);
-    
-    CGRect rect = CGRectMake(0, 0, image.size.width, image.size.height);
-    
-    [[UIColor blackColor] setFill];
-    CGContextFillRect(context, rect);
-    
-    CGColorRef fillColor = [[UIColor whiteColor] CGColor];
-    CGContextSetFillColor(context, CGColorGetComponents(fillColor));
-    
-    CGContextMoveToPoint(context, tlp.x, tlp.y);
-    CGContextAddLineToPoint(context, trp.x, trp.y);
-    CGContextAddLineToPoint(context, brp.x, brp.y);
-    CGContextAddLineToPoint(context, blp.x, blp.y);
-    
-    CGContextClosePath(context);
-    CGContextClip(context);
-    
-    CGContextDrawImage(context, rect, image.CGImage);
-    CGImageRef imageMasked = CGBitmapContextCreateImage(context);
-    CGContextRelease(context);
-    UIImage *newImage = [UIImage imageWithCGImage:imageMasked];
-    CGImageRelease(imageMasked);
-    
-    /* TODO 这里需要优化 需要抠出需要的图片
-     调研一下 OpenCV提取轮廓
-     float leftX = MIN(rectangle.topLeftX * a, rectangle.bottomLeftX * b);
-     float topY = MIN(rectangle.topLeftY * a, rectangle.topRightY * b);
-     float rightX = MAX(rectangle.topRightX * a, rectangle.bottomRightX * b);
-     float bottomY = MAX(rectangle.bottomLeftY * a, rectangle.bottomRightY * b);
-     
-     CGImageRef imagRef = CGImageCreateWithImageInRect([image CGImage], CGRectMake(leftX, topY, (rightX - leftX), (bottomY - topY)));
-     UIImage* finalImage = [UIImage imageWithCGImage: imagRef];
-     CGImageRelease(imagRef);
-     */
-    
-    return newImage;
+cv::Mat createMask(const cv::Size &size, const std::vector<cv::Point2f> &_pts) {
+    std::vector<cv::Point> pts(_pts.size());
+    for(int i = 0; i < _pts.size(); i++) {
+        pts[i] = _pts[i];
+    }
+    const cv::Point* elementPoints[1] = { &pts[0] };
+    int numPoints = (int)pts.size();
+    cv::Mat mMask = cv::Mat::zeros(size, CV_8U);
+    mMask.setTo(255);
+    //circle(mMask, Point(30,30), 20, Scalar(0), 0);
+    fillPoly(mMask, elementPoints, &numPoints, 1, cv::Scalar(0));
+    //imshow("mMask", mMask);
+    return mMask;
 }
+*/
 
 #pragma mark - Private: Detected document edges form current 'SampleBuffer'
 
