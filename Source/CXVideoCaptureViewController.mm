@@ -22,6 +22,7 @@
 #import "CXImageUtils.h"
 #import "CXFileUtils.h"
 
+#import <SVProgressHUD/SVProgressHUD.h>
 
 @interface CXVideoCaptureViewController()<CXVideoCaptureViewDelegate>
 {
@@ -375,8 +376,8 @@
         _calVideoDurationTimer = nil;
     }
     
+    // 录制时间必须大于5s
     float totalSeconds = CMTimeGetSeconds(self.movieFileOutput.recordedDuration);
-    
     if (totalSeconds < 5) {
         // Video's recorded duration must greater than 5 seconds.
         [CXFileUtils deleteFileWithFilePath:videoPath];
@@ -391,14 +392,68 @@
         return;
     }
     
+    // mov 转 mp4
+    NSURL *inputUrl = [NSURL fileURLWithPath:videoPath];
     
-    CXVideoPreviewViewController *previewController = [[CXVideoPreviewViewController alloc] init];
-    previewController.videoUrl = [NSURL fileURLWithPath:videoPath];
-    previewController.cameraMediaType = self.cameraMediaType;
-    previewController.cameraCaptureResult = self.cameraCaptureResult;
-    previewController.statusBarStyle = statusBarStyle;
-    previewController.statusBarHidden = statusBarHidden;
-    [self.navigationController pushViewController:previewController animated:NO];
+    NSURL *outputUrl = [NSURL fileURLWithPath:[videoPath stringByReplacingOccurrencesOfString:@".mov" withString:@".mp4"]];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
+        [SVProgressHUD showWithStatus:@"处理中,请稍后..."];
+    });
+    
+    [self compressVideo:inputUrl outputURL:outputUrl handler:^(AVAssetExportSession *exportSession) {
+        
+        switch (exportSession.status)
+        {
+            case AVAssetExportSessionStatusCompleted:
+            {
+                NSLog(@"AVAssetExportSessionStatusCompleted");
+                [CXFileUtils deleteFileWithFilePath:inputUrl.path];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    rootView.recordDurationLabel.text = @"00:00:00";
+                    [SVProgressHUD dismiss];
+                    CXVideoPreviewViewController *previewController = [[CXVideoPreviewViewController alloc] init];
+                    NSURL *videoUrl = [NSURL fileURLWithPath:exportSession.outputURL.path];
+                    previewController.videoUrl = videoUrl;
+                    previewController.cameraMediaType = self.cameraMediaType;
+                    previewController.cameraCaptureResult = self.cameraCaptureResult;
+                    previewController.statusBarStyle = statusBarStyle;
+                    previewController.statusBarHidden = statusBarHidden;
+                    [self.navigationController pushViewController:previewController animated:NO];
+                });
+            }
+                break;
+            default:
+            {
+                NSLog(@"AVAssetExportSessionStatus :%ld",(long)exportSession.status);
+                
+                [CXFileUtils deleteFileWithFilePath:inputUrl.path];
+                [CXFileUtils deleteFileWithFilePath:outputUrl.path];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    rootView.recordDurationLabel.text = @"00:00:00";
+                    [SVProgressHUD showErrorWithStatus:@"出错了，请重新录制"];
+                    [SVProgressHUD dismissWithDelay:2];
+                });
+            }
+                break;
+        }
+        
+    }];
+    
+}
+
+- (void)compressVideo:(NSURL*)inputURL
+            outputURL:(NSURL*)outputURL
+              handler:(void (^)(AVAssetExportSession*))completion  {
+    AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:inputURL options:nil];
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:urlAsset presetName:AVAssetExportPresetHighestQuality];
+    exportSession.outputURL = outputURL;
+    exportSession.outputFileType = AVFileTypeMPEG4;
+    exportSession.shouldOptimizeForNetworkUse = YES;
+    [exportSession exportAsynchronouslyWithCompletionHandler:^{
+        completion(exportSession);
+    }];
 }
 
 #pragma mark - Private

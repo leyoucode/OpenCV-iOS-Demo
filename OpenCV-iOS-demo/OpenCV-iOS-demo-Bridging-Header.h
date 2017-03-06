@@ -21,4 +21,3 @@
 
 #import "OpenCVWrapper.h"
 //#import "CannyEdgeDetectingViewController.h"
-

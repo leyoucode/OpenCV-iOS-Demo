@@ -115,19 +115,6 @@
      */
 }
 
-- (void)compressVideo:(NSURL*)inputURL
-            outputURL:(NSURL*)outputURL
-              handler:(void (^)(AVAssetExportSession*))completion  {
-    AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:inputURL options:nil];
-    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:urlAsset presetName:AVAssetExportPresetMediumQuality];
-    exportSession.outputURL = outputURL;
-    exportSession.outputFileType = AVFileTypeMPEG4;
-    exportSession.shouldOptimizeForNetworkUse = YES;
-    [exportSession exportAsynchronouslyWithCompletionHandler:^{
-        completion(exportSession);
-    }];
-}
-
 #pragma mark - UI Actions
 
 - (IBAction)recordVedio:(id)sender {
