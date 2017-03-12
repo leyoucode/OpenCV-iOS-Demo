@@ -11,8 +11,6 @@ pod 'SnapKit', '~> 3.0.0'
 
 pod 'OpenCV', '~> 3.1.0.1'
 
-pod 'AliyunOSSiOS', '~> 2.6.0'
-
 pod 'SVProgressHUD', '~> 2.0.3'
 
 end
